@@ -102,7 +102,6 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     git
     nodejs_23
-    postgresql_17
     home-manager
 #  wget
   ];
@@ -135,4 +134,37 @@
   system.stateVersion = "24.11"; # Did you read the comment?
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Postgres Global setup
+  let
+  postgresVersion = "17";  # Define PostgreSQL version once
+  postgresPackage = pkgs."postgresql_${postgresVersion}";
+  in
+  {
+    # environment.systemPackages = [ postgresPackage ];
+    services.postgresql = {
+      enable = true;
+      package = postgresPackage;  # Install & enable same version
+  
+      # PostgreSQL state management
+      dataDir = "/var/lib/postgresql";  
+      initialScript = pkgs.writeText "init.sql" ''
+        CREATE DATABASE mydatabase;
+        CREATE USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
+        GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;
+      '';
+      ensureDatabases = [ "mydatabase" ];
+      ensureUsers = [
+        { 
+          name = "myuser"; 
+          ensurePermissions."DATABASE mydatabase" = "ALL PRIVILEGES"; 
+        }
+      ];
+  
+      authentication = ''
+        local all all trust
+        host all all 127.0.0.1/32 trust
+      '';
+    };
+  }
 }
