@@ -92,6 +92,23 @@
     };
   };
 
+  {
+    systemd.user.services.pgadmin4 = {
+      Unit = {
+        Description = "pgAdmin 4 Web Service";
+        After = [ "network.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.pgadmin4}/bin/pgadmin4";
+        Restart = "always";
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+  }
+
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
