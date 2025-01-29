@@ -76,6 +76,17 @@
     # EDITOR = "emacs";
   };
 
+  programs.git = {
+    enable = true;
+    userName = "Keranod";
+    userEmail = "konrad.konkel@wp.pl";
+    extraConfig = {
+      init.defaultBranch = "main";
+      color.ui = "auto";
+      pull.rebase = "false";
+    };
+  };
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
