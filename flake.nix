@@ -12,7 +12,7 @@
   };
 
   # Importing self ans nixpkgs
-  outputs = { self, nixpkgs, home-manager, ...}:
+  outputs = { nixpkgs, home-manager, ...}:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
     let
       lib = nixpkgs.lib;

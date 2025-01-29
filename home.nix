@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -26,7 +26,8 @@
     # pkgs.hello
     vscode
     microsoft-edge
-    nixd #nix language server
+    nixd # nix language server
+    nixfmt-rfc-style
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -42,7 +43,7 @@
     # '')
   ];
 
-  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+  nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
