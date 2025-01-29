@@ -9,7 +9,7 @@
       };
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs"; # depents on nigxpkgs/must be the same
     };
   };
 
@@ -19,7 +19,7 @@
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {inherit system;};
     in {
     # Can specify multiple configurations
     nixosConfigurations = {

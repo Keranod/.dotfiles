@@ -89,6 +89,9 @@
       init.defaultBranch = "main";
       color.ui = "auto";
       pull.rebase = "false";
+      merge.tool = "code";
+      mergetool.vscode.cmd = "code --wait $MERGED";
+      core.editor = "code --wait";
     };
   };
 
