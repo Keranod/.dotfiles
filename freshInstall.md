@@ -1,5 +1,6 @@
 # Guide:
-- [Flakes](https://www.youtube.com/watch?v=ACybVzRvDh)
+- [simple-homemanager](https://github.com/Evertras/simple-homemanager/tree/main)
+- [Flakes](https://www.youtube.com/watch?v=ACybVzRvDh)#
 
 # Steps:
 - `nix.settings.experimental-features = [ "nix-command" "flakes" ];` -> add at the end of `/etc/nixos/configuration.nix` in the scope using `sudo nano /etc/nixos/configuration.nix` and rebuild
