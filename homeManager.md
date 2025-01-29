@@ -1,6 +1,6 @@
 # Commands
 
-- `home-manager switch --flake ~/.config/home-manager/#<username>` -> rebuild home-manager and switch to user config
+- `home-manager switch --flake ~/.dotfiles/home-manager/#<username>` -> rebuild home-manager and switch to user config
 
 # Steps
 
