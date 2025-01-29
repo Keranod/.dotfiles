@@ -1,6 +1,7 @@
 # Links
 
-- [MyNixOS](https://mynixos.com)
+- [MyNixOS Options](https://mynixos.com)
+- [NixOS Packages](https://search.nixos.org/packages)
 
 # Commands
 
