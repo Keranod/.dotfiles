@@ -145,8 +145,8 @@ in
     enable = true;
     package = postgresPackage;  # Install & enable same version 
     authentication = ''
-      local all all trust
-      host all all 127.0.0.1/32 trust
+      #type database  DBuser  auth-method
+      local all       all     trust
     '';
   };
 }
