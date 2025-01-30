@@ -28,13 +28,13 @@
         # Architecture
         inherit system;
         # List/Array of modules
-        modules = [ ./hosts/TufNix/configuration.nix ];
+        modules = [ ./hosts/TufNix/configuration.nix ./users.nix ];
       };
       NixOSVMEFI = lib.nixosSystem {
         # Architecture
         inherit system;
         # List/Array of modules
-        modules = [ ./hosts/NixOSVMEFI/configuration.nix ];
+        modules = [ ./hosts/NixOSVMEFI/configuration.nix ./users.nix ];
       };
     };
     homeConfigurations = {
