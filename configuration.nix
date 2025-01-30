@@ -143,10 +143,18 @@ in
   services.postgresql = {
     enable = true;
     package = postgresPackage;  # Install & enable same version 
+    enableTCPIP = true;
     listenAddresses = "127.0.0.1";  # Listen on localhost only
     authentication = {
       local = "scram-sha-256";  # Match your current setting
       host = "scram-sha-256";   # Use the same for local connections over TCP/IP
     };
+    initialScript = pkgs.writeText "backend-initScript" ''
+      -- Change the password of the default postgres user
+      ALTER USER postgres WITH PASSWORD '12345';
+      
+      -- Force the password to expire immediately
+      ALTER USER postgres VALID UNTIL '1970-01-01';
+    '';
   };
 }
