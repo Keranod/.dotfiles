@@ -85,6 +85,7 @@ in
     # EDITOR = "emacs";
   };
 
+  # User programs settings
   programs.git = {
     enable = true;
     userName = username;
@@ -99,13 +100,17 @@ in
     };
   };
 
-  home.shellAliases = {
-    home-switch = "home-manager switch --flake ~/.dotfiles/#${username}";
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      # exec $SHELL to restart shell and apply new aliases
+      home-switch = "home-manager switch --flake ~/.dotfiles/#${username} && exec $SHELL";
+      nix-rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles/#${username}";
+    };
   };
 
+  # User services
   systemd.user.services.pgadmin4 = {
-    # enable = true;
-    # package = pgadminPackage;
     Unit = {
       Description = "Pgadmin web interface";
       After = [ "default.target" ];
