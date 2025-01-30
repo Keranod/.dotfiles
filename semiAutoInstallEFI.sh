@@ -55,24 +55,10 @@ if [ ! -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; the
 fi
 
 # Generate configuration for NixOS
-echo "Generating NixOS configuration..."
+echo "Generating NixOS hardware configuration..."
 mkdir -p /mnt/home/keranod/temp
-nixos-generate-config --root /mnt/home/keranod/temp/
-
-# Check if hardware-configuration.nix exists in the hostname folder
-if [ ! -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix" ]; then
-  echo "Moving generated hardware-configuration.nix to the correct location..."
-  mv /mnt/home/keranod/temp/hardware-configuration.nix /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/
-fi
-
-# Compare the generated hardware-configuration.nix with the one in .dotfiles/hosts/$HOSTNAME
-if ! cmp -s /mnt/home/keranod/temp/hardware-configuration.nix /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix; then
-  echo "Error: Generated hardware-configuration.nix does not match the one in .dotfiles/hosts/$HOSTNAME/"
-  exit 1
-fi
-
-# Remove temp file after verification
-rm -rf /mnt/home/keranod/temp
+rm -rf /mnt/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
+nixos-generate-config --root /mnt/keranod/.dotfiles/hosts/$HOSTNAME
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
