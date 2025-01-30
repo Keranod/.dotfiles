@@ -66,5 +66,8 @@ nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 
 echo "NixOS installation complete."
 
+echo "Lazy unmount iso"
+umount --lazy /iso
+
 # setup home-manager for keranod
-nixos-enter --command "home-manager switch --flake /home/keranod/.dotfiles#keranod"
+nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && sudo -u keranod home-manager switch --flake /home/keranod/.dotfiles#keranod && reboot"
