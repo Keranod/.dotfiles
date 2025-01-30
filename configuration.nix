@@ -146,7 +146,7 @@ in
     enableTCPIP = true;
     authentication = ''
       #type database  DBuser  address        auth-method
-      #local all       all                    trust
+      #local all       all                    peer
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
   };
