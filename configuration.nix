@@ -107,8 +107,6 @@ in
     git
     nodejs_23
     home-manager
-    #sops
-    #postgresPackage
    #  wget
   ];
 
