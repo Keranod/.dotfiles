@@ -67,4 +67,4 @@ nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 echo "NixOS installation complete."
 
 # setup home-manager for keranod
-home-manager switch --flake /mnt/home/keranod/.dotfiles/#keranod
+nixos-enter --command "home-manager switch --flake /home/keranod/.dotfiles#keranod"
