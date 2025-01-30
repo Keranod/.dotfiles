@@ -143,9 +143,10 @@ in
   services.postgresql = {
     enable = true;
     package = postgresPackage;  # Install & enable same version 
-    authentication = ''
-      #type database  DBuser  auth-method
-      local all       all     trust
-    '';
+    listenAddresses = "127.0.0.1";  # Listen on localhost only
+    authentication = {
+      local = "scram-sha-256";  # Match your current setting
+      host = "scram-sha-256";   # Use the same for local connections over TCP/IP
+    };
   };
 }
