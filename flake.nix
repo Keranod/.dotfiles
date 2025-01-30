@@ -24,7 +24,7 @@
     # Can specify multiple configurations
     nixosConfigurations = {
       # Any name to create system configuration, like assiging configuration object to a variable
-      nixos = lib.nixosSystem {
+      TufNix = lib.nixosSystem {
         # Architecture
         inherit system;
         # List/Array of modules
