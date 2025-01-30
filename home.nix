@@ -105,8 +105,13 @@ in
     shellAliases = {
       # exec $SHELL to restart shell and apply new aliases
       home-switch = "home-manager switch --flake ~/.dotfiles/#${username} && exec $SHELL";
-      nix-rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles";
+      #nix-rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles";
     };
+    initExtra = ''
+      nix-rebuild() {
+        sudo nixos-rebuild switch --flake ~/.dotfiles#"$1"
+      }
+    '';
   };
 
   # User services
