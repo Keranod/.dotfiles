@@ -7,6 +7,8 @@
 let
   postgresVersion = "17";  # Define PostgreSQL version once
   postgresPackage = pkgs."postgresql_${postgresVersion}";
+  pgadminVersion = "4";
+  pgadminPackage = pkgs."pgadmin${pgadminVersion}";
 in
 {
   imports =
@@ -107,6 +109,7 @@ in
     git
     nodejs_23
     home-manager
+    #sops
     #postgresPackage
    #  wget
   ];
@@ -149,4 +152,12 @@ in
       local all       all     trust
     '';
   };
+
+  # Pgadmin Global setup
+  # services.pgadmin = {
+  #   enable = true;
+  #   package =  pgadminPackage;
+  #   initialEmail = "konrad.konke@wp.pl";
+  #   initialPasswordFile = "./pgadminPassword";
+  # };
 }

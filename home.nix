@@ -1,10 +1,15 @@
 { pkgs, ... }:
 
+let
+  username = "keranod";
+  pgadminVersion = "4";
+  pgadminPackage = pkgs."pgadmin${pgadminVersion}-desktopmode";
+in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "keranod";
-  home.homeDirectory = "/home/keranod";
+  home.username = username;
+  home.homeDirectory = "/home/${username}";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -28,8 +33,7 @@
     microsoft-edge
     nixd # nix language server
     nixfmt-rfc-style
-    pgadmin4-desktopmode
-
+    pgadminPackage
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
@@ -83,7 +87,7 @@
 
   programs.git = {
     enable = true;
-    userName = "Keranod";
+    userName = username;
     userEmail = "konrad.konkel@wp.pl";
     extraConfig = {
       init.defaultBranch = "main";
@@ -95,22 +99,28 @@
     };
   };
 
-  {
-    systemd.user.services.pgadmin4 = {
-      Unit = {
-        Description = "pgAdmin 4 Web Service";
-        After = [ "network.target" ];
-      };
-      Service = {
-        ExecStart = "${pkgs.pgadmin4}/bin/pgadmin4";
-        Restart = "always";
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
-  }
+  home.shellAliases = {
+    home-switch = "home-manager switch --flake ~/.dotfiles/#${username}";
+  };
 
+  systemd.user.services.pgadmin4 = {
+    # enable = true;
+    # package = pgadminPackage;
+    Unit = {
+      Description = "Pgadmin web interface";
+      After = [ "default.target" ];
+    };
+
+    Service = {
+      ExecStart = "${pgadminPackage}/bin/pgadmin4";
+      Restart = "always";
+      WorkingDirectory = "%h";
+    };
+
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
