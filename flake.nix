@@ -28,7 +28,7 @@
         # Architecture
         inherit system;
         # List/Array of modules
-        modules = [ ./configuration.nix ];
+        modules = [ .hosts/TufNix/configuration.nix ];
       };
     };
     homeConfigurations = {
