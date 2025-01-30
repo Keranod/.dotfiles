@@ -124,7 +124,7 @@ in
   systemd.user.services.pgadmin4 = {
     Unit = {
       Description = "Pgadmin web interface";
-      After = [ "default.target" ];
+      After = [ "default.target" "postgres.service" ];
     };
 
     Service = {

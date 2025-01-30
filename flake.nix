@@ -30,6 +30,12 @@
         # List/Array of modules
         modules = [ ./hosts/TufNix/configuration.nix ];
       };
+      NixOSVMEFI = lib.nixosSystem {
+        # Architecture
+        inherit system;
+        # List/Array of modules
+        modules = [ ./hosts/NixOSVMEFI/configuration.nix ];
+      };
     };
     homeConfigurations = {
       keranod = home-manager.lib.homeManagerConfiguration {
