@@ -109,6 +109,12 @@ in
     };
     initExtra = ''
       nix-rebuild() {
+        if [ -z "$1" ]; then
+          echo "Error: Missing configuration name in a flake!"
+          echo "Usage: nix-rebuild <configurationname>"
+          return 1
+        fi
+        
         sudo nixos-rebuild switch --flake ~/.dotfiles#"$1"
       }
     '';
