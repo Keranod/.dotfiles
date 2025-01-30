@@ -70,4 +70,4 @@ echo "Lazy unmount iso"
 umount --lazy /iso
 
 # setup home-manager for keranod
-nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && sudo -u keranod home-manager switch --flake /home/keranod/.dotfiles#keranod && reboot"
+nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && sudo -u keranod home-manager switch --flake /home/keranod/.dotfiles#keranod && passwd --expire root && passwd --expire keranod && reboot"
