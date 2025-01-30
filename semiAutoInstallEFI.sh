@@ -41,7 +41,7 @@ echo "Partitioning and formatting complete."
 # Install git and clone dotfiles
 echo "Installing git and cloning dotfiles..."
 nix-shell -p git && mkdir -p /mnt/home/keranod && git clone https://github.com/keranod/.dotfiles /mnt/home/keranod/ .dotfiles
-return 0
+sleep 100
 # Check if the hostname folder exists
 if [ ! -d "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME" ]; then
   echo "Error: Host configuration for '$HOSTNAME' not found in .dotfiles/hosts/"
