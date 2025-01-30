@@ -6,10 +6,10 @@
     extraGroups = [ "networkmanager" "wheel" ];  # Allow sudo
     home = "/home/keranod";
     shell = pkgs.bash;
-    hashedPassword = "";  # Forces password change on first login
+    initialPassword = "12345";
   };
 
   users.users.root = {
-    hashedPassword = "";  # Forces password change on first login
+    initialPassword = "12345";
   };
 }
