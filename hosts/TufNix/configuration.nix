@@ -86,17 +86,6 @@ in
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.keranod = {
-    isNormalUser = true;
-    description = "Keranod";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      kdePackages.kate
-    #  thunderbird
-    ];
-  };
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
