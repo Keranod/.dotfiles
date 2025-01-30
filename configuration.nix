@@ -146,30 +146,8 @@ in
     enableTCPIP = true;
     authentication = ''
       #type database  DBuser  address        auth-method
-      local all       all                    scram-sha-256
+      #local all       all                    trust
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
-    #authentication = ''
-    #  # TYPE  DATABASE        USER            ADDRESS                 METHOD
-    #  # "local" is for Unix domain socket connections only
-    #  local   all             all                                     scram-sha-256
-    #  # IPv4 local connections:
-    #  host    all             all             127.0.0.1/32            scram-sha-256
-    #  # IPv6 local connections:
-    #  host    all             all             ::1/128                 scram-sha-256
-    #  # Allow replication connections from localhost, by a user with the
-    #  # replication privilege.
-    #  local   replication     all                                     scram-sha-256
-    #  host    replication     all             127.0.0.1/32            scram-sha-256
-    #  host    replication     all             ::1/128                 scram-sha-256
-    #'';
-  
-    # initialScript = pkgs.writeText "backend-initScript" ''
-    #   -- Change the password of the default postgres user
-    #   ALTER USER postgres WITH PASSWORD '12345';
-      
-    #   -- Force the password to expire immediately
-    #   ALTER USER postgres VALID UNTIL '1970-01-01';
-    # '';
   };
 }
