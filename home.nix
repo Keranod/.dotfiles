@@ -139,8 +139,6 @@ in
     };
   };
 
-  services.xserver.desktopManager.plasma6.enable = true;
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
