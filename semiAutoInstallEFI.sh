@@ -113,6 +113,11 @@ CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
 rm -rf /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
 cp $CONFIG_PATH /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
 
+#  Git commit before starting install
+cd /mnt/home/keranod/.dotfiles
+git add .
+git commit --author="Keranod <konrad.konkel@wp.pl>" -m "Pre-install commit"
+
 # Start the NixOS installation
 echo "Starting NixOS installation..."
 nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
