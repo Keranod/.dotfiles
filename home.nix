@@ -30,7 +30,7 @@ in
     # # "Hello, world!" when run.
     # pkgs.hello
     vscode
-    microsoft-edge
+    # microsoft-edge
     nixd # nix language server
     nixfmt-rfc-style
     pgadminPackage
@@ -120,13 +120,6 @@ in
         sudo nixos-rebuild switch --flake ~/.dotfiles#"$1"
       }
     '';
-  };
-
-  # User default applications
-  xdg.mime.defaultApplications = {
-    "text/html" = [ "google-chrome.desktop" ];
-    "x-scheme-handler/http" = [ "google-chrome.desktop" ];
-    "x-scheme-handler/https" = [ "google-chrome.desktop" ];
   };
 
   # User services

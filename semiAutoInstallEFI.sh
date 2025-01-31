@@ -132,4 +132,4 @@ nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && passwd --expi
 
 echo "Rebooting in 60 seconds..."
 sleep 60
-# reboot
+reboot

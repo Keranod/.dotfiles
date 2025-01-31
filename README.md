@@ -11,6 +11,8 @@
 - `nix flake update` -> updates flake.lock file with wihtin directory containing it, updates just flake.lock not whole system
 - `echo "<password>" | sudo tee <filename>` -> save password in plain text for pgadmin
 - `sudo chmod 600 <filename>` -> make password only readable for root
+- `nix-shell -p picutils && lspci` -> get pcis of devices
 
 # One line installer:
+
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstallEFI.sh | sudo bash -s <disk> <hostname>` -> disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
