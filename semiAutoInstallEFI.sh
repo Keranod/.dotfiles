@@ -10,6 +10,15 @@ fi
 
 DISK="$1"
 
+# Determine partition suffix (p1/p2 for disks ending in a number)
+if [[ "$DISK" =~ [0-9]$ ]]; then
+  PART1="${DISK}p1"
+  PART2="${DISK}p2"
+else
+  PART1="${DISK}1"
+  PART2="${DISK}2"
+fi
+
 # Ensure a hostname is provided
 if [ -z "$2" ]; then
   echo "Specify the hostname (machine name)"
@@ -29,15 +38,16 @@ parted $DISK -- mkpart ESP fat32 1MiB 512MiB
 parted $DISK -- set 1 esp on
 parted $DISK -- mkpart primary ext4 512MiB 100%
 
-if [ ! -b ${DISK}1 ] || [ ! -b ${DISK}2 ]; then
-  echo "Partitions ${DISK}1 or ${DISK}2 do not exist. Exiting."
+# Verify partitions exist
+if [ ! -b "$PART1" ] || [ ! -b "$PART2" ]; then
+  echo "Partitions $PART1 or $PART2 do not exist. Exiting."
   exit 1
 fi
 
 echo "Formatting and labeling partitions..."
-mkfs.fat -F 32 ${DISK}1
-fatlabel ${DISK}1 NIXBOOT
-mkfs.ext4 ${DISK}2 -L NIXROOT
+mkfs.fat -F 32 "$PART1"
+fatlabel "$PART1" NIXBOOT
+mkfs.ext4 "$PART2" -L NIXROOT
 
 # Wait for commands to finish
 sync
