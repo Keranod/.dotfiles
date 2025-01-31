@@ -35,6 +35,7 @@ in
     nixfmt-rfc-style
     pgadminPackage
     thunderbird
+    google-chrome
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
@@ -119,6 +120,13 @@ in
         sudo nixos-rebuild switch --flake ~/.dotfiles#"$1"
       }
     '';
+  };
+
+  # User default applications
+  xdg.mime.defaultApplications = {
+    "text/html" = [ "google-chrome.desktop" ];
+    "x-scheme-handler/http" = [ "google-chrome.desktop" ];
+    "x-scheme-handler/https" = [ "google-chrome.desktop" ];
   };
 
   # User services
