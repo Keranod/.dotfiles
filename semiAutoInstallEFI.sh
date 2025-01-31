@@ -112,6 +112,6 @@ echo "Unmounting bootable ISO..."
 umount --lazy /iso || umount --force /iso
 
 # setup home-manager for keranod
-nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && chmod +x /home/keranod/.dotfiles/firstBootScript.sh && passwd --expire root && passwd --expire keranod"
+nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && passwd --expire root && passwd --expire keranod"
 
 reboot
