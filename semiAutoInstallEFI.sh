@@ -39,6 +39,9 @@ mkfs.fat -F 32 ${DISK}1
 fatlabel ${DISK}1 NIXBOOT
 mkfs.ext4 ${DISK}2 -L NIXROOT
 
+# Reread partition table
+blockdev --rereadpt
+
 # Mount partitions
 echo "Mounting partitions..."
 mount /dev/disk/by-label/NIXROOT /mnt
