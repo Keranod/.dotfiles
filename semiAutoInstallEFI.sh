@@ -29,7 +29,7 @@ HOSTNAME="$2"
 
 # Wipe the disk (destroy all existing partitions)
 echo "Wiping disk $DISK..."
-parted $DISK -- mklabel gpt --yes
+parted --script $DISK mklabel gpt
 
 # Partitioning (GPT, EFI)
 echo "Partitioning $DISK..."
