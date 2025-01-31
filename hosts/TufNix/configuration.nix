@@ -20,6 +20,7 @@ in
   fileSystems."/boot" = {
     fsType = "vfat";
   };
+  boot.kernelParams = [ "nouveau.modeset=0" "i915.modeset=0" "nvidia.NVreg_EnableGpuFirmware=0" ];
 
   # Networking
   networking.hostName = "TufNix"; # Define your hostname.
@@ -86,63 +87,39 @@ in
   };
 
   hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      # ✅ Common OpenGL/Vulkan/VAAPI packages for Intel + Nvidia
-      mesa                    # OpenGL & Vulkan drivers for Intel
-      vulkan-loader           # Vulkan loader for general Vulkan support
-      libvdpau-va-gl          # VDPAU to VA-API bridge
-      libva                   # VAAPI video acceleration core
-      libva-utils             # Tools to test VAAPI (e.g., `vainfo`)
+  enable = true;
+  extraPackages = with pkgs; [
+    libvdpau
+    vaapiVdpau
+    libva
+    vulkan-loader
+    vulkan-validation-layers
+    nvidia-vaapi-driver  # For VAAPI support on Nvidia
+  ];
+};
 
-      # ✅ Intel-specific drivers
-      #intel-media-driver      # VAAPI driver for modern Intel GPUs
-      #vaapiIntel              # VAAPI driver for older Intel GPUs
-      #vpl-gpu-rt              # Intel OneVPL runtime (for newer Intel GPUs)
+services.xserver.videoDrivers = [ "nvidia" ];
 
-      # ✅ Nvidia-specific drivers (if using Nvidia)
-      nvidia-vaapi-driver     # Enables VAAPI for Nvidia GPUs
-      vulkan-validation-layers # Useful for debugging Vulkan apps
-    ];
+hardware.nvidia = {
+  modesetting.enable = true;
+  powerManagement.enable = false;
+  powerManagement.finegrained = false;
+  open = false;  # Keep it false for stability
+  nvidiaSettings = true;
+  
+  prime = {
+    offload = {
+      enable = true;
+      enableOffloadCmd = true;
+    };
+    intelBusId = "PCI:00:02:0";
+    nvidiaBusId = "PCI:01:00:0";
   };
 
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver = {
-      videoDrivers = lib.mkForce [ "nvidia" ];
-    };
+  package = config.boot.kernelPackages.nvidiaPackages.stable;
+};
 
-  # boot.kernelParams = [
-  #   "nvidia-drm.modeset=1"
-  #   "nvidia-drm.fbdev=1"
-  # ];
-
-  # hardware.nvidia = {
-  #   powerManagement = {
-  #     enable = true;
-  #     finegrained = false;
-  #   };
-  #   open = false;
-  #   nvidiaSettings = true;
-  #   package = config.boot.kernelPackages.nvidiaPackages.stable;
-  # };
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
-    open = false;
-    nvidiaSettings = true;
-    prime = {
-      offload.enable = lib.mkForce false;
-      sync.enable = true;
-
-      intelBusId = "PCI:00:02:0";
-      nvidiaBusId = "PCI:01:00:0";
-    };
-
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-  };
+  
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
