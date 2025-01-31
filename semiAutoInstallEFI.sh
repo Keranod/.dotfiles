@@ -125,4 +125,4 @@ umount --lazy /iso || umount --force /iso
 # setup home-manager for keranod
 nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && passwd --expire root && passwd --expire keranod"
 
-reboot
+# reboot
