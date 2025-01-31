@@ -18,6 +18,10 @@ fi
 
 HOSTNAME="$2"
 
+# Wipe the disk (destroy all existing partitions)
+echo "Wiping disk $DISK..."
+parted $DISK -- mklabel gpt --yes
+
 # Partitioning (GPT, EFI)
 echo "Partitioning $DISK..."
 parted $DISK -- mklabel gpt
@@ -28,15 +32,26 @@ parted $DISK -- mkpart primary ext4 512MiB 100%
 # Format partitions
 echo "Formatting partitions..."
 mkfs.fat -F 32 ${DISK}1
-mkfs.ext4 ${DISK}2
+mkfs.ext4 ${DISK}2 
+
+# Label partitions
+echo "Labeling partitions..."
+fatlabel ${DISK}1 NIXBOOT
+e2label ${DISK}2 NIXROOT
 
 # Mount partitions
 echo "Mounting partitions..."
-mount ${DISK}2 /mnt
+mount /dev/disk/by-label/NIXROOT /mnt
 mkdir -p /mnt/boot
-mount ${DISK}1 /mnt/boot
+mount /dev/disk/by-label/NIXBOOT /mnt/boot
 
 echo "Partitioning and formatting complete."
+
+echo "Creating swap file"
+dd if=/dev/zero of=/mnt/.swapfile bs=1024 count=2097152 # 2GB size
+chmod 600 /mnt/.swapfile
+mkswap /mnt/.swapfile
+swapon /mnt/.swapfile
 
 # Install git and clone dotfiles
 echo "Installing git and cloning dotfiles..."
@@ -55,10 +70,19 @@ if [ ! -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; the
 fi
 
 # Generate configuration for NixOS
-echo "Generating NixOS hardware configuration..."
-mkdir -p /mnt/home/keranod/temp
+echo "Generating NixOS and modyfying configuration..."
+nixos-generate-config --root /mnt
+
+# Define the path to your NixOS configuration
+CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
+
+# Replace UUID with partition labels for root and boot in configuration.nix
+sed -i '/fileSystems\."\/"/s|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXROOT|' "$CONFIG_PATH"
+sed -i '/fileSystems\."\/boot"/s|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXBOOT|' "$CONFIG_PATH"
+
+# Remove git repo hardware repo
 rm -rf /mnt/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
-nixos-generate-config --root /mnt/keranod/.dotfiles/hosts/$HOSTNAME
+cp $CONFIG_PATH /mnt/keranod/.dotfiles/hosts/$HOSTNAME
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
@@ -66,8 +90,10 @@ nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 
 echo "NixOS installation complete."
 
-echo "Lazy unmount iso"
-umount --lazy /iso
+echo "Unmounting bootable ISO..."
+umount --lazy /iso || umount --force /iso
 
 # setup home-manager for keranod
-nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && sudo -u keranod home-manager switch --flake /home/keranod/.dotfiles#keranod && passwd --expire root && passwd --expire keranod && reboot"
+nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && sudo -u keranod home-manager switch --flake /home/keranod/.dotfiles#keranod && passwd --expire root && passwd --expire keranod"
+
+reboot
