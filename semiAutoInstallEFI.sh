@@ -42,7 +42,7 @@ mkfs.ext4 ${DISK}2 -L NIXROOT
 # Wait for commands to finish
 sync
 sleep 1  # Wait a second for the formatting to be fully registered
-
+lsblk -o name,mountpoint,label,size,uuid
 # Reread partition table
 blockdev --rereadpt $DISK
 
