@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   postgresVersion = "17";  # Define PostgreSQL version once
@@ -55,6 +55,7 @@ in
   # Enable GNOME 
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.wayland = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -84,53 +85,59 @@ in
     #media-session.enable = true;
   };
 
-  # GPU drivers
-  # Enable OpenGL
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-      vpl-gpu-rt          # for newer GPUs on NixOS >24.05 or unstable
-      vaapiIntel 
-      intel-media-driver
-      # onevpl-intel-gpu  # for newer GPUs on NixOS <= 24.05
-      # intel-media-sdk   # for older GPUs
+      # ✅ Common OpenGL/Vulkan/VAAPI packages for Intel + Nvidia
+      mesa                    # OpenGL & Vulkan drivers for Intel
+      vulkan-loader           # Vulkan loader for general Vulkan support
+      libvdpau-va-gl          # VDPAU to VA-API bridge
+      libva                   # VAAPI video acceleration core
+      libva-utils             # Tools to test VAAPI (e.g., `vainfo`)
+
+      # ✅ Intel-specific drivers
+      #intel-media-driver      # VAAPI driver for modern Intel GPUs
+      #vaapiIntel              # VAAPI driver for older Intel GPUs
+      #vpl-gpu-rt              # Intel OneVPL runtime (for newer Intel GPUs)
+
+      # ✅ Nvidia-specific drivers (if using Nvidia)
+      nvidia-vaapi-driver     # Enables VAAPI for Nvidia GPUs
+      vulkan-validation-layers # Useful for debugging Vulkan apps
     ];
   };
 
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver = {
+      videoDrivers = lib.mkForce [ "nvidia" ];
+    };
+
+  # boot.kernelParams = [
+  #   "nvidia-drm.modeset=1"
+  #   "nvidia-drm.fbdev=1"
+  # ];
+
+  # hardware.nvidia = {
+  #   powerManagement = {
+  #     enable = true;
+  #     finegrained = false;
+  #   };
+  #   open = false;
+  #   nvidiaSettings = true;
+  #   package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # };
 
   hardware.nvidia = {
-
-    # Modesetting is required.
     modesetting.enable = true;
-
-    # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-    # Enable this if you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
-    # of just the bare essentials.
     powerManagement.enable = false;
-
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = false;
-
-    # Use the NVidia open source kernel module (not to be confused with the
-    # independent third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of 
-    # supported GPUs is at: 
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
-    # Only available from driver 515.43.04+
-    # Currently alpha-quality/buggy, so false is currently the recommended setting.
     open = false;
-
-    # Enable the Nvidia settings menu,
-	# accessible via `nvidia-settings`.
     nvidiaSettings = true;
-
     prime = {
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0";
+      offload.enable = lib.mkForce false;
+      sync.enable = true;
+
+      intelBusId = "PCI:00:02:0";
+      nvidiaBusId = "PCI:01:00:0";
     };
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
@@ -150,6 +157,7 @@ in
     git
     nodejs_23
     home-manager
+    # cudatoolkit
    #  wget
   ];
 
