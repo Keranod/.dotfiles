@@ -35,8 +35,19 @@ if [ ! -b ${DISK}1 ] || [ ! -b ${DISK}2 ]; then
 fi
 
 echo "Formatting and labeling partitions..."
-mkfs.fat -F 32 ${DISK}1 && fatlabel ${DISK}1 NIXBOOT && mkfs.ext4 ${DISK}2 -L NIXROOT && sync && sleep 1 && blockdev --rereadpt $DISK
+mkfs.fat -F 32 ${DISK}1
+fatlabel ${DISK}1 NIXBOOT
+mkfs.ext4 ${DISK}2 -L NIXROOT
 
+# Wait for commands to finish
+sync
+sleep 1  # Wait a second for the formatting to be fully registered
+
+# Reread partition table
+blockdev --rereadpt $DISK
+
+# Wait to ensure the partition table is reread
+sleep 1
 
 # Mount partitions
 echo "Mounting partitions..."
