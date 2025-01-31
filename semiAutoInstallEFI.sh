@@ -29,6 +29,11 @@ parted $DISK -- mkpart ESP fat32 1MiB 512MiB
 parted $DISK -- set 1 esp on
 parted $DISK -- mkpart primary ext4 512MiB 100%
 
+if [ ! -b ${DISK}1 ] || [ ! -b ${DISK}2 ]; then
+  echo "Partitions ${DISK}1 or ${DISK}2 do not exist. Exiting."
+  exit 1
+fi
+
 echo "Formatting and labeling partitions..."
 mkfs.fat -F 32 ${DISK}1
 fatlabel ${DISK}1 NIXBOOT
@@ -39,6 +44,14 @@ echo "Mounting partitions..."
 mount /dev/disk/by-label/NIXROOT /mnt
 mkdir -p /mnt/boot
 mount /dev/disk/by-label/NIXBOOT /mnt/boot
+
+# Check if both /mnt and /mnt/boot are mounted successfully
+if mount | grep -q "/mnt" && mount | grep -q "/mnt/boot"; then
+  echo "Both root and EFI partitions mounted successfully."
+else
+  echo "Failed to mount root or EFI partition."
+  exit 1
+fi
 
 echo "Partitioning and formatting complete."
 
