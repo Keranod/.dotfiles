@@ -27,4 +27,4 @@ chmod 444 $FLAGPATH
 
 echo "Pre-GUI setup completed."
 
-reboot
+# reboot
