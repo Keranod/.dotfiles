@@ -100,7 +100,7 @@ sed -i '/fileSystems\."\/boot"/s|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXB
 
 # Remove git repo hardware repo
 rm -rf /mnt/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
-cp $CONFIG_PATH /mnt/keranod/.dotfiles/hosts/$HOSTNAME
+cp $CONFIG_PATH /mnt/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
