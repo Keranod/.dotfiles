@@ -40,7 +40,7 @@ fatlabel ${DISK}1 NIXBOOT
 mkfs.ext4 ${DISK}2 -L NIXROOT
 
 # Reread partition table
-blockdev --rereadpt
+blockdev --rereadpt $DISK
 
 # Mount partitions
 echo "Mounting partitions..."
