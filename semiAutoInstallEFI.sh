@@ -106,8 +106,8 @@ nixos-generate-config --root /mnt
 CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
 
 # Replace UUID with partition labels for root and boot in configuration.nix
-sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXROOT|; q' "$CONFIG_PATH"
-sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXBOOT|; q' "$CONFIG_PATH"
+# sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXROOT|; q' "$CONFIG_PATH"
+# sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXBOOT|; q' "$CONFIG_PATH"
 
 # Remove git repo hardware repo
 rm -rf /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
