@@ -29,15 +29,10 @@ parted $DISK -- mkpart ESP fat32 1MiB 512MiB
 parted $DISK -- set 1 esp on
 parted $DISK -- mkpart primary ext4 512MiB 100%
 
-# Format partitions
-echo "Formatting partitions..."
+echo "Formatting and labeling partitions..."
 mkfs.fat -F 32 ${DISK}1
-mkfs.ext4 ${DISK}2 
-
-# Label partitions
-echo "Labeling partitions..."
 fatlabel ${DISK}1 NIXBOOT
-e2label ${DISK}2 NIXROOT
+mkfs.ext4 ${DISK}2 -L NIXROOT
 
 # Mount partitions
 echo "Mounting partitions..."
