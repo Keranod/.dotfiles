@@ -9,9 +9,6 @@ in
     after = [ "network.target" ];
 
     serviceConfig.ExecStart = ''
-      if [ ! -x ${firstBootScript} ]; then
-        chmod +x ${firstBootScript}
-      fi
       ${pkgs.bash}/bin/bash ${firstBootScript}
     '';
 
