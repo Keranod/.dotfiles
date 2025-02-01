@@ -7,8 +7,8 @@ in
   # TODO: is internal 60hz only when not plugged in? fix regardless to be full fps
   # Force usage of nvidia gpu for rendering/ Disable Intel gpu?
   # Better colors
-  boot.kernelParams = [ "i915.modeset=0" "nvidia.NVreg_EnableGpuFirmware=0" ];
-  #   "nouveau.modeset=0" 
+  boot.kernelParams = [ "nvidia.NVreg_EnableGpuFirmware=0" ];
+  #   "nouveau.modeset=0" "i915.modeset=0"
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
