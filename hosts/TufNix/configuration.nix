@@ -56,6 +56,7 @@ in
     gnome-tour
     gnome-weather
     gnome-maps
+    # nautilus # File manager
     totem
     gedit
     cheese
