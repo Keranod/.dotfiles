@@ -96,11 +96,18 @@ in
   # TODO
   # GNOME
   # Run `dconf watch /` and edit settings that you want to change and apply them below
+  # notes taht sync with keep
+  # dconf watch /
   dconf.settings = {
     # Does not work
     # "org/gnome/shell" = {
     #   last-selected-power-profile = "balanced";
     # };
+    "org/gnome/shell" = {
+      disable-user-extensions = false;
+      disabled-extensions = [];
+      enabled-extensions = ["display-brightness-ddcutil@themightydeity.github.com"];
+    };
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
       show-battery-percentage = true;
