@@ -103,11 +103,11 @@ in
     # "org/gnome/shell" = {
     #   last-selected-power-profile = "balanced";
     # };
-    "org/gnome/shell" = {
-      disable-user-extensions = false;
-      disabled-extensions = [];
-      enabled-extensions = ["display-brightness-ddcutil@themightydeity.github.com"];
-    };
+    # "org/gnome/shell" = {
+    #   disable-user-extensions = false;
+    #   disabled-extensions = [];
+    #   enabled-extensions = ["display-brightness-ddcutil@themightydeity.github.com"];
+    # };
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
       show-battery-percentage = true;
