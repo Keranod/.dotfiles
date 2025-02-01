@@ -6,8 +6,7 @@ let
   pgadminPackage = pkgs."pgadmin${pgadminVersion}-desktopmode";
 in
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
+  # Infomration for home-manager which path to manage
   home.username = username;
   home.homeDirectory = "/home/${username}";
 
@@ -23,50 +22,19 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
+  # List packages installed in user profile. 
+  # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
     vscode
-    # microsoft-edge
     nixd # nix language server
     nixfmt-rfc-style
     pgadminPackage
     thunderbird
     google-chrome
-    youtube-music
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
+    vlc
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
-
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
-  home.file = {
-    # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-    # # symlink to the Nix store copy.
-    # ".screenrc".source = dotfiles/screenrc;
-
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
-  };
 
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
@@ -88,6 +56,9 @@ in
     # EDITOR = "emacs";
   };
 
+  # GNOME settings
+
+
   # User programs settings
   programs.git = {
     enable = true;
@@ -108,7 +79,6 @@ in
     shellAliases = {
       # exec $SHELL to restart shell and apply new aliases
       home-switch = "home-manager switch --flake ~/.dotfiles/#${username} && exec $SHELL";
-      #nix-rebuild = "sudo nixos-rebuild switch --flake ~/.dotfiles";
     };
     initExtra = ''
       nix-rebuild() {
