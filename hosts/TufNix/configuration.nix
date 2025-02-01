@@ -61,8 +61,8 @@ in
     gedit
     cheese
     gnome-music
-    epiphany
-    geary
+    # epiphany # needed for online accounts
+    # geary
     gnome-characters 
     tali
     iagno
@@ -107,6 +107,8 @@ in
     nodejs_23
     home-manager
     gnome.gnome-tweaks
+    gnome-online-accounts
+    gnome-notes
   ];
 
   # Enable the OpenSSH daemon.

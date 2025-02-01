@@ -29,7 +29,7 @@ in
     nixd # nix language server
     nixfmt-rfc-style
     pgadminPackage
-    thunderbird
+    # hunderbird
     google-chrome
     vlc
   ];
@@ -95,7 +95,26 @@ in
 
   # TODO
   # GNOME
-  # dark theme, different file manager, multitasking-active-screen-edges, online accounts?, thunderbird, wp, powermodes(systemwide?)
+  # Run `dconf watch /` and edit settings that you want to change and apply them below
+  dconf.settings = {
+    # Does not work
+    # "org/gnome/shell" = {
+    #   last-selected-power-profile = "balanced";
+    # };
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      show-battery-percentage = true;
+    };
+    "org/gnome/mutter" = { 
+      edge-tiling = true;
+    };
+    "org/gnome/settings-daemon/plugins/power" = {
+      power-button-action = "interactive";
+      sleep-inactive-ac-type = "nothing";
+      # Does not work
+      # sleep-inactive-battery-timeout = "3600";
+    };
+  }; 
 
   # User services
   systemd.user.services.pgadmin4 = {
