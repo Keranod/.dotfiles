@@ -12,6 +12,7 @@
 - `echo "<password>" | sudo tee <filename>` -> save password in plain text for pgadmin
 - `sudo chmod 600 <filename>` -> make password only readable for root
 - `nix-shell -p picutils && lspci` -> get pcis of devices
+- `ls -ltrha /run/current-system/sw/bin | grep "<execname>"` -> find name of the package to use in module
 
 # One line installer:
 

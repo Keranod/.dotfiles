@@ -93,6 +93,10 @@ in
     '';
   };
 
+  # TODO
+  # GNOME
+  # dark theme, different file manager, multitasking-active-screen-edges, online accounts?, thunderbird, wp, powermodes(systemwide?)
+
   # User services
   systemd.user.services.pgadmin4 = {
     Unit = {
