@@ -109,6 +109,7 @@ in
     gnome.gnome-tweaks
     gnome-online-accounts
     gnome-notes
+    gnomeExtensions.brightness-control-using-ddcutil
   ];
 
   # Enable the OpenSSH daemon.
