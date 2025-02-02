@@ -112,6 +112,9 @@ in
       color-scheme = "prefer-dark";
       show-battery-percentage = true;
     };
+    "org/gnome/desktop/peripherals/touchpad" = {
+      natural-scroll = false;
+    };
     "org/gnome/mutter" = { 
       edge-tiling = true;
       dynamic-workspaces = true;
