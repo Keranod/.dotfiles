@@ -114,6 +114,7 @@ in
     };
     "org/gnome/mutter" = { 
       edge-tiling = true;
+      dynamic-workspaces = true;
     };
     "org/gnome/settings-daemon/plugins/power" = {
       power-button-action = "interactive";
