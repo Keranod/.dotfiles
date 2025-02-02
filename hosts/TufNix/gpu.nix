@@ -4,11 +4,11 @@ let
   nvidiaPackage = config.boot.kernelPackages.nvidiaPackages.stable;
 in
 {
-  # TODO: is internal 60hz only when not plugged in? fix regardless to be full fps
-  # Force usage of nvidia gpu for rendering/ Disable Intel gpu?
-  # Better colors
-  boot.kernelParams = [ "nvidia.NVreg_EnableGpuFirmware=0" ];
-  #   "nouveau.modeset=0" "i915.modeset=0"
+  # X11 with current settings works so far the best with 144Hz on external and internal and can change brightness, no gestures for gnome(meh)
+  # sudo systemctl restart display-manager -> restart to apply changes; !!!All apps would close
+  # For now not laggy when intel enabled
+  boot.kernelParams = [ "i915.modeset=1" ];
+  #   "nouveau.modeset=0" "nvidia.NVreg_EnableGpuFirmware=0" 
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -38,11 +38,11 @@ in
     nvidiaPersistenced = true;
     dynamicBoost.enable = true;
     
-    # prime = {
-    #   sync.enable = true;
-    #   intelBusId = "PCI:00:02:0";
-    #   nvidiaBusId = "PCI:01:00:0";
-    # };
+    prime = {
+      sync.enable = true;
+      intelBusId = "PCI:00:02:0";
+      nvidiaBusId = "PCI:01:00:0";
+    };
 
     package = nvidiaPackage;
   };
@@ -52,13 +52,13 @@ in
   # nvidia-smi -rgc -> reset nvidia clocks
   # nvidia-smi -lgs <minvalue>,<maxvalue> -> specyfi nvidia cloc values
   # nvidia-smi --query-gpu=clocks.gr --format=csv,noheader,nounits -> to check min value
-  systemd.services.nvidia-gpu-boost = {
-    description = "Set NVIDIA GPU Clock Speed";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${nvidiaPackage.bin}/bin/nvidia-smi -lgc 1500,2100";
-      RemainAfterExit = true;
-    };
-  };
+  # systemd.services.nvidia-gpu-boost = {
+  #   description = "Set NVIDIA GPU Clock Speed";
+  #   wantedBy = [ "multi-user.target" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     ExecStart = "${nvidiaPackage.bin}/bin/nvidia-smi -lgc 1500,2100";
+  #     RemainAfterExit = true;
+  #   };
+  # };
 }
