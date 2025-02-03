@@ -116,7 +116,7 @@ in
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 5173 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -139,4 +139,14 @@ in
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
   };
+
+  # Not working/not sorted yet
+  # Always mount second hard drive
+  # lsblk -> get /dev/<diskname>
+  # sudo blkid /dev/<diskname> -> get uuid of the disk
+  # fileSystems."/mnt/data" = {
+  #   device = "/dev/disk/by-uuid/b298f8d8-1745-4581-ad9e-a58023d83f61";
+  #   fsType = "ext4";
+  #   options = [ "defaults" "nofail" ];
+  # };
 }
