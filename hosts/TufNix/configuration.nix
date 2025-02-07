@@ -104,7 +104,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     git
-    nodejs_23
+    nodejs_22
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
