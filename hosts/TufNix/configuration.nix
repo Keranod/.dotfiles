@@ -8,6 +8,7 @@ in
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./gpu.nix
     ];
 
   # Default settings for EFI
@@ -18,7 +19,7 @@ in
   };
 
   # Networking
-  networking.hostName = "MainServer"; 
+  networking.hostName = "TufNix"; 
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
@@ -42,6 +43,35 @@ in
     LC_TIME = "en_GB.UTF-8";
   };
 
+  # Enable the X11 windowing system.
+  # You can disable this if you're only using the Wayland session.
+  services.xserver.enable = true;
+
+  # GNOME 
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.wayland = false;
+  environment.gnome.excludePackages = (with pkgs; [
+    gnome-photos
+    gnome-tour
+    gnome-weather
+    gnome-maps
+    # nautilus # File manager
+    totem
+    gedit
+    cheese
+    gnome-music
+    # epiphany # needed for online accounts
+    # geary
+    gnome-characters 
+    tali
+    iagno
+    hitori
+    atomix
+    yelp
+    gnome-initial-setup
+    #gnome-contacts
+  ]);
   programs.dconf.enable = true;
 
   # Configure keymap in X11
@@ -76,13 +106,17 @@ in
     git
     nodejs_22
     home-manager
+    gnome.gnome-tweaks
+    gnome-online-accounts
+    # gnome-notes
+    # gnomeExtensions.brightness-control-using-ddcutil
   ];
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ 5173 ];
+  networking.firewall.allowedTCPPorts = [ 5173 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -105,4 +139,14 @@ in
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
   };
+
+  # Not working/not sorted yet
+  # Always mount second hard drive
+  # lsblk -> get /dev/<diskname>
+  # sudo blkid /dev/<diskname> -> get uuid of the disk
+  # fileSystems."/mnt/data" = {
+  #   device = "/dev/disk/by-uuid/b298f8d8-1745-4581-ad9e-a58023d83f61";
+  #   fsType = "ext4";
+  #   options = [ "defaults" "nofail" ];
+  # };
 }
