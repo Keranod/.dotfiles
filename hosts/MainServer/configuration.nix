@@ -18,9 +18,9 @@ boot.loader.grub.device = "/dev/sda";  # or the appropriate disk, replace /dev/s
 boot.loader.grub.useOSProber = true;
 
 # File system settings for boot
-fileSystems."/boot" = {
-  fsType = "ext4";  # Assuming you want to use ext4 for the boot partition in legacy BIOS
-};
+# fileSystems."/boot" = {
+#   fsType = "ext4";  # Assuming you want to use ext4 for the boot partition in legacy BIOS
+# };
 
 
   # Networking
