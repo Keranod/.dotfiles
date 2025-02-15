@@ -50,7 +50,7 @@ if [ "$IS_UEFI" == "true" ]; then
 else
 # Create a new MBR partition table
 echo "Creating a new MBR partition table on $DISK..."
-parted "$DISK" mklabel msdos
+parted -s "$DISK" mklabel msdos
 
   # Partition with fdisk for MBR (Legacy)
 echo "Partitioning $DISK (Legacy)..."
