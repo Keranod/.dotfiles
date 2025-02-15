@@ -31,19 +31,27 @@ HOSTNAME="$2"
 echo "Wiping disk $DISK..."
 wipefs --all --force "$DISK"
 
-# Legacy Partitioning (MBR)
-echo "Partitioning $DISK (Legacy)..."
+# Create a new partition table (DOS)
+echo "Creating partition table..."
 parted $DISK -- mklabel msdos
-parted $DISK -- mkpart primary ext4 1MiB 100%
+
+# Create boot partition (500MB) and root partition
+echo "Creating partitions..."
+parted $DISK -- mkpart primary ext4 2048s 500MiB     # Boot partition (500MB)
+parted $DISK -- mkpart primary ext4 500MiB 100%       # Root partition
+parted $DISK -- mkpart primary ext4 100% 100%          # Unused partition (optional, can be skipped)
+parted $DISK -- mkpart primary ext4 100% 100%          # Unused partition (optional, can be skipped)
+
+# Write changes to the disk
+parted $DISK -- set 1 boot on    # Set boot flag on the first partition
 
 # Verify partitions exist
-if [ ! -b "$PART1" ]; then
-  echo "Partition $PART1 does not exist. Exiting."
-  exit 1
-fi
+lsblk -o name,mountpoint,label,size,uuid
 
-echo "Formatting and labeling partitions..."
-mkfs.ext4 "$PART1" -L NIXROOT
+# Format boot and root partitions
+echo "Formatting partitions..."
+mkfs.ext4 "${DISK}1" -L BOOT       # Boot partition
+mkfs.ext4 "${DISK}2" -L NIXROOT    # Root partition
 
 # Wait for commands to finish
 sync
