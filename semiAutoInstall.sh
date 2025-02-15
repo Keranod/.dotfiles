@@ -54,7 +54,7 @@ parted -s "$DISK" mklabel msdos
 
   # Partition with fdisk for MBR (Legacy)
 echo "Partitioning $DISK (Legacy)..."
-fdisk $DISK <<EOF
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${DISK}
 o    # Create a new DOS partition table
 n    # New partition
 p    # Primary partition
