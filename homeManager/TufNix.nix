@@ -29,7 +29,7 @@ in
     nixd # nix language server
     nixfmt-rfc-style
     pgadminPackage
-    # hunderbird
+    #thunderbird
     google-chrome
     vlc
   ];

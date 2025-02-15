@@ -67,7 +67,7 @@ in
     enable = true;
     shellAliases = {
       # exec $SHELL to restart shell and apply new aliases
-      home-switch = "home-manager switch --flake ~/.dotfiles/#${username} --show-trace && exec $SHELL";
+      home-switch = "home-manager switch --flake ~/.dotfiles --show-trace && exec $SHELL";
     };
     initExtra = ''
       nix-rebuild() {
@@ -81,7 +81,7 @@ in
           
           echo "Rebuilding NixOS with configuration: $config"
           
-          sudo nixos-rebuild switch --flake "~/.dotfiles#$config" --show-trace
+          sudo nixos-rebuild switch --flake ~/.dotfiles#"$config" --show-trace
       }
     '';
   };
