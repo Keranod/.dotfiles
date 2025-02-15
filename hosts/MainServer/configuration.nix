@@ -10,12 +10,18 @@ in
       ./hardware-configuration.nix
     ];
 
-  # Default settings for EFI
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  fileSystems."/boot" = {
-    fsType = "vfat";
-  };
+# Disable EFI bootloader and use GRUB for Legacy BIOS
+boot.loader.grub.enable = true;
+boot.loader.grub.device = "/dev/sda";  # or the appropriate disk, replace /dev/sda with your disk name
+
+# Set boot partition label for GRUB to use
+boot.loader.grub.useOSProber = true;
+
+# File system settings for boot
+fileSystems."/boot" = {
+  fsType = "ext4";  # Assuming you want to use ext4 for the boot partition in legacy BIOS
+};
+
 
   # Networking
   networking.hostName = "MainServer"; 
