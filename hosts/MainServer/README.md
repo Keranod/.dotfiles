@@ -1,3 +1,1 @@
-- Login in settings to accounts
-- Login to github on vscode
-- Login onto google-chrome
+
