@@ -48,33 +48,10 @@ if [ "$IS_UEFI" == "true" ]; then
   parted $DISK -- set 1 esp on
   parted $DISK -- mkpart primary ext4 512MiB 100%
 else
-# Create a new MBR partition table (msdos)
-echo "Creating a new MBR (msdos) partition table on $DISK..."
-parted -s "$DISK" mklabel msdos
-
-# Check if partition table creation was successful
-if ! parted "$DISK" print | grep -q "Partition Table: msdos"; then
-  echo "Error: Failed to create MBR partition table."
-  exit 1
-fi
-
-# Debugging: Output fdisk commands
-echo "Running fdisk to create partitions on $DISK..."
-fdisk_output=$(fdisk "$DISK" <<EOF
-o     # Create new DOS partition table (MBR)
-n     # New partition
-p     # Primary partition
-1     # Partition number 1
-2048  # First sector (alignment for performance)
-+500M # Last sector (boot sector size)
-n     # New partition
-p     # Primary partition
-2     # Partition number 2
-      # Default first sector (next available)
-      # Default last sector (use remaining space)
-w     # Write changes to disk
-EOF
-)
+echo "Partitioning $DISK for Legacy (MBR)..."
+parted $DISK -- mklabel msdos
+parted $DISK -- mkpart primary ext4 1MiB 500MiB
+parted $DISK -- mkpart primary ext4 500MiB 100%
 fi
 
 # Verify partitions exist
