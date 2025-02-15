@@ -50,7 +50,7 @@ lsblk -o name,mountpoint,label,size,uuid
 
 # Format boot and root partitions
 echo "Formatting partitions..."
-mkfs.ext4 "${DISK}1" -L BOOT       # Boot partition
+mkfs.ext4 "${DISK}1" -L NIXBOOT       # Boot partition
 mkfs.ext4 "${DISK}2" -L NIXROOT    # Root partition
 
 # Wait for commands to finish
@@ -66,6 +66,8 @@ sleep 1
 # Mount partitions
 echo "Mounting partitions..."
 mount /dev/disk/by-label/NIXROOT /mnt
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/NIXBOOT /mnt/boot
 
 # Check if /mnt is mounted successfully
 if mount | grep -q "/mnt"; then
