@@ -99,19 +99,20 @@ if [ ! -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; the
 fi
 
 # Generate configuration for NixOS
-echo "Generating NixOS and modyfying configuration..."
+echo "Generating NixOS configuration..."
 nixos-generate-config --root /mnt
 
-# Define the path to your NixOS configuration
 CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
+TARGET_PATH="/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix"
 
-# Replace UUID with partition labels for root and boot in configuration.nix
-# sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXROOT|; q' "$CONFIG_PATH"
-# sed -i 's|/dev/disk/by-uuid/[^"]*|/dev/disk/by-label/NIXBOOT|; q' "$CONFIG_PATH"
-
-# Remove git repo hardware repo
-rm -rf /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
-cp $CONFIG_PATH /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix
+# Skip copying if the file already exists
+if [ -f "$TARGET_PATH" ]; then
+    echo "Hardware configuration already exists at $TARGET_PATH. Skipping copy..."
+else
+    echo "Copying hardware configuration..."
+    rm -f "$TARGET_PATH"
+    cp "$CONFIG_PATH" "$TARGET_PATH"
+fi
 
 # Git commit to not cause errors during install
 cd /mnt/home/keranod/.dotfiles
