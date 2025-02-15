@@ -1,6 +1,6 @@
 # Commands
 
-- `home-manager switch --flake ~/.dotfiles/#<username>` -> rebuild home-manager and switch to user config
+- `home-manager switch --flake ~/.dotfiles` -> username and machine pulled from current machine and user who is running, no need to specify as long as flake is using "username@hostname"
 
 # Steps
 
