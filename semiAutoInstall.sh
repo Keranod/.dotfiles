@@ -48,6 +48,10 @@ if [ "$IS_UEFI" == "true" ]; then
   parted $DISK -- set 1 esp on
   parted $DISK -- mkpart primary ext4 512MiB 100%
 else
+# Create a new MBR partition table
+echo "Creating a new MBR partition table on $DISK..."
+parted "$DISK" mklabel msdos
+
   # Partition with fdisk for MBR (Legacy)
 echo "Partitioning $DISK (Legacy)..."
 fdisk $DISK <<EOF
