@@ -39,7 +39,7 @@
         # Architecture
         inherit system;
         # List/Array of modules
-        modules = [ ./hosts/NixOSVMEFI/configuration.nix ./users.nix ];
+        modules = [ ./hosts/MainServer/configuration.nix ./users.nix ];
       };
     };
     homeConfigurations = {
