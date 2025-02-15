@@ -1,5 +1,4 @@
 {
-
   description = "Flake stores each individual package exact version in config file";
 
   inputs = {
@@ -41,8 +40,7 @@
       keranod = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./homeManager/common.nix
-          (import ./homeManager/${builtins.getEnv "HOSTNAME"}.nix) # Load host-specific config
+          ./homeManager/default.nix
         ];
       };
     };
