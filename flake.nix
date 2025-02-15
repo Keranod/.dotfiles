@@ -46,13 +46,13 @@
       "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./homeManager/common.nix ./homeManager/TufNix.nix
+          ./common.nix ./hosts/TufNix/home.nix
         ];
       };
        "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./homeManager/common.nix
+          ./common.nix ./hosts/MainServer/home.nix
         ];
       };
     };

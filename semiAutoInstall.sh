@@ -129,16 +129,21 @@ else
     cp "$CONFIG_PATH" "$TARGET_PATH"
 fi
 
+email="konrad.konkel@wp.pl"
+
 # Git commit to not cause errors during install
 cd /mnt/home/keranod/.dotfiles
 git add .
-git commit -c user.name="Keranod" -c user.email="konrad.konkel@wp.pl" -m "Pre-install commit"
+git commit -c user.name="Keranod" -c user.email="$email" -m "Pre-install commit"
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
 nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 
 echo "NixOS installation complete."
+
+echo "Creating SSH Key"
+ssh-keygen -t rsa -b 4096 -C "$email" -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/.ssh/id_rsa" -N ""
 
 echo "Unmounting bootable ISO..."
 umount --lazy /iso || umount --force /iso
