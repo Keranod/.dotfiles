@@ -35,12 +35,24 @@
         # List/Array of modules
         modules = [ ./hosts/NixOSVMEFI/configuration.nix ./users.nix ];
       };
+      MainServer = lib.nixosSystem {
+        # Architecture
+        inherit system;
+        # List/Array of modules
+        modules = [ ./hosts/NixOSVMEFI/configuration.nix ./users.nix ];
+      };
     };
     homeConfigurations = {
-      keranod = home-manager.lib.homeManagerConfiguration {
+      "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./homeManager/default.nix
+          ./homeManager/common.nix ./homeManager/TufNix.nix
+        ];
+      };
+       "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [
+          ./homeManager/common.nix
         ];
       };
     };
