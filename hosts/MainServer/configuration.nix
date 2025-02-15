@@ -88,10 +88,21 @@ boot.loader.grub.useOSProber = true;
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ ];
+  # networking.firewall.allowedTCPPorts = [ ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ ];  # No allowed ports
+    allowedUDPPorts = [ ];  # No allowed UDP ports
+    rejectPackets = true;
+    extraRules = ''
+      iptables -A INPUT -p tcp --dport 22 -j DROP
+      iptables -A INPUT -p tcp --dport 5432 -j DROP
+    '';
+  };
 
   # https://mynixos.com/
   system.stateVersion = "24.11";
