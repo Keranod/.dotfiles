@@ -17,4 +17,5 @@
 
 # One line installer:
 
-- `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstallEFI.sh | sudo bash -s <disk> <hostname>` -> disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
+- EFI -> `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstallEFI.sh | sudo bash -s <disk> <hostname>` -> disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
+- Legacy -> `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstallLegacy.sh | sudo bash -s <disk> <hostname>` -> disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
