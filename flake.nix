@@ -41,8 +41,8 @@
       keranod = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./home-manager/common.nix
-          (import ./home-manager/${builtins.getEnv "HOSTNAME"}.nix) # Load host-specific config
+          ./homeManager/common.nix
+          (import ./homeManager/${builtins.getEnv "HOSTNAME"}.nix) # Load host-specific config
         ];
       };
     };

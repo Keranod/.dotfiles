@@ -48,9 +48,6 @@ in
     # EDITOR = "emacs";
   };
 
-  # GNOME settings
-
-
   # User programs settings
   programs.git = {
     enable = true;
@@ -70,15 +67,22 @@ in
     enable = true;
     shellAliases = {
       # exec $SHELL to restart shell and apply new aliases
-      home-switch = "home-manager switch --flake ~/.dotfiles/home-manager/${builtins.getEnv "HOSTNAME"}.nix/#${username} && exec $SHELL";
+      home-switch = "home-manager switch --flake ~/.dotfiles/flake.nix/#${username} && exec $SHELL";
     };
     initExtra = ''
       nix-rebuild() {
-        local config="${1:-$(hostname)}"  # Use provided argument, else default to hostname
-        echo "Rebuilding NixOS with configuration: $config"
-        
-        sudo nixos-rebuild switch --flake ~/.dotfiles#"$config"
-    }
+          # Check if an argument is passed, otherwise fallback to hostname
+          local config
+          if [ -z "$1" ]; then
+              config=$(hostname)
+          else
+              config="$1"
+          fi
+          
+          echo "Rebuilding NixOS with configuration: $config"
+          
+          sudo nixos-rebuild switch --flake "~/.dotfiles#$config"
+      }
     '';
   };
 

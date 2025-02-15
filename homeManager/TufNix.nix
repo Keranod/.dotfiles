@@ -56,43 +56,6 @@ in
     # EDITOR = "emacs";
   };
 
-  # GNOME settings
-
-
-  # User programs settings
-  programs.git = {
-    enable = true;
-    userName = username;
-    userEmail = "konrad.konkel@wp.pl";
-    extraConfig = {
-      init.defaultBranch = "main";
-      color.ui = "auto";
-      pull.rebase = "false";
-      merge.tool = "code";
-      mergetool.vscode.cmd = "code --wait $MERGED";
-      core.editor = "code --wait";
-    };
-  };
-
-  programs.bash = {
-    enable = true;
-    shellAliases = {
-      # exec $SHELL to restart shell and apply new aliases
-      home-switch = "home-manager switch --flake ~/.dotfiles/#${username} && exec $SHELL";
-    };
-    initExtra = ''
-      nix-rebuild() {
-        if [ -z "$1" ]; then
-          echo "Error: Missing configuration name in a flake!"
-          echo "Usage: nix-rebuild <configurationname>"
-          return 1
-        fi
-        
-        sudo nixos-rebuild switch --flake ~/.dotfiles#"$1"
-      }
-    '';
-  };
-
   # TODO
   # GNOME
   # Run `dconf watch /` and edit settings that you want to change and apply them below
