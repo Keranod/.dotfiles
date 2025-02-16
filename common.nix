@@ -92,6 +92,18 @@ in
           
           sudo nixos-rebuild switch --flake ~/.dotfiles#"$config" --show-trace
       }
+
+      ssh-connect() {
+          if [ $# -lt 1 ]; then
+              echo "Usage: ssh-connect <IP>"
+              return 1
+          fi
+          
+          local ip="$1"
+          
+          echo "Connecting to $ip..."
+          ssh -i ~/.dotfiles/.ssh/id_rsa "keranod@$ip"
+      }
     '';
   };
 
