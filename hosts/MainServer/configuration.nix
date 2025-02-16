@@ -95,9 +95,9 @@ boot.loader.grub.useOSProber = true;
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ ];  # No allowed ports
-    allowedUDPPorts = [ ];  # No allowed UDP ports
-    #rejectPackets = true;
+    # allowedTCPPorts = [ ];  # No allowed ports
+    # allowedUDPPorts = [ ];  # No allowed UDP ports
+    # rejectPackets = true;
     extraCommands = ''
       iptables -A INPUT -p tcp --dport 5432 -j DROP
     '';
