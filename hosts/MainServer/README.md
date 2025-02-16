@@ -2,4 +2,5 @@
 - login on user and root to change default password
 - log back on user
 - `home-manager switch --flake ~/.dotfiles`
+- `cat ~/.dotfiles/.ssh/id_rsa.pub` -> add on github
 - cd to ~/.dotfiles and git push
