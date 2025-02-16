@@ -143,8 +143,8 @@ nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 echo "NixOS installation complete."
 
 echo "Creating SSH Key"
-mkdir -p "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/.ssh"
-ssh-keygen -t rsa -b 4096 -C "$email" -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/.ssh/id_rsa" -N ""
+mkdir -p "/mnt/home/keranod/.dotfiles/.ssh"
+ssh-keygen -t rsa -b 4096 -C "$email" -f "/mnt/home/keranod/.dotfiles/.ssh/id_rsa" -N ""
 
 echo "Unmounting bootable ISO..."
 umount --lazy /iso || umount --force /iso
