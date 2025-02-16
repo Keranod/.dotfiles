@@ -1,0 +1,10 @@
+{
+	"addresses": [
+		"10.252.1.0/24"
+	],
+	"listen_port": "51820",
+	"updated_at": "2025-02-16T17:24:37.382495207Z",
+	"post_up": "",
+	"pre_down": "",
+	"post_down": ""
+}

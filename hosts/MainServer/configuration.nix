@@ -99,7 +99,6 @@ boot.loader.grub.useOSProber = true;
     allowedUDPPorts = [ ];  # No allowed UDP ports
     #rejectPackets = true;
     extraCommands = ''
-      iptables -A INPUT -p tcp --dport 22 -j DROP
       iptables -A INPUT -p tcp --dport 5432 -j DROP
     '';
   };

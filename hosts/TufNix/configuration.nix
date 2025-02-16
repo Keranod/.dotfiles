@@ -108,6 +108,8 @@ in
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
+    #wireguard-tools
+    #wireguard-ui
     # gnome-notes
     # gnomeExtensions.brightness-control-using-ddcutil
   ];
