@@ -60,7 +60,6 @@ in
       merge.tool = "code";
       mergetool.vscode.cmd = "code --wait $MERGED";
       core.editor = "code --wait";
-      
     };
   };
 
@@ -68,7 +67,7 @@ in
     enable = true;
     extraConfig = ''
       Host github.com
-        IdentityFile /home/keranod/.dotfiles/.ssh/id_rsa.pub
+        IdentityFile /home/keranod/.dotfiles/.ssh/id_rsa
         IdentitiesOnly yes
     '';
   };
