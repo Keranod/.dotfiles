@@ -99,7 +99,7 @@ swapon /mnt/.swapfile
 
 # Install git and clone dotfiles
 echo "Installing git and cloning dotfiles..."
-nix-shell -p git && mkdir -p /mnt/home/keranod && git clone https://github.com/keranod/.dotfiles /mnt/home/keranod/.dotfiles
+nix-shell -p git && mkdir -p /mnt/home/keranod && git clone https://github.com/keranod/.dotfiles /mnt/home/keranod/.dotfiles && cd /mnt/home/keranod/.dotfiles && git remote set-url origin git@github.com:Keranod/.dotfiles.git && git remote -v
 
 # Check if the hostname folder exists
 if [ ! -d "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME" ]; then
