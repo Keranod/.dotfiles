@@ -134,7 +134,7 @@ email="konrad.konkel@wp.pl"
 # Git commit to not cause errors during install
 cd /mnt/home/keranod/.dotfiles
 git add .
-git commit -c user.name="Keranod" -c user.email="$email" -m "Pre-install commit"
+git -c user.name="Keranod" -c user.email="$email" commit -m "Pre-install commit"
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
@@ -150,7 +150,7 @@ cp /mnt/home/keranod/.dotfiles/.shh/id_rsa.pub /mnt/home/keranod/.dotfiles/hosts
 # Git commit ssh keys
 cd /mnt/home/keranod/.dotfiles
 git add .
-git commit -c user.name="Keranod" -c user.email="$email" -m "Git ssh key commit"
+git -c user.name="Keranod" -c user.email="$email" commit -m "Git ssh key commit"
 
 echo "Unmounting bootable ISO..."
 umount --lazy /iso || umount --force /iso
