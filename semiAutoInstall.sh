@@ -145,7 +145,7 @@ echo "NixOS installation complete."
 echo "Creating SSH Key"
 mkdir -p "/mnt/home/keranod/.dotfiles/.ssh"
 ssh-keygen -t rsa -b 4096 -C "$email" -f "/mnt/home/keranod/.dotfiles/.ssh/id_rsa" -N ""
-cp /mnt/home/keranod/.dotfiles/.shh/id_rsa.pub /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME
+cp /mnt/home/keranod/.dotfiles/.ssh/id_rsa.pub /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME
 
 # Git commit ssh keys
 cd /mnt/home/keranod/.dotfiles
