@@ -1,1 +1,4 @@
-
+- login on user and root to change default password
+- log back on user
+- `home-manager switch --flake ~/.dotfiles`
+-
