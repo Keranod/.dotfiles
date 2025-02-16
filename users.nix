@@ -8,7 +8,7 @@
     shell = pkgs.bash;
     initialPassword = "12345";
     openssh.authorizedKeys.keyFiles = [
-      /home/keranod/.dotfiles/hosts/TufNix/id_rsa.pub
+      (builtins.toFile "keranod_id_rsa.pub" (builtins.readFile ./hosts/TufNix/id_rsa.pub))
     ];
   };
 
