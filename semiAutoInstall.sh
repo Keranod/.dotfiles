@@ -152,8 +152,8 @@ cd /mnt/home/keranod/.dotfiles
 git add .
 git -c user.name="Keranod" -c user.email="$email" commit -m "Git ssh key commit"
 
-echo "Unmounting bootable ISO..."
-umount --lazy /iso || umount --force /iso
+# echo "Unmounting bootable ISO..."
+# umount --lazy /iso || umount --force /iso
 
 # setup home-manager for keranod
 nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && passwd --expire root && passwd --expire keranod"
