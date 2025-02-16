@@ -84,14 +84,15 @@ boot.loader.grub.useOSProber = true;
     home-manager
   ];
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  # Enable the OpenSSH service
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;  # Disable password login
+      PermitRootLogin = "no";         # Root login disabled
+      PubkeyAuthentication = true;    # Ensure pubkey authentication is enabled
+    };
+  };
 
   networking.firewall = {
     enable = true;
