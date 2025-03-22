@@ -169,8 +169,7 @@ boot.loader.grub.useOSProber = true;
       sshd.settings = {
         enabled = true;
         filter = "sshd";
-        logpath = "/var/log/auth.log";
-        backend = "auto";
+        backend = "systemd";
         maxretry = 3;
         findtime = 600;
       };
