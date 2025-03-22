@@ -149,6 +149,11 @@ boot.loader.grub.useOSProber = true;
         root = "/home/keranod/programming/WatchesWithMark/WatchesWithMark-frontend/dist";
         index = "index.html";
         tryFiles = "$uri $uri/ /index.html";
+
+        extraConfig = ''
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+        '';
       };
 
       # Cache static assets efficiently
@@ -190,9 +195,6 @@ boot.loader.grub.useOSProber = true;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
         gzip_proxied any;
         gzip_min_length 256;
-
-        add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header X-Content-Type-Options "nosniff" always;
       '';
     };
   };
