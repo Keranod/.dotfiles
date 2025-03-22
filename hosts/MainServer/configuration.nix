@@ -187,7 +187,7 @@ boot.loader.grub.useOSProber = true;
       # Rate limit API requests
       locations."~* ^/(api|uploads)/" = {
         extraConfig = ''
-          limit_req zone=api burst=10 nodelay;
+          limit_req zone=api:10m burst=10 nodelay;
           proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
