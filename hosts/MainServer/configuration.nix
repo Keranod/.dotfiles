@@ -169,45 +169,40 @@ boot.loader.grub.useOSProber = true;
       sshd.settings = {
         enabled = true;
         filter = "sshd";
-        action = "iptables-multiport[name=SSH, port=ssh]";
         logpath = "/var/log/auth.log";
-        backend = "systemd";
+        backend = "auto";
         maxretry = 3;
         findtime = 600;
-        bantime = "24h";
       };
 
       # Nginx Bad Bots
       nginx-badbots.settings = {
         enabled = true;
         filter = "nginx-badbots";
-        action = "iptables-multiport[name=HTTP, port=http,https]";
         logpath = "/var/log/nginx/access.log";
+        backend = "auto";
         maxretry = 5;
         findtime = 600;
-        bantime = "24h";
       };
 
       # Nginx 404 Error Protection
       nginx-404.settings = {
         enabled = true;
         filter = "nginx-404";
-        action = "iptables-multiport[name=HTTP, port=http,https]";
         logpath = "/var/log/nginx/access.log";
+        backend = "auto";
         maxretry = 10;
         findtime = 600;
-        bantime = "24h";
       };
 
       # Nginx Login Protection
       nginx-login.settings = {
         enabled = true;
         filter = "nginx-login";
-        action = "iptables-multiport[name=HTTP, port=http,https]";
         logpath = "/var/log/nginx/access.log";
+        backend = "auto";
         maxretry = 5;
         findtime = 600;
-        bantime = "24h";
       };
     };
   };
