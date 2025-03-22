@@ -127,20 +127,45 @@ boot.loader.grub.useOSProber = true;
     '';
   };
 
-  # Fail2ban global setup
+  # Filters for Fail2Ban
+  environment.etc = {
+    "fail2ban/filter.d/nginx-badbots.conf".text = ''
+      [Definition]
+      failregex = ^<HOST>.*"(GET|POST).* (?:config\.json|wp-login\.php|xmlrpc\.php|phpmyadmin|/boaform).*" 403
+      ignoreregex =
+    '';
+
+    "fail2ban/filter.d/nginx-404.conf".text = ''
+      [Definition]
+      failregex = ^<HOST>.*"(GET|POST) .*" 404
+      ignoreregex =
+    '';
+
+    "fail2ban/filter.d/nginx-login.conf".text = ''
+      [Definition]
+      failregex = ^<HOST>.*"(GET|POST).* /login.*" 401
+      ignoreregex =
+    '';
+  };
+
+  # Fail2Ban Global Setup
   services.fail2ban = {
     enable = true;
+    extraPackages = [pkgs.ipset]; # Needed for banning on IPv4 & IPv6
+    banaction = "iptables-ipset-proto6-allports";
     maxretry = 5;
-    ignoreIP = ["84.39.117.57"];
+    ignoreIP = ["84.39.117.57"]; # Whitelist trusted IPs
     bantime = "24h";
+
     bantime-increment = {
       enable = true;
-      #formula = "ban.Time * math.exp(float(ban.Count+1)*1.5)/math.exp(1*1.5)";
-      multipliers = "1 2 4 8 16 32 64";
-      maxtime = "168h";
+      multipliers = "1 2 4 8 16 32 64"; # Exponential increase
+      maxtime = "168h"; # Max ban time (7 days)
       overalljails = true;
     };
+
     jails = {
+      # SSH Protection
       sshd.settings = {
         enabled = true;
         filter = "sshd";
@@ -151,9 +176,33 @@ boot.loader.grub.useOSProber = true;
         findtime = 600;
         bantime = "24h";
       };
+
+      # Nginx Bad Bots
       nginx-badbots.settings = {
         enabled = true;
         filter = "nginx-badbots";
+        action = "iptables-multiport[name=HTTP, port=http,https]";
+        logpath = "/var/log/nginx/access.log";
+        maxretry = 5;
+        findtime = 600;
+        bantime = "24h";
+      };
+
+      # Nginx 404 Error Protection
+      nginx-404.settings = {
+        enabled = true;
+        filter = "nginx-404";
+        action = "iptables-multiport[name=HTTP, port=http,https]";
+        logpath = "/var/log/nginx/access.log";
+        maxretry = 10;
+        findtime = 600;
+        bantime = "24h";
+      };
+
+      # Nginx Login Protection
+      nginx-login.settings = {
+        enabled = true;
+        filter = "nginx-login";
         action = "iptables-multiport[name=HTTP, port=http,https]";
         logpath = "/var/log/nginx/access.log";
         maxretry = 5;
