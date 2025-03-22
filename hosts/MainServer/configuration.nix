@@ -176,7 +176,11 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           allow 84.39.117.57;
           deny all;
-          include /etc/nginx/strapi-admin.conf;
+          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
 
@@ -184,7 +188,11 @@ boot.loader.grub.useOSProber = true;
       locations."~* ^/(api|uploads)/" = {
         extraConfig = ''
           limit_req zone=api burst=10 nodelay;
-          include /etc/nginx/strapi-backend.conf;
+          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
 
