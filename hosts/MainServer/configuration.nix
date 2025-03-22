@@ -129,38 +129,38 @@ boot.loader.grub.useOSProber = true;
 
   # Fail2ban global setup
   services.fail2ban = {
-  enable = true;
-  maxretry = 5;
-  ignoreIP = ["84.39.117.57"];
-  bantime = "24h";
-  bantime-increment = {
     enable = true;
-    formula = "ban.Time * math.exp(float(ban.Count+1)*1.5)/math.exp(1*1.5)";
-    multipliers = "1 2 4 8 16 32 64";
-    maxtime = "168h";
-    overalljails = true;
-  };
-  jails = {
-    sshd.settings = {
-      enabled = true;
-      filter = "sshd";
-      action = "iptables-multiport[name=SSH, port=ssh]";
-      logpath = "/var/log/auth.log";
-      backend = "systemd";
-      maxretry = 3;
-      findtime = 600;
-      bantime = "24h";
+    maxretry = 5;
+    ignoreIP = ["84.39.117.57"];
+    bantime = "24h";
+    bantime-increment = {
+      enable = true;
+      formula = "ban.Time * math.exp(float(ban.Count+1)*1.5)/math.exp(1*1.5)";
+      multipliers = "1 2 4 8 16 32 64";
+      maxtime = "168h";
+      overalljails = true;
     };
-    nginx-badbots.settings = {
-      enabled = true;
-      filter = "nginx-badbots";
-      action = "iptables-multiport[name=HTTP, port="http,https"]";
-      logpath = "/var/log/nginx/access.log";
-      maxretry = 5;
-      findtime = 600;
-      bantime = "24h";
+    jails = {
+      sshd.settings = {
+        enabled = true;
+        filter = "sshd";
+        action = "iptables-multiport[name=SSH, port=ssh]";
+        logpath = "/var/log/auth.log";
+        backend = "systemd";
+        maxretry = 3;
+        findtime = 600;
+        bantime = "24h";
+      };
+      nginx-badbots.settings = {
+        enabled = true;
+        filter = "nginx-badbots";
+        action = "iptables-multiport[name=HTTP, port=http,https]";
+        logpath = "/var/log/nginx/access.log";
+        maxretry = 5;
+        findtime = 600;
+        bantime = "24h";
+      };
     };
   };
-};
 
 }
