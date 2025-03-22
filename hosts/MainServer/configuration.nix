@@ -88,19 +88,9 @@ boot.loader.grub.useOSProber = true;
     unzip
   ];
 
-  # Enable the OpenSSH service
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;  # Disable password login
-      PermitRootLogin = "no";         # Root login disabled
-      PubkeyAuthentication = true;    # Ensure pubkey authentication is enabled
-    };
-  };
-
   networking.firewall = {
     enable = true;
-    # allowedTCPPorts = [ ];  # No allowed ports
+    allowedTCPPorts = [ 80 443 ];
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     extraCommands = ''
@@ -112,6 +102,16 @@ boot.loader.grub.useOSProber = true;
   system.stateVersion = "24.11";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Enable the OpenSSH service
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;  # Disable password login
+      PermitRootLogin = "no";         # Root login disabled
+      PubkeyAuthentication = true;    # Ensure pubkey authentication is enabled
+    };
+  };
 
   # Postgres Global setup
   services.postgresql = {
@@ -125,6 +125,76 @@ boot.loader.grub.useOSProber = true;
       #local all       all                    peer
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
+  };
+
+  # ACME (Let's Encrypt)
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "konrad.konkel@wp.pl";
+  };
+
+  # Nginx setup
+  services.nginx = {
+    enable = true;
+
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
+
+    virtualHosts."test.keranod.dev" = {
+      forceSSL = true;
+      enableACME = true;
+
+      locations."/" = {
+        root = "/home/keranod/programming/WatchesWithMark/WatchesWithMark-frontend/dist";
+        index = "index.html";
+        tryFiles = "$uri $uri/ /index.html";
+      };
+
+      # Cache static assets efficiently
+      locations."~* \\.(?:css|js|woff2|ttf|eot|otf)$" = {
+        extraConfig = ''
+          expires 1y;
+          add_header Cache-Control "public, max-age=31556952, immutable";
+        '';
+      };
+
+      locations."~* \\.(?:jpg|jpeg|png|gif|ico|webp|svg)$" = {
+        extraConfig = ''
+          expires 30d;
+          add_header Cache-Control "public, max-age=2592000, immutable";
+        '';
+      };
+
+      # Restrict access to Strapi admin panel
+      locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
+        extraConfig = ''
+          allow 84.39.117.57;
+          deny all;
+          include /etc/nginx/strapi-admin.conf;
+        '';
+      };
+
+      # Rate limit API requests
+      locations."~* ^/(api|uploads)/" = {
+        extraConfig = ''
+          limit_req zone=api burst=10 nodelay;
+          include /etc/nginx/strapi-backend.conf;
+        '';
+      };
+
+      # Security headers
+      extraConfig = ''
+        gzip on;
+        gzip_static on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+        gzip_proxied any;
+        gzip_min_length 256;
+
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+      '';
+    };
   };
 
   # Filters for Fail2Ban
