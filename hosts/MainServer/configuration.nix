@@ -188,14 +188,20 @@ boot.loader.grub.useOSProber = true;
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
-          allow 84.39.117.57;
-          deny all;
+          geo $allowedIPs {
+            default 0;
+            84.39.117.57; Allowed IP to access admin
+          }
+          #allow 84.39.117.57;
+          #deny all;
 
-          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
+          if ($allowedIPs = 1) {
+            proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
         '';
       };
 
