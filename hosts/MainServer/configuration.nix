@@ -127,7 +127,7 @@ boot.loader.grub.useOSProber = true;
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
     settings = {
-      listen_address = "127.0.0.1";
+      listen_addresses = "127.0.0.1";
     };
   };
 
