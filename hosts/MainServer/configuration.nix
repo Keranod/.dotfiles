@@ -229,7 +229,7 @@ boot.loader.grub.useOSProber = true;
 
     serviceConfig = {
       WorkingDirectory = "/var/www/WatchesWithMark/WatchesWithMark-backend";
-      ExecStart = "/run/current-system/sw/bin/npm start";
+      ExecStart = "/run/wrappers/bin/bash -c 'PATH=/run/current-system/sw/bin:$PATH /run/current-system/sw/bin/npm start'";
       Restart = "always";
       User = "keranod";
       Group = "users";
