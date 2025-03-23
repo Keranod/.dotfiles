@@ -146,38 +146,34 @@ boot.loader.grub.useOSProber = true;
       enableACME = true;
 
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-      index = "index.html";
 
       locations."/" = {
+        index = "index.html";
+        tryFiles = "$uri $uri/ /index.html";
+
         extraConfig = ''
-          try_files $uri $uri/ /index.html;
           add_header X-Frame-Options "SAMEORIGIN" always;
           add_header X-Content-Type-Options "nosniff" always;
         '';
       };
 
-      # Serve static assets correctly
+      # Serve static assets from the correct directory
       locations."/assets/" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-        extraConfig = ''
-          try_files $uri /index.html;
+          extraConfig = ''
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
         '';
       };
 
-      # Ensure CSS, JS, fonts are served from the correct location
+      # Cache static assets efficiently
       locations."~* \\.(?:css|js|woff2|ttf|eot|otf)$" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         extraConfig = ''
-          try_files $uri /index.html;
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
         '';
       };
 
       locations."~* \\.(?:jpg|jpeg|png|gif|ico|webp|svg)$" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         extraConfig = ''
           expires 30d;
           add_header Cache-Control "public, max-age=2592000, immutable";
@@ -189,7 +185,7 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           allow 84.39.117.57;
           deny all;
-          proxy_pass http://localhost:1337;
+          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -197,10 +193,10 @@ boot.loader.grub.useOSProber = true;
         '';
       };
 
-      # Proxy API requests to Strapi
+      # Rate limit API requests
       locations."~* ^/(api|uploads)/" = {
         extraConfig = ''
-          proxy_pass http://localhost:1337;
+          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
