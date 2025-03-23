@@ -94,9 +94,9 @@ boot.loader.grub.useOSProber = true;
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     # Allow local connections to 5432 but block external
-    extraCommands = ''
-      iptables -A INPUT -p tcp --dport 5432 ! -s 127.0.0.1 -j DROP
-    '';
+    # extraCommands = ''
+    #   iptables -A INPUT -p tcp --dport 5432 ! -s 127.0.0.1 -j DROP
+    # '';
   };
 
   # https://mynixos.com/
