@@ -188,13 +188,11 @@ boot.loader.grub.useOSProber = true;
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
-          geo $allowedIPs {
-            default 0;
-            84.39.117.57 1;
-          }
+          allow 84.39.117.57;
+          deny all;
 
-          rewrite ^(.*)$ /404.html redirect;
-
+          error_page 403 =302 /404.html;
+          
           proxy_pass http://localhost:1337;
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
