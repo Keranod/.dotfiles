@@ -227,7 +227,7 @@ boot.loader.grub.useOSProber = true;
 
   # Strapi
   systemd.services.myapp = {
-    description = "My Node.js App";
+    description = "Strapi";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
     
@@ -235,8 +235,8 @@ boot.loader.grub.useOSProber = true;
       WorkingDirectory = "/var/www/WatchesWithMark/WatchesWithMark-backend";
       ExecStart = "/run/current-system/sw/bin/npm run start";
       Restart = "always";
-      User = "your-user";   # Change this to your actual user
-      Group = "your-user";
+      User = "keranod";
+      Group = "keranod";
       Environment = "NODE_ENV=production";
       StandardOutput = "journal";
       StandardError = "journal";
