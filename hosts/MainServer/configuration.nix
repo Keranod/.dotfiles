@@ -146,7 +146,7 @@ boot.loader.grub.useOSProber = true;
       enableACME = true;
 
       locations."/" = {
-        root = "/home/keranod/programming/WatchesWithMark/WatchesWithMark-frontend/dist";
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         index = "index.html";
         tryFiles = "$uri $uri/ /index.html";
 
