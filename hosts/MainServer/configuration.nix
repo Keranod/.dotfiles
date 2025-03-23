@@ -190,12 +190,10 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           geo $allowedIPs {
             default 0;
-            84.39.117.57 1; #Allowed IP to access admin
+            84.39.117.57 1; # Allowed IP to access admin
           }
-          #allow 84.39.117.57;
-          #deny all;
 
-          if ($allowedIPs = 1) {
+          if ($allowedIPs) {
             proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -204,6 +202,7 @@ boot.loader.grub.useOSProber = true;
           }
         '';
       };
+
 
       # Rate limit API requests
       locations."~* ^/(api|uploads)/" = {
