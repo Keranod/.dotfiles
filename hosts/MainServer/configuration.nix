@@ -90,7 +90,7 @@ boot.loader.grub.useOSProber = true;
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 80 443 5432 ];
+    allowedTCPPorts = [ 80 443 ];
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     # Allow local connections to 5432 but block external
