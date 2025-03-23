@@ -190,6 +190,11 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           allow 84.39.117.57;
           deny all;
+
+          # Redirect unauthorized users to React's 404 page
+          error_page 403 = 404;
+          error_page 404 /index.html;
+
           proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
@@ -217,6 +222,24 @@ boot.loader.grub.useOSProber = true;
         gzip_proxied any;
         gzip_min_length 256;
       '';
+    };
+  };
+
+  # Strapi
+  systemd.services.myapp = {
+    description = "My Node.js App";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    
+    serviceConfig = {
+      WorkingDirectory = "/var/www/WatchesWithMark/WatchesWithMark-backend";
+      ExecStart = "/run/current-system/sw/bin/npm run start";
+      Restart = "always";
+      User = "your-user";   # Change this to your actual user
+      Group = "your-user";
+      Environment = "NODE_ENV=production";
+      StandardOutput = "journal";
+      StandardError = "journal";
     };
   };
 
