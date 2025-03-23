@@ -236,7 +236,7 @@ boot.loader.grub.useOSProber = true;
       ExecStart = "/run/current-system/sw/bin/npm start";
       Restart = "on-failure";
       User = "keranod";
-      Group = "keranod";
+      Group = "users";
       Environment = "NODE_ENV=production";
       StandardOutput = "journal";
       StandardError = "journal";
