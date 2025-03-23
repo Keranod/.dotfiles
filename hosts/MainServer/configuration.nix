@@ -232,7 +232,7 @@ boot.loader.grub.useOSProber = true;
       ExecStart = "/run/wrappers/bin/bash -c 'PATH=/run/current-system/sw/bin:$PATH npm start'";
       Restart = "always";
       User = "keranod";
-      Group = "keranod";
+      Group = "users";
       Environment = "NODE_ENV=production";
       StandardOutput = "journal";
       StandardError = "journal";
