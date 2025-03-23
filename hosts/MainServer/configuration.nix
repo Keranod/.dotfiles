@@ -126,6 +126,9 @@ boot.loader.grub.useOSProber = true;
       #local all       all                    scram-sha-256 
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
+    settings = {
+      listen_address = "127.0.0.1";
+    };
   };
 
   # ACME (Let's Encrypt)
