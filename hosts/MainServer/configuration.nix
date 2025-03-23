@@ -191,10 +191,6 @@ boot.loader.grub.useOSProber = true;
           allow 84.39.117.57;
           deny all;
 
-          # Redirect unauthorized users to React's 404 page
-          error_page 403 = 404;
-          error_page 404 /index.html;
-
           proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
