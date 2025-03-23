@@ -134,83 +134,90 @@ boot.loader.grub.useOSProber = true;
   };
 
   # Nginx setup
-  services.nginx.virtualHosts."test.keranod.dev" = {
-    forceSSL = true;
-    enableACME = true;
+  services.nginx = {
+    enable = true;
 
-    root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-    index = "index.html";
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
 
-    locations."/" = {
-      extraConfig = ''
-        try_files $uri $uri/ /index.html;
-        add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header X-Content-Type-Options "nosniff" always;
-      '';
-    };
+    virtualHosts."test.keranod.dev" = {
+      forceSSL = true;
+      enableACME = true;
 
-    # Serve static assets correctly
-    locations."/assets/" = {
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+      index = "index.html";
+
+      locations."/" = {
+        extraConfig = ''
+          try_files $uri $uri/ /index.html;
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+        '';
+      };
+
+      # Serve static assets correctly
+      locations."/assets/" = {
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+        extraConfig = ''
+          try_files $uri /index.html;
+          expires 1y;
+          add_header Cache-Control "public, max-age=31556952, immutable";
+        '';
+      };
+
+      # Ensure CSS, JS, fonts are served from the correct location
+      locations."~* \\.(?:css|js|woff2|ttf|eot|otf)$" = {
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+        extraConfig = ''
+          try_files $uri /index.html;
+          expires 1y;
+          add_header Cache-Control "public, max-age=31556952, immutable";
+        '';
+      };
+
+      locations."~* \\.(?:jpg|jpeg|png|gif|ico|webp|svg)$" = {
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+        extraConfig = ''
+          expires 30d;
+          add_header Cache-Control "public, max-age=2592000, immutable";
+        '';
+      };
+
+      # Restrict access to Strapi admin panel
+      locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
+        extraConfig = ''
+          allow 84.39.117.57;
+          deny all;
+          proxy_pass http://localhost:1337;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+
+      # Proxy API requests to Strapi
+      locations."~* ^/(api|uploads)/" = {
+        extraConfig = ''
+          proxy_pass http://localhost:1337;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+
+      # Security headers
       extraConfig = ''
-        try_files $uri /index.html;
-        expires 1y;
-        add_header Cache-Control "public, max-age=31556952, immutable";
+        gzip on;
+        gzip_static on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+        gzip_proxied any;
+        gzip_min_length 256;
       '';
     };
-
-    # Ensure CSS, JS, fonts are served from the correct location
-    locations."~* \\.(?:css|js|woff2|ttf|eot|otf)$" = {
-      root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-      extraConfig = ''
-        try_files $uri /index.html;
-        expires 1y;
-        add_header Cache-Control "public, max-age=31556952, immutable";
-      '';
-    };
-
-    locations."~* \\.(?:jpg|jpeg|png|gif|ico|webp|svg)$" = {
-      root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-      extraConfig = ''
-        expires 30d;
-        add_header Cache-Control "public, max-age=2592000, immutable";
-      '';
-    };
-
-    # Restrict access to Strapi admin panel
-    locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
-      extraConfig = ''
-        allow 84.39.117.57;
-        deny all;
-        proxy_pass http://localhost:1337;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      '';
-    };
-
-    # Proxy API requests to Strapi
-    locations."~* ^/(api|uploads)/" = {
-      extraConfig = ''
-        proxy_pass http://localhost:1337;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      '';
-    };
-
-    # Security headers
-    extraConfig = ''
-      gzip on;
-      gzip_static on;
-      gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
-      gzip_proxied any;
-      gzip_min_length 256;
-    '';
   };
-
 
   # Filters for Fail2Ban
   environment.etc = {
