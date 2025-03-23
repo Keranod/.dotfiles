@@ -190,7 +190,7 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           geo $allowedIPs {
             default 0;
-            84.39.117.57; Allowed IP to access admin
+            84.39.117.57 1; Allowed IP to access admin
           }
           #allow 84.39.117.57;
           #deny all;
