@@ -145,11 +145,11 @@ boot.loader.grub.useOSProber = true;
       forceSSL = true;
       enableACME = true;
 
-      root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+      locations."/" = {
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         index = "index.html";
         tryFiles = "$uri $uri/ /index.html";
 
-      locations."/" = {
         extraConfig = ''
           add_header X-Frame-Options "SAMEORIGIN" always;
           add_header X-Content-Type-Options "nosniff" always;
@@ -158,6 +158,8 @@ boot.loader.grub.useOSProber = true;
 
       # Serve static assets from the correct directory
       locations."/assets/" = {
+        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
+        
         extraConfig = ''
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
