@@ -146,8 +146,8 @@ boot.loader.grub.useOSProber = true;
       enableACME = true;
 
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
-      index = "index.html";
-      tryFiles = "$uri $uri/ /index.html";
+        index = "index.html";
+        tryFiles = "$uri $uri/ /index.html";
 
       locations."/" = {
         extraConfig = ''
@@ -158,7 +158,6 @@ boot.loader.grub.useOSProber = true;
 
       # Serve static assets from the correct directory
       locations."/assets/" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         extraConfig = ''
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
@@ -167,7 +166,6 @@ boot.loader.grub.useOSProber = true;
 
       # Cache static assets efficiently
       locations."~* \\.(?:css|js|woff2|ttf|eot|otf)$" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         extraConfig = ''
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
@@ -175,7 +173,6 @@ boot.loader.grub.useOSProber = true;
       };
 
       locations."~* \\.(?:jpg|jpeg|png|gif|ico|webp|svg)$" = {
-        root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
         extraConfig = ''
           expires 30d;
           add_header Cache-Control "public, max-age=2592000, immutable";
