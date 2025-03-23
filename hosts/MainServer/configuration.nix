@@ -90,7 +90,7 @@ boot.loader.grub.useOSProber = true;
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 80 443 5432 ];
+    allowedTCPPorts = [ 80 443 ];
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     # Allow local connections to 5432 but block external
@@ -126,9 +126,9 @@ boot.loader.grub.useOSProber = true;
       #local all       all                    scram-sha-256 
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
-    settings = {
-      listen_addresses = lib.mkForce "127.0.0.1";
-    };
+    # settings = {
+    #  listen_addresses = lib.mkForce "127.0.0.1";
+    # };
   };
 
   # ACME (Let's Encrypt)
