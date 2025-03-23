@@ -226,15 +226,15 @@ boot.loader.grub.useOSProber = true;
   };
 
   # Strapi
-  systemd.services.myapp = {
-    description = "Strapi";
+  systemd.services.strapi = {
+    description = "Strapi Headless CMS";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
-    
+
     serviceConfig = {
       WorkingDirectory = "/var/www/WatchesWithMark/WatchesWithMark-backend";
-      ExecStart = "/run/current-system/sw/bin/npm run start";
-      Restart = "always";
+      ExecStart = "/run/current-system/sw/bin/npm start";
+      Restart = "on-failure";
       User = "keranod";
       Group = "keranod";
       Environment = "NODE_ENV=production";
