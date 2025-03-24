@@ -212,7 +212,7 @@ boot.loader.grub.useOSProber = true;
       };
 
       # Logs location
-      locations."/nginx-logs" = {
+      locations."/nginx-logs/" = {
         extraConfig = ''
           allow 84.39.117.57;
           allow 84.39.117.56;
@@ -221,7 +221,7 @@ boot.loader.grub.useOSProber = true;
           error_page 403 =302 /404.html;
   
           # Dir where logs are stored
-          alias /var/log/nginx;
+          alias /var/log/nginx/;
   
           # Autoindex fires up only index.html not found, rename index.html if you want to list files in dir
           # Enable autoindex to list .html files
