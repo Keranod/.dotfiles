@@ -82,9 +82,7 @@ boot.loader.grub.useOSProber = true;
     git
     nodejs_22
     home-manager
-    nginx
     goaccess
-    certbot
     unzip
   ];
 
