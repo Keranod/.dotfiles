@@ -187,6 +187,7 @@ boot.loader.grub.useOSProber = true;
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
           allow 84.39.117.57;
+          allow 84.39.117.56;
           deny all;
 
           error_page 403 =302 /404.html;
@@ -266,7 +267,7 @@ boot.loader.grub.useOSProber = true;
     extraPackages = [pkgs.ipset]; # Needed for banning on IPv4 & IPv6
     banaction = "iptables-ipset-proto6-allports";
     maxretry = 5;
-    ignoreIP = ["84.39.117.57"]; # Whitelist trusted IPs
+    ignoreIP = ["84.39.117.57 84.39.117.56"]; # Whitelist trusted IPs
     bantime = "24h";
 
     bantime-increment = {
