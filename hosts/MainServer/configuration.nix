@@ -349,14 +349,19 @@ boot.loader.grub.useOSProber = true;
     };
   };
 
-systemd.services."goaccess-report" = {
-    script = ''
-      sudo /run/current-system/sw/bin/goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED
-      sudo /run/current-system/sw/bin/goaccess /var/log/nginx/error.log -o /var/log/nginx/error.html --log-format=COMBINED
-    '';
+  systemd.services.goaccess-report = {
+    description = "GoAccess Nginx Log Analyzer";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+  
     serviceConfig = {
-      Type = "oneshot";
-      User = "root"; # Run as root for access
+      WorkingDirectory = "/var/log/nginx";
+      ExecStart = "/run/current-system/sw/bin/bash -c 'PATH=/run/current-system/sw/bin:$PATH goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED && goaccess /var/log/nginx/error.log -o /var/log/nginx/error.html --log-format=COMBINED'";
+      Restart = "always";
+      User = "root"; # Or "keranod" if permissions allow
+      Group = "users";
+      StandardOutput = "journal";
+      StandardError = "journal";
     };
   };
 
