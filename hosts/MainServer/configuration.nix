@@ -211,6 +211,25 @@ boot.loader.grub.useOSProber = true;
         '';
       };
 
+      # Logs location
+      locations."/nginx-logs" = {
+          allow 84.39.117.57;
+          allow 84.39.117.56;
+          deny all;
+
+          error_page 403 =302 /404.html;
+  
+          # Dir where logs are stored
+          alias /var/log/nginx;
+  
+          # Autoindex fires up only index.html not found, rename index.html if you want to list files in dir
+          # Enable autoindex to list .html files
+          autoindex on;
+          autoindex_format html;
+          autoindex_exact_size off;  # Optional: Hide exact file sizes
+          autoindex_localtime on;    # Optional: Show local time
+      };
+
       # Security headers
       extraConfig = ''
         gzip on;
