@@ -213,6 +213,7 @@ boot.loader.grub.useOSProber = true;
 
       # Logs location
       locations."/nginx-logs" = {
+        extraConfig = ''
           allow 84.39.117.57;
           allow 84.39.117.56;
           deny all;
@@ -228,6 +229,7 @@ boot.loader.grub.useOSProber = true;
           autoindex_format html;
           autoindex_exact_size off;  # Optional: Hide exact file sizes
           autoindex_localtime on;    # Optional: Show local time
+        '';
       };
 
       # Security headers
