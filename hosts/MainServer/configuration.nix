@@ -351,8 +351,8 @@ boot.loader.grub.useOSProber = true;
 
 systemd.services."goaccess-report" = {
     script = ''
-      sudo goaccess /var/log/nginx/access.log -o /var/log/nginx/domain.html --log-format=COMBINED
-      sudo goaccess /var/log/nginx/error.log -o /var/log/nginx/domain.html --log-format=COMBINED
+      sudo goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED
+      sudo goaccess /var/log/nginx/error.log -o /var/log/nginx/error.html --log-format=COMBINED
     '';
     serviceConfig = {
       Type = "oneshot";
