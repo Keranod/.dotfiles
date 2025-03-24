@@ -340,4 +340,24 @@ boot.loader.grub.useOSProber = true;
     };
   };
 
+  systemd.timers."goaccess-report" = {
+  wantedBy = [ "timers.target" ];
+  partOf = [ "goaccess-report.service" ];
+  timerConfig = {
+    OnCalendar = "*:0/15";  # Runs every 15 minutes
+    Persistent = true;
+  };
+};
+
+systemd.services."goaccess-report" = {
+    script = ''
+      sudo goaccess /var/log/nginx/access.log -o /var/log/nginx/domain.html --log-format=COMBINED
+      sudo goaccess /var/log/nginx/error.log -o /var/log/nginx/domain.html --log-format=COMBINED
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root"; # Run as root for access
+    };
+  };
+
 }
