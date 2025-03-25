@@ -254,7 +254,7 @@ boot.loader.grub.useOSProber = true;
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      WorkingDirectory = "/var/www/WatchesWithMark/WatchesWithMark-backend";
+      WorkingDirectory = "/var/www/WatchesWithMark/backend";
       ExecStart = "/run/current-system/sw/bin/bash -c 'PATH=/run/current-system/sw/bin:$PATH /run/current-system/sw/bin/npm start'";
       Restart = "always";
       User = "keranod";
