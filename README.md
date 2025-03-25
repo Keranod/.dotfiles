@@ -17,6 +17,8 @@
 - `ssh-keygen -R <ip or hostname>` -> remove remembered server of ip or hostname
 - `df -h` -> check disk free space
 - `top` or `htop` -> get system load
+- `du -sh /nix/store` -> check how much space is used by nix store
+- `sudo nix-collect-garbage -d` -> remove unused packages
 
 # One line installer:
 
