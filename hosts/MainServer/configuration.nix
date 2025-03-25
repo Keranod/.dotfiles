@@ -350,15 +350,15 @@ boot.loader.grub.useOSProber = true;
       Persistent = true;
     };
   };
-
+  
   systemd.services.goaccess-report = {
-    description = "GoAccess Nginx Log Analyzer";
+    description = "GoAccess Nginx Log Analyzer (Access + Error)";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
   
     serviceConfig = {
       WorkingDirectory = "/var/log/nginx";
-      ExecStart = "/run/current-system/sw/bin/goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED";
+      ExecStart = "/run/current-system/sw/bin/bash -c '/run/current-system/sw/bin/goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED && /run/current-system/sw/bin/goaccess /var/log/nginx/error.log -o /var/log/nginx/error.html --log-format=COMBINED'";
       Restart = "always";
       User = "root"; # Adjust if needed
       Group = "users";
