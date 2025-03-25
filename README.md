@@ -15,6 +15,7 @@
 - `nix-shell -p picutils && lspci` -> get pcis of devices
 - `ls -ltrha /run/current-system/sw/bin | grep "<execname>"` -> find name of the package to use in module
 - `ssh-keygen -R <ip or hostname>` -> remove remembered server of ip or hostname
+- `df -h` -> check disk free space
 
 # One line installer:
 
