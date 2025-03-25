@@ -189,6 +189,7 @@ boot.loader.grub.useOSProber = true;
           allow 84.39.117.57;
           allow 84.39.117.56;
           allow 217.146.82.84;
+          allow 62.232.65.182;
           deny all;
 
           error_page 403 =302 /404.html;
@@ -218,6 +219,7 @@ boot.loader.grub.useOSProber = true;
           allow 84.39.117.57;
           allow 84.39.117.56;
           allow 217.146.82.84;
+          allow 62.232.65.182;
           deny all;
 
           error_page 403 =302 /404.html;
@@ -290,7 +292,7 @@ boot.loader.grub.useOSProber = true;
     extraPackages = [pkgs.ipset]; # Needed for banning on IPv4 & IPv6
     banaction = "iptables-ipset-proto6-allports";
     maxretry = 5;
-    ignoreIP = ["84.39.117.57 84.39.117.56 217.146.82.84"]; # Whitelist trusted IPs
+    ignoreIP = ["84.39.117.57 84.39.117.56 217.146.82.84 62.232.65.182"]; # Whitelist trusted IPs
     bantime = "24h";
 
     bantime-increment = {
