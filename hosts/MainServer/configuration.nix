@@ -84,6 +84,7 @@ boot.loader.grub.useOSProber = true;
     home-manager
     goaccess
     unzip
+    htop
   ];
 
   networking.firewall = {
