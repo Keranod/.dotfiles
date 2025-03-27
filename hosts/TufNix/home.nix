@@ -32,6 +32,7 @@ in
     #thunderbird
     google-chrome
     vlc
+    prismlauncher
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
