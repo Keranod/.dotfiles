@@ -214,7 +214,7 @@ boot.loader.grub.useOSProber = true;
       };
 
       # Restrict access to Strapi admin panel
-      locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
+      locations."~ /(admin|i18n|content-manager|content-type-builder|upload/|users-permissions)" = {
         extraConfig = ''
           allow 84.39.117.57;
           allow 84.39.117.56;
