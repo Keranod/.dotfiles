@@ -343,7 +343,7 @@ boot.loader.grub.useOSProber = true;
 
       # Nginx 404 Error Protection
       nginx-404.settings = {
-        enabled = true;
+        enabled = false;
         filter = "nginx-404";
         logpath = "/var/log/nginx/access.log";
         backend = "auto";
