@@ -202,6 +202,17 @@ boot.loader.grub.useOSProber = true;
         '';
       };
 
+      # Rate limit API requests
+      locations."~* ^/(api|uploads)/" = {
+        extraConfig = ''
+          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
@@ -214,17 +225,6 @@ boot.loader.grub.useOSProber = true;
           error_page 403 =302 /404.html;
 
           proxy_pass http://localhost:1337;
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
-
-      # Rate limit API requests
-      locations."~* ^/(api|uploads)/" = {
-        extraConfig = ''
-          proxy_pass http://localhost:1337; # Backend (Strapi admin panel)
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
