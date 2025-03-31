@@ -349,7 +349,7 @@ boot.loader.grub.useOSProber = true;
         backend = "auto";
         maxretry = 10;
         findtime = 600;
-        ignoreregex = "^<HOST> -.* \"(GET|POST|HEAD) /api/(metadata|home-page|repairs|articles|logo)(/.*)? HTTP/.*\" 404 .*";
+        ignoreregex = "GET /api/(metadata|home-page|repairs|articles|logo).* HTTP/\S+";
       };
 
       # Nginx Login Protection
