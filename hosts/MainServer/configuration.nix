@@ -24,7 +24,7 @@ boot.loader.grub.useOSProber = true;
 
 
   # Networking
-  networking.hostName = "MainServer"; 
+  networking.hostName = "MainServer";
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
@@ -70,12 +70,12 @@ boot.loader.grub.useOSProber = true;
   #   alsa.enable = true;
   #   alsa.support32Bit = true;
   #   pulse.enable = true;
-  # };  
+  # };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. 
+  # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [
     vim
@@ -117,13 +117,13 @@ boot.loader.grub.useOSProber = true;
   # Postgres Global setup
   services.postgresql = {
     enable = true;
-    package = postgresPackage;  # Install & enable same version 
+    package = postgresPackage;  # Install & enable same version
     enableTCPIP = true;
     # Authentication only to host, cannot make local work with scram
     # psql -U <username> -h 127.0.0.1
     authentication = ''
       #type database  DBuser  address        auth-method
-      #local all       all                    scram-sha-256 
+      #local all       all                    scram-sha-256
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
      settings = {
@@ -145,7 +145,25 @@ boot.loader.grub.useOSProber = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
 
-    virtualHosts."test.keranod.dev" = {
+    # Drop direct request to IP of server
+    virtualHosts."_" = {
+      default = true;
+      extraConfig = ''
+        return 444;
+      '';
+    };
+
+    # Redirect www. to non www. for better SEO
+    virtualHosts."www.thecuriousendeavor.com" = {
+      forceSSL = true;
+      enableACME = true;
+
+      extraConfig = ''
+        return 301 https://thecuriousendeavor.com$request_uri;
+      '';
+    };
+
+    virtualHosts."thecuriousendeavor.com" = {
       forceSSL = true;
       enableACME = true;
 
@@ -194,7 +212,7 @@ boot.loader.grub.useOSProber = true;
           deny all;
 
           error_page 403 =302 /404.html;
-          
+
           proxy_pass http://localhost:1337;
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
@@ -224,10 +242,10 @@ boot.loader.grub.useOSProber = true;
           deny all;
 
           error_page 403 =302 /404.html;
-  
+
           # Dir where logs are stored
           alias /var/log/nginx/;
-  
+
           # Autoindex fires up only index.html not found, rename index.html if you want to list files in dir
           # Enable autoindex to list .html files
           autoindex on;
@@ -358,7 +376,7 @@ boot.loader.grub.useOSProber = true;
     description = "GoAccess Nginx Log Analyzer";
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
-  
+
     serviceConfig = {
       WorkingDirectory = "/var/log/nginx";
       ExecStart = "/run/current-system/sw/bin/goaccess /var/log/nginx/access.log -o /var/log/nginx/access.html --log-format=COMBINED";
