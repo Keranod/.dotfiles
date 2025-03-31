@@ -223,6 +223,23 @@ boot.loader.grub.useOSProber = true;
         '';
       };
 
+      # Define rate limiting zone for API contact form
+      extraConfig = ''
+        limit_req_zone $binary_remote_addr zone=contact_limit:10m rate=1r/h;
+      '';
+
+      # Rate limit API requests to /api/contacts
+      locations."^~ /api/contacts" = {
+        extraConfig = ''
+          limit_req zone=contact_limit burst=1 nodelay;
+          proxy_pass http://localhost:1337;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
