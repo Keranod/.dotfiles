@@ -33,6 +33,8 @@ in
     google-chrome
     vlc
     prismlauncher
+    godot_4-mono
+    dotnet-sdk_9
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
