@@ -169,13 +169,43 @@ boot.loader.grub.useOSProber = true;
 
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
 
+      extraConfig = ''
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+
+          # Define rate limits
+          limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
+          limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
+
+          # Map request status to corresponding rate limit zone
+          map $status $limit_zone {
+              200  successful_requests;
+              default failed_requests;
+          }
+        '';
+
       locations."/" = {
         index = "index.html";
         tryFiles = "$uri $uri/ /index.html";
+      };
 
+      locations."/api/contacts" = {
         extraConfig = ''
-          add_header X-Frame-Options "SAMEORIGIN" always;
-          add_header X-Content-Type-Options "nosniff" always;
+          limit_req zone=$limit_zone burst=0 nodelay;
+          error_page 503 = @rate_limited;
+
+          proxy_pass http://localhost:1337;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+
+      locations."@rate_limited" = {
+        extraConfig = ''
+          default_type application/json;
+          return 429 '{"error": "You can only submit the contact form once per hour if successful, or up to 5 failed attempts. Please try again later."}';
         '';
       };
 
