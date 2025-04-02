@@ -201,7 +201,7 @@ boot.loader.grub.useOSProber = true;
 
       locations."/api/contacts" = {
         extraConfig = ''
-          limit_req zone=$limit_zone burst=0 nodelay;
+          limit_req zone=$limit_zone burst=1 nodelay;
           error_page 503 = @rate_limited;
 
           proxy_pass http://localhost:1337;
