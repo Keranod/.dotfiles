@@ -22,6 +22,10 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "dotnet-sdk-6.0.428"
+  ];
+
   # List packages installed in user profile. 
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
@@ -33,8 +37,9 @@ in
     google-chrome
     vlc
     prismlauncher
-    godot_4-mono
     dotnet-sdk_9
+    godot_4-mono
+    
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
