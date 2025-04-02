@@ -176,9 +176,6 @@ boot.loader.grub.useOSProber = true;
           gzip_proxied any;
           gzip_min_length 256;
 
-          add_header X-Frame-Options "SAMEORIGIN" always;
-          add_header X-Content-Type-Options "nosniff" always;
-
           # Define rate limits
           limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
           limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
@@ -193,6 +190,11 @@ boot.loader.grub.useOSProber = true;
       locations."/" = {
         index = "index.html";
         tryFiles = "$uri $uri/ /index.html";
+
+        extraConfig = ''
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+        '';
       };
 
       locations."/api/contacts" = {
