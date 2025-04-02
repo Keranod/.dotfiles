@@ -170,6 +170,12 @@ boot.loader.grub.useOSProber = true;
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
 
       extraConfig = ''
+          gzip on;
+          gzip_static on;
+          gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+          gzip_proxied any;
+          gzip_min_length 256;
+
           add_header X-Frame-Options "SAMEORIGIN" always;
           add_header X-Content-Type-Options "nosniff" always;
 
@@ -294,15 +300,6 @@ boot.loader.grub.useOSProber = true;
           autoindex_localtime on;    # Optional: Show local time
         '';
       };
-
-      # Security headers
-      extraConfig = ''
-        gzip on;
-        gzip_static on;
-        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
-        gzip_proxied any;
-        gzip_min_length 256;
-      '';
     };
   };
 
