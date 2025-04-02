@@ -145,6 +145,18 @@ boot.loader.grub.useOSProber = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
 
+    extraConfig = ''
+      # Define rate limits globally
+      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
+      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
+
+      # Map request status to correct rate limit
+      map $status $limit_zone {
+          200  successful_requests;
+          default failed_requests;
+      }
+    '';
+
     # Drop direct request to IP of server
     virtualHosts."_" = {
       default = true;
@@ -162,18 +174,6 @@ boot.loader.grub.useOSProber = true;
         return 301 https://thecuriousendeavor.com$request_uri;
       '';
     };
-
-    appendConfig = ''
-      # Define rate limits globally
-      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
-      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
-
-      # Map request status to correct rate limit
-      map $status $limit_zone {
-          200  successful_requests;
-          default failed_requests;
-      }
-    '';
 
     virtualHosts."thecuriousendeavor.com" = {
       forceSSL = true;
