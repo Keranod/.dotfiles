@@ -163,6 +163,18 @@ boot.loader.grub.useOSProber = true;
       '';
     };
 
+    appendConfig = ''
+      # Define rate limits globally
+      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
+      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
+
+      # Map request status to correct rate limit
+      map $status $limit_zone {
+          200  successful_requests;
+          default failed_requests;
+      }
+    '';
+
     virtualHosts."thecuriousendeavor.com" = {
       forceSSL = true;
       enableACME = true;
@@ -175,17 +187,7 @@ boot.loader.grub.useOSProber = true;
           gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
           gzip_proxied any;
           gzip_min_length 256;
-
-          # Define rate limits
-          limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
-          limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
-
-          # Map request status to corresponding rate limit zone
-          map $status $limit_zone {
-              200  successful_requests;
-              default failed_requests;
-          }
-        '';
+      '';
 
       locations."/" = {
         index = "index.html";
