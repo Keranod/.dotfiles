@@ -145,7 +145,7 @@ boot.loader.grub.useOSProber = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
 
-    extraConfig = ''
+    appendConfig = ''
       # Define rate limits globally
       limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
       limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
