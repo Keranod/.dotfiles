@@ -312,6 +312,12 @@ boot.loader.grub.useOSProber = true;
       failregex = ^<HOST>.*"(GET|POST).* /login.*" 401
       ignoreregex =
     '';
+
+    "fail2ban/filter.d/nginx-api-contacts.conf".text = ''
+      [Definition]
+        failregex = ^<HOST> -.*"POST /api/contacts.*"( 201|403|5\d{2})\s
+        ignoreregex =
+    '';
   };
 
   # Fail2Ban Global Setup
@@ -369,6 +375,17 @@ boot.loader.grub.useOSProber = true;
         backend = "auto";
         maxretry = 5;
         findtime = 600;
+      };
+
+      # Nginx Api Contacts
+      nginx-api-contacts.settings = {
+        enabled = true;
+        filter = "nginx-api-contacts";
+        action = "action_mwl";
+        logPath = "/var/log/nginx/access.log";
+        maxRetry = 5;
+        findTime = 3600;
+        banTime = 3600;
       };
     };
   };
