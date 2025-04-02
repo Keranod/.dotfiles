@@ -147,8 +147,8 @@ boot.loader.grub.useOSProber = true;
 
     appendHttpConfig = ''
       # Define rate limits globally
-      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1r/h;
-      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5r/h;
+      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1/3600r/s;
+      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5/3600r/s;
 
       # Map request status to correct rate limit
       map $status $limit_zone {
