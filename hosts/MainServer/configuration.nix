@@ -145,18 +145,6 @@ boot.loader.grub.useOSProber = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
 
-    appendHttpConfig = ''
-      # Define rate limits globally
-      limit_req_zone $binary_remote_addr zone=successful_requests:10m rate=1/3600r/s;
-      limit_req_zone $binary_remote_addr zone=failed_requests:10m rate=5/3600r/s;
-
-      # Map request status to correct rate limit
-      map $status $limit_zone {
-          200  successful_requests;
-          default failed_requests;
-      }
-    '';
-
     # Drop direct request to IP of server
     virtualHosts."_" = {
       default = true;
@@ -196,26 +184,6 @@ boot.loader.grub.useOSProber = true;
         extraConfig = ''
           add_header X-Frame-Options "SAMEORIGIN" always;
           add_header X-Content-Type-Options "nosniff" always;
-        '';
-      };
-
-      locations."/api/contacts" = {
-        extraConfig = ''
-          limit_req zone=successful_requests burst=1 nodelay;
-          error_page 503 = @rate_limited;
-
-          proxy_pass http://localhost:1337;
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
-
-      locations."@rate_limited" = {
-        extraConfig = ''
-          default_type application/json;
-          return 429 '{"error": "You can only submit the contact form once per hour if successful, or up to 5 failed attempts. Please try again later."}';
         '';
       };
 
