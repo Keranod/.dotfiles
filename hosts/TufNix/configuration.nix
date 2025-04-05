@@ -99,6 +99,9 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # For vscode extensions
+  programs.nix-ld.enable = true;
+
   # List packages installed in system profile. 
   # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [

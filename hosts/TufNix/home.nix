@@ -39,7 +39,6 @@ in
     prismlauncher
     dotnet-sdk_9
     godot_4-mono
-    
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
