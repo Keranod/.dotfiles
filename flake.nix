@@ -6,6 +6,9 @@
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-24.11";
       };
+    nixpkgs-unstable = {
+      url = "github:NixOS/nixpkgs/nixos-unstable";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs"; # depents on nigxpkgs/must be the same
@@ -13,7 +16,7 @@
   };
 
   # Importing self ans nixpkgs
-  outputs = { nixpkgs, home-manager, ...}:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, ...}:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
     let
       lib = nixpkgs.lib;
@@ -45,6 +48,9 @@
     homeConfigurations = {
       "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        extraSpecialArgs = {
+          pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+        };
         modules = [
           ./common.nix ./hosts/TufNix/home.nix
         ];
