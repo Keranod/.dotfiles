@@ -22,6 +22,7 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  #For c# in vscode extension
   nixpkgs.config.permittedInsecurePackages = [
     "dotnet-sdk-6.0.428"
   ];
@@ -29,7 +30,14 @@ in
   # List packages installed in user profile. 
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    vscode
+    (pkgs.buildFHSUserEnv {
+      name = "vscode-fhs";
+      targetPkgs = pkgs: [
+        pkgs.vscode
+        pkgs.icu
+      ];
+      runScript = "${pkgs.vscode}/bin/code";
+    })
     nixd # nix language server
     nixfmt-rfc-style
     pgadminPackage
@@ -38,7 +46,9 @@ in
     vlc
     prismlauncher
     dotnet-sdk_9
+    #dotnet-sdk_8
     godot_4-mono
+    vscode
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
@@ -59,9 +69,6 @@ in
   #
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
-  home.sessionVariables = {
-    # EDITOR = "emacs";
-  };
 
   # TODO
   # GNOME
