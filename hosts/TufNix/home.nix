@@ -49,6 +49,7 @@ in
     #dotnet-sdk_8
     godot_4-mono
     vscode
+    discord
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
