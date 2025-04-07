@@ -22,12 +22,14 @@
   };
 
   # Importing self ans nixpkgs
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, ...}:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, bindPkgs, sambaPkgs, ...}:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = import nixpkgs {inherit system;};
+      bindPkgs = import bindPkgs {inherit system;};
+      sambaPkgs = import sambaPkgs {inherit system;};
     in {
     # Can specify multiple configurations
     nixosConfigurations = {
@@ -53,7 +55,7 @@
       VMNixOSWork = lib.nixosSystem {
         # Architecture
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit bindPkgs sambaPkgs};
         # List/Array of modules
         modules = [ ./hosts/VMNixOSWork/configuration.nix ./users.nix ];
       };
