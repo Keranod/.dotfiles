@@ -31,12 +31,17 @@ in
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
     (pkgs.buildFHSUserEnv {
-      name = "vscode-fhs";
+      name = "dev-fhs";
       targetPkgs = pkgs: [
         pkgs.vscode
         pkgs.icu
+        pkgs.mono
+        pkgs.godot_4-mono
       ];
-      runScript = "${pkgs.vscode}/bin/code";
+      runScript = pkgs.writeShellScript "launch-both" ''
+        godot4-mono &
+        ${pkgs.vscode}/bin/code
+      '';
     })
     nixd # nix language server
     nixfmt-rfc-style
@@ -48,7 +53,7 @@ in
     dotnet-sdk_9
     #dotnet-sdk_8
     godot_4-mono
-    #vscode
+    vscode
     discord
   ];
 
