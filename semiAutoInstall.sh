@@ -27,6 +27,31 @@ fi
 
 HOSTNAME="$2"
 
+# Check if a proxy is provided
+if [ -n "$3" ]; then
+  PROXY="$3"
+  echo "Setting proxy to $PROXY"
+
+  # Set proxy for curl (for downloading or installing)
+  export http_proxy="$PROXY"
+  export https_proxy="$PROXY"
+
+  # Temporarily set Git proxy if it's not installed yet
+  git_proxy="http.proxy"
+  git config --global $git_proxy "$PROXY"
+else
+  echo "No proxy specified, proceeding without setting proxy"
+fi
+
+# Install Git if it's not already installed (example for NixOS with nix-shell)
+nix-shell -p git
+
+# After Git is installed, configure the proxy for Git if necessary
+if [ -n "$PROXY" ]; then
+  git config --global http.proxy "$PROXY"
+  git config --global https.proxy "$PROXY"
+fi
+
 # Check if EFI variables are supported
 if efibootmgr 2>&1 | grep -q "EFI variables are not supported"; then
   IS_UEFI="false"
