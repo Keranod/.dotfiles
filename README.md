@@ -22,6 +22,7 @@
 
 # One line installer:
 
+- In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
 - if behind proxy add after `curl` `-x <proxy_url>:<port>`
 - !!! IMPORTANT add proxy settings in `configuration.nix` otherwise no internet access after install
