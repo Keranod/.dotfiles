@@ -42,7 +42,7 @@ in
     nixfmt-rfc-style
     #pgadminPackage
     #thunderbird
-    #google-chrome
+    google-chrome
     vlc
     #prismlauncher
     dotnet-sdk_9
