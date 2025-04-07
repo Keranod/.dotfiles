@@ -13,6 +13,12 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs"; # depents on nigxpkgs/must be the same
     };
+    bindPkgs = {
+      url = "github:NixOS/nixpkgs/3a641defd170a4ef25ce8c7c64cb13f91f867fca";
+    };
+    sambaPkgs = {
+      url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
+    };
   };
 
   # Importing self ans nixpkgs
@@ -47,6 +53,7 @@
       VMNixOSWork = lib.nixosSystem {
         # Architecture
         inherit system;
+        specialArgs = { inherit inputs; };
         # List/Array of modules
         modules = [ ./hosts/VMNixOSWork/configuration.nix ./users.nix ];
       };

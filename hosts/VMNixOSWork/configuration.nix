@@ -1,9 +1,9 @@
 { pkgs, ... }:
 
-# let
-#   postgresVersion = "17";  # Define PostgreSQL version once
-#   postgresPackage = pkgs."postgresql_${postgresVersion}";
-# in
+let
+  legacyBind = import inputs.bindPkgs { inherit (pkgs) system; };
+  legacySamba = import inputs.sambaPkgs { inherit (pkgs) system; };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -16,6 +16,9 @@
   fileSystems."/boot" = {
     fsType = "vfat";
   };
+
+  # Virtualbox guest additions
+  systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
 
   # Networking
   networking.hostName = "VMNixOSWork";
@@ -110,6 +113,8 @@
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
+    legacyBind.bind
+    legacySamba.samba
     #wireguard-tools
     #wireguard-ui
     # gnome-notes
