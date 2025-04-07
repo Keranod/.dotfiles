@@ -70,7 +70,7 @@
       "keranod@VMNixOSWork" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./common.nix ./hosts/MainServer/home.nix
+          ./common.nix ./hosts/VMNixOSWork/home.nix
         ];
       };
     };
