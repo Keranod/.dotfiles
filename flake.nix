@@ -44,6 +44,12 @@
         # List/Array of modules
         modules = [ ./hosts/MainServer/configuration.nix ./users.nix ];
       };
+      VMNixOSWork = lib.nixosSystem {
+        # Architecture
+        inherit system;
+        # List/Array of modules
+        modules = [ ./hosts/VMNixOSWork/configuration.nix ./users.nix ];
+      };
     };
     homeConfigurations = {
       "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
