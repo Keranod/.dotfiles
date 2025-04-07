@@ -113,7 +113,7 @@ in
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
-    legacyBind.bind
+    #legacyBind.bind
     #legacySamba.samba
     #wireguard-tools
     #wireguard-ui
@@ -189,6 +189,12 @@ in
         create mask = 0664
         directory mask = 0775
     '';
+  };
+
+  # Bind
+  services.bind = {
+    enable = true;
+    package = legacyBind.bind;
   };
 
   # Open ports in the firewall.
