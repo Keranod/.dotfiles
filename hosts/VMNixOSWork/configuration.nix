@@ -22,7 +22,7 @@
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
+  networking.proxy.default = "192.9.253.10:80";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   time.timeZone = "Europe/London";
