@@ -2,6 +2,7 @@
 
 - [MyNixOS Options](https://mynixos.com)
 - [NixOS Packages](https://search.nixos.org/packages)
+- [NixOS historical packages](https://www.nixhub.io/)
 
 # Commands
 
@@ -23,8 +24,9 @@
 # One line installer:
 
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
+- !!! IMPORTANT add proxy settings in `configuration.nix` otherwise no internet access after install
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
 - if behind proxy add after `curl` `-x <proxy_url>:<port>`
-- !!! IMPORTANT add proxy settings in `configuration.nix` otherwise no internet access after install
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`
 - after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
+- remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
