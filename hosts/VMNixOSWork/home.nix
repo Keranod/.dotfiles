@@ -1,10 +1,5 @@
 { pkgs, ... }:
 
-let
-  username = "keranod";
-  pgadminVersion = "4";
-  pgadminPackage = pkgs."pgadmin${pgadminVersion}-desktopmode";
-in
 {
   # Infomration for home-manager which path to manage
   home.username = username;
