@@ -1,8 +1,7 @@
-{ pkgs, ... }:
-
-let
-  legacyBind = import inputs.bindPkgs { inherit (pkgs) system; };
-  legacySamba = import inputs.sambaPkgs { inherit (pkgs) system; };
+{ pkgs, specialArgs, ... }:
+let 
+  bindPkgs = specialArgs.bindPkgs;
+  sambaPkgs = specialArgs.sambaPkgs;
 in
 {
   imports =
@@ -127,7 +126,7 @@ in
   # Samba
   services.samba = {
     enable = true;
-    package = legacySamba.samba;
+    package = bindPkgs.bind;
     extraConfig = ''
       [global]
         workgroup = PSFRANKSNET
@@ -194,7 +193,7 @@ in
   # Bind
   services.bind = {
     enable = true;
-    package = legacyBind.bind;
+    package = sambaPkgs.samba;
   };
 
   # Open ports in the firewall.
