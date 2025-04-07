@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  username = "keranod";
+in
 {
   # Infomration for home-manager which path to manage
   home.username = username;
