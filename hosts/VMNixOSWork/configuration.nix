@@ -1,13 +1,15 @@
-{ pkgs, specialArgs, ... }:
-let 
-  bindPkgs = specialArgs.bindPkgs;
-  sambaPkgs = specialArgs.sambaPkgs;
-in
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  pkgs,
+  bindPkgs_,
+  sambaPkgs_,
+  ...
+}:
+
+{
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
@@ -52,27 +54,30 @@ in
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
   services.xserver.displayManager.gdm.wayland = false;
-  environment.gnome.excludePackages = (with pkgs; [
-    gnome-photos
-    gnome-tour
-    gnome-weather
-    gnome-maps
-    # nautilus # File manager
-    totem
-    gedit
-    cheese
-    gnome-music
-    # epiphany # needed for online accounts
-    # geary
-    gnome-characters
-    tali
-    iagno
-    hitori
-    atomix
-    yelp
-    gnome-initial-setup
-    #gnome-contacts
-  ]);
+  environment.gnome.excludePackages = (
+    with pkgs;
+    [
+      gnome-photos
+      gnome-tour
+      gnome-weather
+      gnome-maps
+      # nautilus # File manager
+      totem
+      gedit
+      cheese
+      gnome-music
+      # epiphany # needed for online accounts
+      # geary
+      gnome-characters
+      tali
+      iagno
+      hitori
+      atomix
+      yelp
+      gnome-initial-setup
+      #gnome-contacts
+    ]
+  );
   programs.dconf.enable = true;
 
   # Configure keymap in X11
@@ -126,7 +131,7 @@ in
   # Samba
   services.samba = {
     enable = true;
-    package = bindPkgs.bind;
+    package = sambaPkgs_.samba;
     # extraConfig = ''
     #   [global]
     #     workgroup = PSFRANKSNET
@@ -193,19 +198,30 @@ in
   # Bind
   services.bind = {
     enable = true;
-    package = sambaPkgs.samba;
+    package = bindPkgs_.bind;
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 137 138 139 445 ];
-  networking.firewall.allowedUDPPorts = [ 137 138 ];
+  networking.firewall.allowedTCPPorts = [
+    137
+    138
+    139
+    445
+  ];
+  networking.firewall.allowedUDPPorts = [
+    137
+    138
+  ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
   # https://mynixos.com/
   system.stateVersion = "24.11";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Postgres Global setup
   # services.postgresql = {
