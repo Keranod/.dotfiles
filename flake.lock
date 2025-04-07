@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "bindPkgs": {
+      "locked": {
+        "lastModified": 1644898910,
+        "narHash": "sha256-eNUp37Ms7D+2XRv09lygClWEpTu1s8GYD8a+aH8XiRo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3a641defd170a4ef25ce8c7c64cb13f91f867fca",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3a641defd170a4ef25ce8c7c64cb13f91f867fca",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -55,9 +71,27 @@
     },
     "root": {
       "inputs": {
+        "bindPkgs": "bindPkgs",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "sambaPkgs": "sambaPkgs"
+      }
+    },
+    "sambaPkgs": {
+      "locked": {
+        "lastModified": 1742578646,
+        "narHash": "sha256-GiQ40ndXRnmmbDZvuv762vS+gew1uDpFwOfgJ8tLiEs=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "94c4dbe77c0740ebba36c173672ca15a7926c993",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "94c4dbe77c0740ebba36c173672ca15a7926c993",
+        "type": "github"
       }
     }
   },
