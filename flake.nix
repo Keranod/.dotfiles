@@ -27,6 +27,8 @@
       nixpkgs,
       nixpkgs-unstable,
       home-manager,
+      bindPkgs,
+      sambaPkgs,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
@@ -34,8 +36,8 @@
       lib = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
-      bindPkgs = import bindPkgs { inherit system; };
-      sambaPkgs = import sambaPkgs { inherit system; };
+      bindPkgs_ = import bindPkgs { inherit system; };
+      sambaPkgs_ = import sambaPkgs { inherit system; };
     in
     {
       # Can specify multiple configurations
@@ -71,7 +73,7 @@
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit bindPkgs sambaPkgs; };
+          specialArgs = { inherit bindPkgs_ sambaPkgs_; };
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix

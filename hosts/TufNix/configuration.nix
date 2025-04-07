@@ -1,15 +1,18 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  ...
+}:
 
 let
-  postgresVersion = "17";  # Define PostgreSQL version once
+  postgresVersion = "17"; # Define PostgreSQL version once
   postgresPackage = pkgs."postgresql_${postgresVersion}";
 in
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./gpu.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./gpu.nix
+  ];
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
@@ -19,7 +22,7 @@ in
   };
 
   # Networking
-  networking.hostName = "TufNix"; 
+  networking.hostName = "TufNix";
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
@@ -47,31 +50,34 @@ in
   # You can disable this if you're only using the Wayland session.
   services.xserver.enable = true;
 
-  # GNOME 
+  # GNOME
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
   services.xserver.displayManager.gdm.wayland = false;
-  environment.gnome.excludePackages = (with pkgs; [
-    gnome-photos
-    gnome-tour
-    gnome-weather
-    gnome-maps
-    # nautilus # File manager
-    totem
-    gedit
-    cheese
-    gnome-music
-    # epiphany # needed for online accounts
-    # geary
-    gnome-characters 
-    tali
-    iagno
-    hitori
-    atomix
-    yelp
-    gnome-initial-setup
-    #gnome-contacts
-  ]);
+  environment.gnome.excludePackages = (
+    with pkgs;
+    [
+      gnome-photos
+      gnome-tour
+      gnome-weather
+      gnome-maps
+      # nautilus # File manager
+      totem
+      gedit
+      cheese
+      gnome-music
+      # epiphany # needed for online accounts
+      # geary
+      gnome-characters
+      tali
+      iagno
+      hitori
+      atomix
+      yelp
+      gnome-initial-setup
+      #gnome-contacts
+    ]
+  );
   programs.dconf.enable = true;
 
   # Configure keymap in X11
@@ -94,7 +100,7 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-  };  
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -102,7 +108,7 @@ in
   # For vscode extensions
   programs.nix-ld.enable = true;
 
-  # List packages installed in system profile. 
+  # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [
     vim
@@ -121,7 +127,10 @@ in
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 5173 45000 ];
+  networking.firewall.allowedTCPPorts = [
+    5173
+    45000
+  ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -129,12 +138,15 @@ in
   # https://mynixos.com/
   system.stateVersion = "24.11";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Postgres Global setup
   services.postgresql = {
     enable = true;
-    package = postgresPackage;  # Install & enable same version 
+    package = postgresPackage; # Install & enable same version
     enableTCPIP = true;
     # Authentication only to host, cannot make local work with scram
     # psql -U <username> -h 127.0.0.1
