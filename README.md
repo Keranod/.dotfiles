@@ -26,3 +26,4 @@
 - if behind proxy add after `curl` `-x <proxy_url>:<port>`
 - !!! IMPORTANT add proxy settings in `configuration.nix` otherwise no internet access after install
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`
+- after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
