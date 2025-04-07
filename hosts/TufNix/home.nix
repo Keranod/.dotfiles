@@ -27,7 +27,7 @@ in
     "dotnet-sdk-6.0.428"
   ];
 
-  # List packages installed in user profile. 
+  # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
     (pkgs.buildFHSUserEnv {
@@ -48,7 +48,7 @@ in
     dotnet-sdk_9
     #dotnet-sdk_8
     godot_4-mono
-    vscode
+    #vscode
     discord
   ];
 
@@ -93,7 +93,7 @@ in
     "org/gnome/desktop/peripherals/touchpad" = {
       natural-scroll = false;
     };
-    "org/gnome/mutter" = { 
+    "org/gnome/mutter" = {
       edge-tiling = true;
       dynamic-workspaces = true;
     };
@@ -103,13 +103,16 @@ in
       # Does not work
       # sleep-inactive-battery-timeout = "3600";
     };
-  }; 
+  };
 
   # User services
   systemd.user.services.pgadmin4 = {
     Unit = {
       Description = "Pgadmin web interface";
-      After = [ "default.target" "postgres.service" ];
+      After = [
+        "default.target"
+        "postgres.service"
+      ];
     };
 
     Service = {
