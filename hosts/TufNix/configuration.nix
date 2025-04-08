@@ -21,6 +21,9 @@ in
     fsType = "vfat";
   };
 
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
   # Networking
   networking.hostName = "TufNix";
   networking.networkmanager.enable = true;
