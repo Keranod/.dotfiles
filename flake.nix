@@ -38,7 +38,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
+        #config.allowUnfree = true;
       };
       pkgsUnstable_ = import nixpkgs-unstable {
         inherit system;
@@ -92,9 +92,6 @@
       homeConfigurations = {
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          extraSpecialArgs = {
-            pkgsUnstable = pkgsUnstable_;
-          };
           modules = [
             ./common.nix
             ./hosts/TufNix/home.nix

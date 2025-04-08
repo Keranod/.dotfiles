@@ -18,6 +18,9 @@
     fsType = "vfat";
   };
 
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
   # Virtualbox guest additions
   systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
   # Enable VirtualBox guest additions
@@ -102,9 +105,6 @@
     alsa.support32Bit = true;
     pulse.enable = true;
   };
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
 
   # For vscode extensions
   programs.nix-ld.enable = true;
