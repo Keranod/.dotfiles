@@ -28,14 +28,14 @@ in
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    # (pkgs.buildFHSUserEnv {
-    #   name = "vscode-fhs";
-    #   targetPkgs = pkgs: [
-    #     pkgs.vscode
-    #     pkgs.icu
-    #   ];
-    #   runScript = "${pkgs.vscode}/bin/code";
-    # })
+    (pkgs.buildFHSUserEnv {
+      name = "vscode-fhs";
+      targetPkgs = pkgs: [
+        pkgs.vscode
+        pkgs.icu
+      ];
+      runScript = "${pkgs.vscode}/bin/code";
+    })
     nixd # nix language server
     nixfmt-rfc-style
     google-chrome
@@ -64,12 +64,6 @@ in
   #
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
-
-  # Set the necessary environment variables for the .NET runtime
-  home.sessionVariables = {
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = "false";
-    LD_LIBRARY_PATH = "${pkgs.icu}/lib";
-  };
 
   # TODO
   # GNOME
