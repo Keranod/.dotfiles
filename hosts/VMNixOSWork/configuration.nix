@@ -20,7 +20,7 @@
 
   # Virtualbox guest additions
   systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
-   # Enable VirtualBox guest additions
+  # Enable VirtualBox guest additions
   virtualisation.virtualbox.guest = {
     enable = true;
     seamless = true;
@@ -32,8 +32,11 @@
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
-  networking.proxy.default = "192.9.253.10:80";
-  networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  environment.variables = {
+    http_proxy = "http://192.9.253.10:80";
+    https_proxy = "http://192.9.253.10:80";
+    no_proxy = "127.0.0.1,localhost,internal.domain";
+  };
 
   time.timeZone = "Europe/London";
 
@@ -150,7 +153,8 @@
 
         "acl group control" = "yes";
         "add user script" = "sudo /usr/sbin/useradd  -d /home/%u -s /bin/bash %u";
-        "add machine script" = "sudo /usr/sbin/useradd -g machines -c \"Samba Client\" -d /dev/null -s /bin/false -M %u";
+        "add machine script" =
+          "sudo /usr/sbin/useradd -g machines -c \"Samba Client\" -d /dev/null -s /bin/false -M %u";
         "add group script" = "sudo /usr/sbin/groupadd %g";
         "delete user script" = "/usr/sbin/userdel %u";
         # "delete user from group script" = "/usr/sbin/deluser %u %g"; # deprecated
