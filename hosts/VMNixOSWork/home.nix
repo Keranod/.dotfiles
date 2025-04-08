@@ -33,10 +33,11 @@ in
       targetPkgs = pkgs: [
         pkgs.vscode
         pkgs.icu
+        pkgs.openssl
       ];
       runScript = ''
         #!/usr/bin/env bash
-        LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH"
+        LD_LIBRARY_PATH="${pkgs.icu}/lib:${pkgs.openssl}/lib:$LD_LIBRARY_PATH"
         export LD_LIBRARY_PATH
         exec ${pkgs.vscode}/bin/code
       '';
