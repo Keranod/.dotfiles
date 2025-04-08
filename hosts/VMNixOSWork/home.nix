@@ -34,7 +34,10 @@ in
         pkgs.vscode
         pkgs.icu
       ];
-      runScript = "${pkgs.vscode}/bin/code";
+      runScript = ''
+        export LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH"
+        ${pkgs.vscode}/bin/code
+      '';
     })
     nixd # nix language server
     nixfmt-rfc-style
