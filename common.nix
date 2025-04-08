@@ -20,11 +20,11 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in user profile. 
+  # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
-  home.packages = with pkgs; [
-    #
-  ];
+  # home.packages = with pkgs; [
+  #
+  # ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
 
@@ -90,7 +90,7 @@ in
           
           echo "Rebuilding NixOS with configuration: $config"
           
-          sudo nixos-rebuild switch --flake ~/.dotfiles#"$config" --show-trace
+          sudo nixos-rebuild switch --flake ~/.dotfiles#"$config" --show-trace && exec $SHELL
       }
 
       ssh-connect() {

@@ -13,6 +13,7 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs"; # depents on nigxpkgs/must be the same
     };
+    # For specific ones look readme how to get hash
     bindPkgs = {
       url = "github:NixOS/nixpkgs/3a641defd170a4ef25ce8c7c64cb13f91f867fca";
     };
@@ -35,7 +36,14 @@
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pkgsUnstable_ = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
+      };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
     in
@@ -85,7 +93,7 @@
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+            pkgsUnstable = pkgsUnstable_;
           };
           modules = [
             ./common.nix
