@@ -20,6 +20,12 @@
 
   # Virtualbox guest additions
   systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
+   # Enable VirtualBox guest additions
+  virtualisation.virtualbox.guest = {
+    enable = true;
+    seamless = true;
+    clipboard = true;
+  };
 
   # Networking
   networking.hostName = "VMNixOSWork";
