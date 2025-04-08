@@ -35,7 +35,10 @@ in
         pkgs.icu
       ];
       runScript = ''
-        LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH" ${pkgs.vscode}/bin/code
+        #!/usr/bin/env bash
+        LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH
+        exec ${pkgs.vscode}/bin/code
       '';
     })
     nixd # nix language server
