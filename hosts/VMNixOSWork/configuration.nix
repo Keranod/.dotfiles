@@ -31,6 +31,8 @@
   networking.hostName = "VMNixOSWork";
   networking.networkmanager.enable = true;
   networking.proxy.default = "192.9.253.10:80";
+  networking.proxy.httpsProxy = "192.9.253.10:80";
+  networking.proxy.httpProxy = "192.9.253.10:80";
 
   time.timeZone = "Europe/London";
 
@@ -122,6 +124,7 @@
   # services.openssh.enable = true;
 
   # Samba
+  # `testparm` to test config after rebuilding and switching
   services.samba = {
     enable = true;
     package = sambaPkgs_.samba;
@@ -129,7 +132,7 @@
 
     settings = {
       global = {
-        "workgroup" = "PSFRANKSNET";
+        "workgroup" = "TESTDOMAIN";
         "server min protocol" = "CORE";
         "server max protocol" = "NT1";
         "ntlm auth" = "yes";
@@ -137,13 +140,13 @@
 
         "passdb backend" = "tdbsam";
 
-        "printing" = "cups";
-        "printcap name" = "cups";
-        "load printers" = "yes";
-        "cups options" = "raw";
+        # "printing" = "cups";
+        # "printcap name" = "cups";
+        # "load printers" = "yes";
+        # "cups options" = "raw";
 
         "server string" = "Oracle Linux VM";
-        "netbios name" = "ENDOR";
+        "netbios name" = "VMNixOSWork";
 
         "acl group control" = "yes";
         "add user script" = "sudo /usr/sbin/useradd  -d /home/%u -s /bin/bash %u";
@@ -154,11 +157,11 @@
         # "delete user from group script" = "/usr/sbin/deluser %u %g"; # deprecated
         "delete group script" = "/usr/sbin/groupdel %g";
 
-        "admin users" = "iand";
-        "allow nt4 crypto" = "yes";
+        "admin users" = "keranod";
+        # deprecated "allow nt4 crypto" = "yes";
 
         "dns proxy" = "no";
-        "domain logons" = "yes";
+        # deprecated "domain logons" = "yes";
         "domain master" = "yes";
 
         "idmap config * : range" = "10000 - 10999";
