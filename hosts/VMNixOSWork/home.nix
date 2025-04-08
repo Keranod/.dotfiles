@@ -17,9 +17,6 @@ in
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   #For c# in vscode extension
   nixpkgs.config.permittedInsecurePackages = [
     "dotnet-sdk-6.0.428"
@@ -91,6 +88,21 @@ in
     "org/gnome/settings-daemon/plugins/power" = {
       power-button-action = "interactive";
       sleep-inactive-ac-type = "nothing";
+    };
+    "system/proxy" = {
+      mode = "manual";
+      # http-host = "192.9.253.10";
+      # http-port = 80;
+      # https-host = "192.9.253.10";
+      # https-port = 80;
+    };
+    "system/proxy/http" = {
+      port = 80;
+      host = "192.9.253.10";
+    };
+    "system/proxy/https" = {
+      port = 80;
+      host = "192.9.253.10";
     };
   };
 

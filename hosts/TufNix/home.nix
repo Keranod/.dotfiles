@@ -19,9 +19,6 @@ in
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   #For c# in vscode extension
   nixpkgs.config.permittedInsecurePackages = [
     "dotnet-sdk-6.0.428"

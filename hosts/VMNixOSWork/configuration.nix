@@ -30,13 +30,7 @@
   # Networking
   networking.hostName = "VMNixOSWork";
   networking.networkmanager.enable = true;
-
-  # Configure network proxy if necessary
-  environment.variables = {
-    http_proxy = "http://192.9.253.10:80";
-    https_proxy = "http://192.9.253.10:80";
-    no_proxy = "127.0.0.1,localhost,internal.domain";
-  };
+  networking.proxy.default = "192.9.253.10:80";
 
   time.timeZone = "Europe/London";
 
@@ -132,7 +126,6 @@
     enable = true;
     package = sambaPkgs_.samba;
     openFirewall = true;
-    securityType = "user";
 
     settings = {
       global = {
@@ -140,6 +133,7 @@
         "server min protocol" = "CORE";
         "server max protocol" = "NT1";
         "ntlm auth" = "yes";
+        "security" = "user";
 
         "passdb backend" = "tdbsam";
 

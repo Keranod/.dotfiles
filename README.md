@@ -6,6 +6,7 @@
 
 # Commands
 
+- `nix flake update` - it if works do not fix it
 - `nix-shell -p <packagename>` -> enable package for this shell only
 - `sudo nixos-rebuild test` -> test build
 - `sudo nixos-rebuild switch` -> rebuild distro and switch to it
@@ -24,7 +25,7 @@
 # One line installer:
 
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
-- `PROXY` - add proxy settings in `configuration.nix` otherwise no internet access after install
+- `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
 - `PROXY` - if behind proxy add after `curl` `-x <proxy_url>:<port>`
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`

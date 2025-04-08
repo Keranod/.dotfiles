@@ -61,13 +61,10 @@ in
       gnome-tour
       gnome-weather
       gnome-maps
-      # nautilus # File manager
       totem
       gedit
       cheese
       gnome-music
-      # epiphany # needed for online accounts
-      # geary
       gnome-characters
       tali
       iagno
@@ -75,7 +72,6 @@ in
       atomix
       yelp
       gnome-initial-setup
-      #gnome-contacts
     ]
   );
   programs.dconf.enable = true;
@@ -102,9 +98,6 @@ in
     pulse.enable = true;
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # For vscode extensions
   programs.nix-ld.enable = true;
 
@@ -117,10 +110,6 @@ in
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
-    #wireguard-tools
-    #wireguard-ui
-    # gnome-notes
-    # gnomeExtensions.brightness-control-using-ddcutil
   ];
 
   # Enable the OpenSSH daemon.
