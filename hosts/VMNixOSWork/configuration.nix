@@ -176,32 +176,32 @@
       };
     };
 
-    shares = {
-      "homes" = {
-        "comment" = "Home Directories";
-        "valid users" = [ "%S" "%D%w%S" ];
-        "browseable" = false;
-        "read only" = false;
-        "inherit acls" = "Yes";
-      };
+    # shares = {
+    #   "homes" = {
+    #     "comment" = "Home Directories";
+    #     "valid users" = [ "%S" "%D%w%S" ];
+    #     "browseable" = false;
+    #     "read only" = false;
+    #     "inherit acls" = "Yes";
+    #   };
 
-      "printers" = {
-        "comment" = "All Printers";
-        "path" = "/var/tmp";
-        "printable" = true;
-        "create mask" = "0600";
-        "browseable" = false;
-      };
+    #   "printers" = {
+    #     "comment" = "All Printers";
+    #     "path" = "/var/tmp";
+    #     "printable" = true;
+    #     "create mask" = "0600";
+    #     "browseable" = false;
+    #   };
 
-      "print$" = {
-        "comment" = "Printer Drivers";
-        "path" = "/var/lib/samba/drivers";
-        "write list" = "@printadmin root";
-        "force group" = "@printadmin";
-        "create mask" = "0664";
-        "directory mask" = "0775";
-      };
-    };
+    #   "print$" = {
+    #     "comment" = "Printer Drivers";
+    #     "path" = "/var/lib/samba/drivers";
+    #     "write list" = "@printadmin root";
+    #     "force group" = "@printadmin";
+    #     "create mask" = "0664";
+    #     "directory mask" = "0775";
+    #   };
+    # };
   };
 
   # Bind

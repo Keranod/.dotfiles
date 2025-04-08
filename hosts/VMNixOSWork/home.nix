@@ -28,14 +28,14 @@ in
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    (pkgs.buildFHSUserEnv {
-      name = "vscode-fhs";
-      targetPkgs = pkgs: [
-        pkgs.vscode
-        pkgs.icu
-      ];
-      runScript = "${pkgs.vscode}/bin/code";
-    })
+    # (pkgs.buildFHSUserEnv {
+    #   name = "vscode-fhs";
+    #   targetPkgs = pkgs: [
+    #     pkgs.vscode
+    #     pkgs.icu
+    #   ];
+    #   runScript = "${pkgs.vscode}/bin/code";
+    # })
     nixd # nix language server
     nixfmt-rfc-style
     google-chrome
@@ -43,6 +43,7 @@ in
     dotnet-sdk_9
     godot_4-mono # To run use in termial `godot4-mono --rendering-driver opengl3` otherwise running project crashes
     vscode
+    icu
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
@@ -63,6 +64,12 @@ in
   #
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
+
+  # Set the necessary environment variables for the .NET runtime
+  home.sessionVariables = {
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = "false";
+    LD_LIBRARY_PATH = "${pkgs.icu}/lib";
+  };
 
   # TODO
   # GNOME
