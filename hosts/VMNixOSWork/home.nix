@@ -35,8 +35,7 @@ in
         pkgs.icu
       ];
       runScript = ''
-        export LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH"
-        ${pkgs.vscode}/bin/code
+        LD_LIBRARY_PATH="${pkgs.icu}/lib:$LD_LIBRARY_PATH" ${pkgs.vscode}/bin/code
       '';
     })
     nixd # nix language server
