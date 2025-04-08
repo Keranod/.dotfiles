@@ -38,16 +38,11 @@ in
     })
     nixd # nix language server
     nixfmt-rfc-style
-    #pgadminPackage
-    #thunderbird
     google-chrome
     vlc
-    #prismlauncher
     dotnet-sdk_9
-    #dotnet-sdk_8
-    godot_4-mono
+    godot_4-mono # To run use in termial `godot4-mono --rendering-driver opengl3` otherwise running project crashes
     vscode
-    #discord
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
@@ -75,15 +70,6 @@ in
   # notes taht sync with keep
   # dconf watch /
   dconf.settings = {
-    # Does not work
-    # "org/gnome/shell" = {
-    #   last-selected-power-profile = "balanced";
-    # };
-    # "org/gnome/shell" = {
-    #   disable-user-extensions = false;
-    #   disabled-extensions = [];
-    #   enabled-extensions = ["display-brightness-ddcutil@themightydeity.github.com"];
-    # };
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
       show-battery-percentage = true;
@@ -98,28 +84,8 @@ in
     "org/gnome/settings-daemon/plugins/power" = {
       power-button-action = "interactive";
       sleep-inactive-ac-type = "nothing";
-      # Does not work
-      # sleep-inactive-battery-timeout = "3600";
     };
   };
-
-  # User services
-  # systemd.user.services.pgadmin4 = {
-  #   Unit = {
-  #     Description = "Pgadmin web interface";
-  #     After = [ "default.target" "postgres.service" ];
-  #   };
-
-  #   Service = {
-  #     ExecStart = "${pgadminPackage}/bin/pgadmin4";
-  #     Restart = "always";
-  #     WorkingDirectory = "%h";
-  #   };
-
-  #   Install = {
-  #     WantedBy = [ "default.target" ];
-  #   };
-  # };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
