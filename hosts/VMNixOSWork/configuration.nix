@@ -129,11 +129,11 @@
     enable = true;
     package = sambaPkgs_.samba;
     openFirewall = true;
+    securityType = "user";
 
     settings = {
       global = {
         "workgroup" = "PSFRANKSNET";
-        "security" = "user";
         "server min protocol" = "CORE";
         "server max protocol" = "NT1";
         "ntlm auth" = "yes";
