@@ -239,7 +239,7 @@ in
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
-          client_max_body_size 200M;
+          #client_max_body_size 200M;
 
           allow 84.39.117.57;
           allow 84.39.117.56;
