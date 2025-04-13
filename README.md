@@ -21,6 +21,7 @@
 - `top` or `htop` -> get system load
 - `du -sh /nix/store` -> check how much space is used by nix store
 - `sudo nix-collect-garbage -d` -> remove unused packages
+- `journalctl -u strapi.service --since today` -> get lastest logs of strapi.service since today
 
 # One line installer:
 
