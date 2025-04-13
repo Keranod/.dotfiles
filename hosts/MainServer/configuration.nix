@@ -1,27 +1,26 @@
 { pkgs, lib, ... }:
 
 let
-  postgresVersion = "17";  # Define PostgreSQL version once
+  postgresVersion = "17"; # Define PostgreSQL version once
   postgresPackage = pkgs."postgresql_${postgresVersion}";
 in
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
-# Disable EFI bootloader and use GRUB for Legacy BIOS
-boot.loader.grub.enable = true;
-boot.loader.grub.device = "/dev/sda";  # or the appropriate disk, replace /dev/sda with your disk name
+  # Disable EFI bootloader and use GRUB for Legacy BIOS
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda"; # or the appropriate disk, replace /dev/sda with your disk name
 
-# Set boot partition label for GRUB to use
-boot.loader.grub.useOSProber = true;
+  # Set boot partition label for GRUB to use
+  boot.loader.grub.useOSProber = true;
 
-# File system settings for boot
-# fileSystems."/boot" = {
-#   fsType = "ext4";  # Assuming you want to use ext4 for the boot partition in legacy BIOS
-# };
-
+  # File system settings for boot
+  # fileSystems."/boot" = {
+  #   fsType = "ext4";  # Assuming you want to use ext4 for the boot partition in legacy BIOS
+  # };
 
   # Networking
   networking.hostName = "MainServer";
@@ -89,11 +88,14 @@ boot.loader.grub.useOSProber = true;
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 80 443 ];
+    allowedTCPPorts = [
+      80
+      443
+    ];
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     # Allow local connections to 5432 but block external
-     extraCommands = ''
+    extraCommands = ''
       iptables -A INPUT -p tcp --dport 5432 -s 127.0.0.1 -j ACCEPT
       iptables -A INPUT -p tcp --dport 5432 -j DROP
     '';
@@ -102,22 +104,25 @@ boot.loader.grub.useOSProber = true;
   # https://mynixos.com/
   system.stateVersion = "24.11";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication = false;  # Disable password login
-      PermitRootLogin = "no";         # Root login disabled
-      PubkeyAuthentication = true;    # Ensure pubkey authentication is enabled
+      PasswordAuthentication = false; # Disable password login
+      PermitRootLogin = "no"; # Root login disabled
+      PubkeyAuthentication = true; # Ensure pubkey authentication is enabled
     };
   };
 
   # Postgres Global setup
   services.postgresql = {
     enable = true;
-    package = postgresPackage;  # Install & enable same version
+    package = postgresPackage; # Install & enable same version
     enableTCPIP = true;
     # Authentication only to host, cannot make local work with scram
     # psql -U <username> -h 127.0.0.1
@@ -126,9 +131,9 @@ boot.loader.grub.useOSProber = true;
       #local all       all                    scram-sha-256
       host  all       all     127.0.0.1/32   scram-sha-256
     '';
-     settings = {
+    settings = {
       listen_addresses = lib.mkForce "127.0.0.1";
-     };
+    };
   };
 
   # ACME (Let's Encrypt)
@@ -170,11 +175,12 @@ boot.loader.grub.useOSProber = true;
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
 
       extraConfig = ''
-          gzip on;
-          gzip_static on;
-          gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
-          gzip_proxied any;
-          gzip_min_length 256;
+        client_max_body_size 20M;
+        gzip on;
+        gzip_static on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+        gzip_proxied any;
+        gzip_min_length 256;
       '';
 
       locations."/" = {
@@ -189,7 +195,7 @@ boot.loader.grub.useOSProber = true;
 
       # Serve static assets from the correct directory
       locations."/assets/" = {
-          extraConfig = ''
+        extraConfig = ''
           expires 1y;
           add_header Cache-Control "public, max-age=31556952, immutable";
         '';
@@ -318,10 +324,10 @@ boot.loader.grub.useOSProber = true;
   # Fail2Ban Global Setup
   services.fail2ban = {
     enable = true;
-    extraPackages = [pkgs.ipset]; # Needed for banning on IPv4 & IPv6
+    extraPackages = [ pkgs.ipset ]; # Needed for banning on IPv4 & IPv6
     banaction = "iptables-ipset-proto6-allports";
     maxretry = 5;
-    ignoreIP = ["84.39.117.57 84.39.117.56 217.146.82.84 62.232.65.182"]; # Whitelist trusted IPs
+    ignoreIP = [ "84.39.117.57 84.39.117.56 217.146.82.84 62.232.65.182" ]; # Whitelist trusted IPs
     bantime = "24h";
 
     bantime-increment = {
@@ -378,7 +384,7 @@ boot.loader.grub.useOSProber = true;
     wantedBy = [ "timers.target" ];
     partOf = [ "goaccess-report.service" ];
     timerConfig = {
-      OnCalendar = "*:0/15";  # Runs every 15 minutes
+      OnCalendar = "*:0/15"; # Runs every 15 minutes
       Persistent = true;
     };
   };
