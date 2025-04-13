@@ -241,7 +241,7 @@ in
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
           # Disable modsecurity for these endpoints
-          modsecurity off;
+          ModSecurityEnabled off;
 
           allow 84.39.117.57;
           allow 84.39.117.56;
