@@ -175,7 +175,6 @@ in
       root = "/var/www/WatchesWithMark/WatchesWithMark-frontend/dist";
 
       extraConfig = ''
-        # client_max_body_size 20M;
         gzip on;
         gzip_static on;
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
@@ -240,8 +239,7 @@ in
       # Restrict access to Strapi admin panel
       locations."~ /(admin|i18n|content-manager|content-type-builder|upload|users-permissions)" = {
         extraConfig = ''
-          # Disable modsecurity for these endpoints
-          ModSecurityEnabled off;
+          client_max_body_size 200M;
 
           allow 84.39.117.57;
           allow 84.39.117.56;
