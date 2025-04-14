@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable_, ... }:
 
 let
   username = "keranod";
@@ -18,9 +18,9 @@ in
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
   #For c# in vscode extension
-  nixpkgs.config.permittedInsecurePackages = [
-    "dotnet-sdk-6.0.428"
-  ];
+  # nixpkgs.config.permittedInsecurePackages = [
+  #   "dotnet-sdk-6.0.428"
+  # ];
 
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
@@ -31,20 +31,22 @@ in
         pkgs.vscode
         pkgs.icu
         pkgs.openssl
+        pkgsUnstable_.godot-mono
       ];
       runScript = ''
         #!/usr/bin/env bash
         LD_LIBRARY_PATH="${pkgs.icu}/lib:${pkgs.openssl}/lib:$LD_LIBRARY_PATH"
         export LD_LIBRARY_PATH
         exec ${pkgs.vscode}/bin/code
+        exec ${pkgsUnstable_.godot-mono}/bin/godot4-mono
       '';
     })
     nixd # nix language server
     nixfmt-rfc-style
     google-chrome
     vlc
-    dotnet-sdk_9
-    godot_4-mono # To run use in termial `godot4-mono --rendering-driver opengl3` otherwise running project crashes
+    dotnet-sdk_8
+    pkgsUnstable_.godot-mono # To run use in termial `godot4-mono --rendering-driver opengl3` otherwise running project crashes
     vscode
     icu
   ];
