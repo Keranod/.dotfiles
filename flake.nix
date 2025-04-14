@@ -92,6 +92,7 @@
       homeConfigurations = {
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+          extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
             ./common.nix
             ./hosts/TufNix/home.nix
