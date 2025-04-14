@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable_, ... }:
 
 let
   username = "keranod";
@@ -30,15 +30,15 @@ in
     (pkgs.buildFHSUserEnv {
       name = "vscode-fhs";
       targetPkgs = pkgs: [
-        pkgs.vscode
-        pkgs.icu
-        pkgs.openssl
+        pkgsUnstable_.vscode
+        pkgsUnstable_.icu
+        pkgsUnstable_.openssl
       ];
       runScript = ''
         #!/usr/bin/env bash
         LD_LIBRARY_PATH="${pkgs.icu}/lib:${pkgs.openssl}/lib:$LD_LIBRARY_PATH"
         export LD_LIBRARY_PATH
-        exec ${pkgs.vscode}/bin/code
+        exec ${pkgsUnstable_.vscode}/bin/code
       '';
     })
     nixd # nix language server
@@ -48,9 +48,11 @@ in
     vlc
     prismlauncher
     dotnet-sdk_9
-    godot_4-mono
-    vscode
-    discord
+    #godot_4-mono
+    pkgsUnstable_.godot-mono
+    pkgsUnstable_.vscode
+    pkgsUnstable_.discord
+    icu
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
