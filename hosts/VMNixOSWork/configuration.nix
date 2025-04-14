@@ -133,92 +133,76 @@
     settings = {
       global = {
         "workgroup" = "TESTDOMAIN";
-        "server min protocol" = "CORE";
-        "server max protocol" = "NT1";
-        "ntlm auth" = "yes";
+        "netbios name" = "VMNixOSWork"; # Use the DC's NetBIOS name as desired.
+        "server string" = "Samba NT4 DC for TESTDOMAIN";
         "security" = "user";
-
+        "domain logons" = "yes"; # Crucial for domain controller functionality.
+        "domain master" = "yes";
+        "ntlm auth" = "yes";
         "passdb backend" = "tdbsam";
 
-        # "printing" = "cups";
-        # "printcap name" = "cups";
-        # "load printers" = "yes";
-        # "cups options" = "raw";
+        # WINS support (ensure Windows clients use this DC for WINS):
+        "wins support" = "yes";
 
-        "server string" = "Oracle Linux VM";
-        "netbios name" = "VMNixOSWork";
-
-        "acl group control" = "yes";
-        "add user script" = "sudo /usr/sbin/useradd  -d /home/%u -s /bin/bash %u";
-        "add machine script" =
-          "sudo /usr/sbin/useradd -g machines -c \"Samba Client\" -d /dev/null -s /bin/false -M %u";
+        "add user script" = "sudo /usr/sbin/useradd -d /home/%u -s /bin/bash %u";
         "add group script" = "sudo /usr/sbin/groupadd %g";
         "delete user script" = "/usr/sbin/userdel %u";
-        # "delete user from group script" = "/usr/sbin/deluser %u %g"; # deprecated
         "delete group script" = "/usr/sbin/groupdel %g";
 
-        "admin users" = "keranod";
-        # deprecated "allow nt4 crypto" = "yes";
-
-        "dns proxy" = "no";
-        # deprecated "domain logons" = "yes";
-        "domain master" = "yes";
-
-        "idmap config * : range" = "10000 - 10999";
-
-        "log level" = "1";
+        # Logon information:
         "logon drive" = "P:";
-        "logon home" = "\\\\GALLIFREY\\%U";
+        "logon home" = "\\\\VMNixOSWork\\%U";
         "logon path" = "";
         "max log size" = "50";
+
         "socket options" = "TCP_NODELAY";
         "time server" = "yes";
-        "wins support" = "yes";
       };
     };
-
-    # shares = {
-    #   "homes" = {
-    #     "comment" = "Home Directories";
-    #     "valid users" = [ "%S" "%D%w%S" ];
-    #     "browseable" = false;
-    #     "read only" = false;
-    #     "inherit acls" = "Yes";
-    #   };
-
-    #   "printers" = {
-    #     "comment" = "All Printers";
-    #     "path" = "/var/tmp";
-    #     "printable" = true;
-    #     "create mask" = "0600";
-    #     "browseable" = false;
-    #   };
-
-    #   "print$" = {
-    #     "comment" = "Printer Drivers";
-    #     "path" = "/var/lib/samba/drivers";
-    #     "write list" = "@printadmin root";
-    #     "force group" = "@printadmin";
-    #     "create mask" = "0664";
-    #     "directory mask" = "0775";
-    #   };
-    # };
+    shares = {
+      Publiczny = {
+        "path" = "/home/franz/publiczny";
+        "writable" = "yes";
+        "guest ok" = "yes";
+        # Need to chmod 777 the path directory
+      };
+    };
   };
 
-  # Bind
-  services.bind = {
-    enable = true;
-    package = bindPkgs_.bind;
-  };
+  # Bind configuration
+  # services.bind = {
+  #   enable = true;
+  #   package = bindPkgs_.bind;
+  #   zones = {
+  #     "TESTDOMAIN" = {
+  #       master = true;
+  #       file = pkgs.writeText "testdomain.zone" ''
+  #         $TTL 3600
+  #         @   IN SOA  dc1.TESTDOMAIN. hostmaster.TESTDOMAIN. (
+  #                 2025041001 ; serial
+  #                 3600       ; refresh
+  #                 900        ; retry
+  #                 604800     ; expire
+  #                 3600       ; minimum
+  #             )
+  #             IN NS  dc1.TESTDOMAIN.
+  #         dc1 IN A 192.168.56.4
+  #         _ldap._tcp.dc._msdcs IN SRV 0 100 389 dc1.TESTDOMAIN.
+  #       '';
+  #     };
+  #   };
+  # };
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
+    53 # for DNS
     137
     138
     139
     445
   ];
   networking.firewall.allowedUDPPorts = [
+    53 # for DNS
     137
     138
   ];
