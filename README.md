@@ -23,6 +23,7 @@
 - `sudo nix-collect-garbage -d` -> remove unused packages
 - `journalctl -u strapi.service --since today` -> get lastest logs of strapi.service since today
 - `ps aux | grep sshd` -> get all ssh sessions, first number after user is PID
+- `nix flake metadata` -> get matadata about inputs, need to run in directory with flake
 
 # One line installer:
 

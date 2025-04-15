@@ -2,6 +2,10 @@
 
 let
   username = "keranod";
+  wrappedGodot = pkgs.writeShellScriptBin "godot" ''
+    export LD_LIBRARY_PATH=${pkgsUnstable_.icu}/lib:$LD_LIBRARY_PATH
+    exec ${pkgsUnstable_.godot-mono}/bin/godot "$@"
+  '';
 in
 {
   # Infomration for home-manager which path to manage
@@ -25,30 +29,30 @@ in
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    (pkgs.buildFHSUserEnv {
+    (buildFHSUserEnv {
       name = "vscode-fhs";
       targetPkgs = pkgs: [
-        pkgs.vscode
-        pkgs.icu
-        pkgs.openssl
-        pkgsUnstable_.godot-mono
+        pkgsUnstable_.vscode
+        pkgsUnstable_.icu
+        pkgsUnstable_.openssl
+        pkgsUnstable_.dotnet-sdk_8
       ];
       runScript = ''
         #!/usr/bin/env bash
-        LD_LIBRARY_PATH="${pkgs.icu}/lib:${pkgs.openssl}/lib:$LD_LIBRARY_PATH"
-        export LD_LIBRARY_PATH
-        exec ${pkgs.vscode}/bin/code
-        exec ${pkgsUnstable_.godot-mono}/bin/godot4-mono
+        export LD_LIBRARY_PATH="${pkgsUnstable_.icu}/lib:${pkgsUnstable_.openssl}/lib:$LD_LIBRARY_PATH"
+        export PATH="${pkgsUnstable_.dotnet-sdk_8}/bin:$PATH"
+        export DOTNET_ROOT="${pkgsUnstable_.dotnet-sdk_8}/share/dotnet"
+        exec ${pkgsUnstable_.vscode}/bin/code
       '';
     })
     nixd # nix language server
     nixfmt-rfc-style
-    google-chrome
     vlc
-    dotnet-sdk_8
-    pkgsUnstable_.godot-mono # To run use in termial `godot4-mono --rendering-driver opengl3` otherwise running project crashes
-    vscode
-    icu
+    #dotnet-sdk_8
+    #pkgsUnstable_.godot-mono # To run use in termial `godot --rendering-driver opengl3` otherwise running project crashes
+    #pkgsUnstable_.vscode
+    #pkgsUnstable_.icu
+    wrappedGodot
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
