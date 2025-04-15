@@ -1,4 +1,4 @@
-{ pkgs, pkgsUnstable_, ... }:
+{ pkgs, ... }:
 
 let
   username = "keranod";
@@ -19,40 +19,13 @@ in
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  #For c# in vscode extension
-  nixpkgs.config.permittedInsecurePackages = [
-    "dotnet-sdk-6.0.428"
-  ];
-
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    (pkgs.buildFHSUserEnv {
-      name = "vscode-fhs";
-      targetPkgs = pkgs: [
-        pkgsUnstable_.vscode
-        pkgsUnstable_.icu
-        pkgsUnstable_.openssl
-      ];
-      runScript = ''
-        #!/usr/bin/env bash
-        LD_LIBRARY_PATH="${pkgs.icu}/lib:${pkgs.openssl}/lib:$LD_LIBRARY_PATH"
-        export LD_LIBRARY_PATH
-        exec ${pkgsUnstable_.vscode}/bin/code
-      '';
-    })
-    nixd # nix language server
-    nixfmt-rfc-style
     pgadminPackage
     google-chrome
     vlc
     prismlauncher
-    dotnet-sdk_9
-    #godot_4-mono
-    pkgsUnstable_.godot-mono
-    pkgsUnstable_.vscode
-    pkgsUnstable_.discord
-    icu
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
@@ -73,40 +46,6 @@ in
   #
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
-
-  # TODO
-  # GNOME
-  # Run `dconf watch /` and edit settings that you want to change and apply them below
-  # notes taht sync with keep
-  # dconf watch /
-  dconf.settings = {
-    # Does not work
-    # "org/gnome/shell" = {
-    #   last-selected-power-profile = "balanced";
-    # };
-    # "org/gnome/shell" = {
-    #   disable-user-extensions = false;
-    #   disabled-extensions = [];
-    #   enabled-extensions = ["display-brightness-ddcutil@themightydeity.github.com"];
-    # };
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      show-battery-percentage = true;
-    };
-    "org/gnome/desktop/peripherals/touchpad" = {
-      natural-scroll = false;
-    };
-    "org/gnome/mutter" = {
-      edge-tiling = true;
-      dynamic-workspaces = true;
-    };
-    "org/gnome/settings-daemon/plugins/power" = {
-      power-button-action = "interactive";
-      sleep-inactive-ac-type = "nothing";
-      # Does not work
-      # sleep-inactive-battery-timeout = "3600";
-    };
-  };
 
   # User services
   systemd.user.services.pgadmin4 = {

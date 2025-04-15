@@ -1,11 +1,7 @@
-{ pkgs, pkgsUnstable_, ... }:
+{ pkgs, ... }:
 
 let
   username = "keranod";
-  wrappedGodot = pkgs.writeShellScriptBin "godot" ''
-    export LD_LIBRARY_PATH=${pkgsUnstable_.icu}/lib:$LD_LIBRARY_PATH
-    exec ${pkgsUnstable_.godot-mono}/bin/godot "$@"
-  '';
 in
 {
   # Infomration for home-manager which path to manage
@@ -21,38 +17,10 @@ in
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  #For c# in vscode extension
-  # nixpkgs.config.permittedInsecurePackages = [
-  #   "dotnet-sdk-6.0.428"
-  # ];
-
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   home.packages = with pkgs; [
-    (buildFHSUserEnv {
-      name = "vscode-fhs";
-      targetPkgs = pkgs: [
-        pkgsUnstable_.vscode
-        pkgsUnstable_.icu
-        pkgsUnstable_.openssl
-        pkgsUnstable_.dotnet-sdk_8
-      ];
-      runScript = ''
-        #!/usr/bin/env bash
-        export LD_LIBRARY_PATH="${pkgsUnstable_.icu}/lib:${pkgsUnstable_.openssl}/lib:$LD_LIBRARY_PATH"
-        export PATH="${pkgsUnstable_.dotnet-sdk_8}/bin:$PATH"
-        export DOTNET_ROOT="${pkgsUnstable_.dotnet-sdk_8}/share/dotnet"
-        exec ${pkgsUnstable_.vscode}/bin/code
-      '';
-    })
-    nixd # nix language server
-    nixfmt-rfc-style
     vlc
-    #dotnet-sdk_8
-    #pkgsUnstable_.godot-mono # To run use in termial `godot --rendering-driver opengl3` otherwise running project crashes
-    #pkgsUnstable_.vscode
-    #pkgsUnstable_.icu
-    wrappedGodot
   ];
 
   nix.nixPath = [ "nixpkgs=${pkgs.path}" ];
@@ -74,33 +42,10 @@ in
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
 
-  # TODO
   # GNOME
-  # Run `dconf watch /` and edit settings that you want to change and apply them below
-  # notes taht sync with keep
-  # dconf watch /
   dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      show-battery-percentage = true;
-    };
-    "org/gnome/desktop/peripherals/touchpad" = {
-      natural-scroll = false;
-    };
-    "org/gnome/mutter" = {
-      edge-tiling = true;
-      dynamic-workspaces = true;
-    };
-    "org/gnome/settings-daemon/plugins/power" = {
-      power-button-action = "interactive";
-      sleep-inactive-ac-type = "nothing";
-    };
     "system/proxy" = {
       mode = "manual";
-      # http-host = "192.9.253.10";
-      # http-port = 80;
-      # https-host = "192.9.253.10";
-      # https-port = 80;
     };
     "system/proxy/http" = {
       port = 80;
