@@ -57,7 +57,7 @@
           # List/Array of modules
           modules = [
             ./hosts/TufNix/configuration.nix
-            ./users.nix
+            ./modules/users.nix
           ];
         };
         NixOSVMEFI = lib.nixosSystem {
@@ -66,7 +66,7 @@
           # List/Array of modules
           modules = [
             ./hosts/NixOSVMEFI/configuration.nix
-            ./users.nix
+            ./modules/users.nix
           ];
         };
         MainServer = lib.nixosSystem {
@@ -75,7 +75,7 @@
           # List/Array of modules
           modules = [
             ./hosts/MainServer/configuration.nix
-            ./users.nix
+            ./modules/users.nix
           ];
         };
         VMNixOSWork = lib.nixosSystem {
@@ -85,7 +85,7 @@
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
-            ./users.nix
+            ./modules/users.nix
           ];
         };
       };
@@ -94,14 +94,17 @@
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
-            ./common.nix
+            ./modules/gnome.nix
+            ./modules/common.nix
+            ./modules/vscode.nix
+            ./modules/godot.nix
             ./hosts/TufNix/home.nix
           ];
         };
         "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./common.nix
+            ./modules/common.nix
             ./hosts/MainServer/home.nix
           ];
         };
@@ -109,7 +112,10 @@
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
-            ./common.nix
+            ./modules/gnome.nix
+            ./modules/common.nix
+            ./modules/vscode.nix
+            ./modules/godot.nix
             ./hosts/VMNixOSWork/home.nix
           ];
         };
