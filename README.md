@@ -32,8 +32,11 @@
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
 - `PROXY` - if behind proxy add after `curl` `-x <proxy_url>:<port>`
+- CASE SENSITIVE COMMAND
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`
 - after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
 - `PROXY` - after install and home manager done, change git origin for `~/.dotfiles` to use `https` instead `ssh` by first doing `git remote -v` and doing `git remote set-url origin https://github.com/username/reponame.git`
 - remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
 - reneable `Secure Boot`
+- Errors:
+  - `Failed to write LoaderSystemToken efi variable input/output error` -> Set `boot.loader.efi.canTouchEfiVariables = false;`
