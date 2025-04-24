@@ -13,9 +13,6 @@
     fsType = "vfat";
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # Networking
   networking.hostName = "NetworkBox";
   networking.networkmanager.enable = true;
