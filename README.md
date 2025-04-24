@@ -27,6 +27,7 @@
 
 # One line installer:
 
+- In `BIOS` disable `Secure Boot` otherwise cannot write to `EFI` variables
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
@@ -35,3 +36,4 @@
 - after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
 - `PROXY` - after install and home manager done, change git origin for `~/.dotfiles` to use `https` instead `ssh` by first doing `git remote -v` and doing `git remote set-url origin https://github.com/username/reponame.git`
 - remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
+- reneable `Secure Boot`
