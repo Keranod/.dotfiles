@@ -1,0 +1,2 @@
+- After finishing default install visit `<serverIP>:3000` and setup admin account
+- Leave rest of config for nix config
