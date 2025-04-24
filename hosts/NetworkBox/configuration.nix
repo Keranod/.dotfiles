@@ -77,17 +77,13 @@
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [
-      80
-      443
-    ];
+    # allowedTCPPorts = [
+    #   80
+    #   443
+    # ];
     # allowedUDPPorts = [ ];  # No allowed UDP ports
     # rejectPackets = true;
     # Allow local connections to 5432 but block external
-    extraCommands = ''
-      iptables -A INPUT -p tcp --dport 5432 -s 127.0.0.1 -j ACCEPT
-      iptables -A INPUT -p tcp --dport 5432 -j DROP
-    '';
   };
 
   # https://mynixos.com/
@@ -112,5 +108,16 @@
   services.adguardhome = {
     enable       = true;
     openFirewall = true;   # automatically adds port 3000 to allowedTCPPorts
+    restartOnChange = true;
+    immutable = true;
+    mutableSettings = true;
+
+    settings = {
+      filtering = {
+        protection_enabled = true;
+        filtering_enabled = true;
+        parental = false;
+      };
+    };
   };
 }
