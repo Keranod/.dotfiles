@@ -88,6 +88,15 @@
             ./modules/users.nix
           ];
         };
+        NetworkBox = lib.nixosSystem {
+          # Architecture
+          inherit system;
+          # List/Array of modules
+          modules = [
+            ./hosts/NetworkBox/configuration.nix
+            ./modules/users.nix
+          ];
+        };
       };
       homeConfigurations = {
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
@@ -117,6 +126,13 @@
             ./modules/vscode.nix
             ./modules/godot.nix
             ./hosts/VMNixOSWork/home.nix
+          ];
+        };
+        "keranod@NetworkBox" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/common.nix
+            ./hosts/NetworkBox/home.nix
           ];
         };
       };
