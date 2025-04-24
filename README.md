@@ -24,6 +24,17 @@
 - `journalctl -u strapi.service --since today` -> get lastest logs of strapi.service since today
 - `ps aux | grep sshd` -> get all ssh sessions, first number after user is PID
 - `nix flake metadata` -> get matadata about inputs, need to run in directory with flake
+- Temporary proxy for current shell/session
+
+```nix
+# Need both for shell and daemon to pickup proxy
+export http_proxy="http://your.proxy:3128"
+export https_proxy="$http_proxy"
+export all_proxy="$http_proxy"
+export no_proxy="localhost,127.0.0.1"
+sudo systemctl set-environment http_proxy="http://proxy:3128" https_proxy="http://proxy:3128"
+sudo systemctl restart nix-daemon
+```
 
 # One line installer:
 
@@ -38,5 +49,6 @@
 - `PROXY` - after install and home manager done, change git origin for `~/.dotfiles` to use `https` instead `ssh` by first doing `git remote -v` and doing `git remote set-url origin https://github.com/username/reponame.git`
 - remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
 - reneable `Secure Boot`
+- `home-manager switch --flake ~/.dotfiles` -> username and machine pulled from current machine and user who is running, no need to specify as long as flake is using "username@hostname"
 - Errors:
   - `Failed to write LoaderSystemToken efi variable input/output error` -> Set `boot.loader.efi.canTouchEfiVariables = false;`
