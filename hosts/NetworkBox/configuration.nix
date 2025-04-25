@@ -29,9 +29,6 @@
     defaultGateway = "192.168.1.1";
     nameservers    = [ "127.0.0.1" ];
 
-    # Enable forwarding if you ever proxy/NAT through this box
-    forwardEnable = true;
-
     firewall = {
       enable         = true;
       allowedUDPPorts = [ 53 ];   # DNS
