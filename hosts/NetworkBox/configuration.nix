@@ -115,7 +115,6 @@
   services.adguardhome = {
     enable         = true;
     openFirewall   = true;   # auto-opens 53 & 3000
-    restartOnChange = true;
     mutableSettings = false;  # re-seed on service start
 
     settings = {
@@ -133,15 +132,13 @@
       dhcp = {
         enabled     = true;
         interface   = "enp3s0";
-        gateway_ip  = "192.168.1.1";
-        subnet_mask = "255.255.255.0";
-        range_start = "192.168.1.100";
-        range_end   = "192.168.1.200";
-        lease_time  = 86400;
-        options = [
-          # Option 6 = DNS server; we explicitly list AGH AND a fallback
-          "6 ip 192.168.1.2,1.1.1.1"
-        ];
+        dhcpv4 = {
+          gateway_ip  = "192.168.1.1";
+          subnet_mask = "255.255.255.0";
+          range_start = "192.168.1.100";
+          range_end   = "192.168.1.200";
+          lease_duration  = 0;
+        };
 
         static_leases = {
           "AA:BB:CC:DD:EE:FF" = "192.168.1.50";  # TV’s MAC → .50
