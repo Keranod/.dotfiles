@@ -116,8 +116,7 @@
     enable         = true;
     openFirewall   = true;   # auto-opens 53 & 3000
     restartOnChange = true;
-    immutable      = true;   # lock UI edits
-    mutableSettings = true;  # re-seed on service start
+    mutableSettings = false;  # re-seed on service start
 
     settings = {
       # DNS
