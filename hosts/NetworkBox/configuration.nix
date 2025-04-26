@@ -23,13 +23,13 @@
       useDHCP = false;
       ipv4.addresses = [
         {
-          address = "192.168.1.2";
+          address = "192.168.8.2";
           prefixLength = 24;
         }
       ];
     };
 
-    defaultGateway = "192.168.1.1";
+    defaultGateway = "192.168.8.1";
     nameservers = [ "127.0.0.1" ];
 
     firewall = {
@@ -41,8 +41,6 @@
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  time.timeZone = "Europe/London";
 
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
@@ -72,28 +70,36 @@
 
     settings = {
       # DNS
-      # dns = {
-      #   bind_hosts   = [ "0.0.0.0" ];
-      #   port         = 53;
-      #   upstream_dns = [ "94.140.14.14" "94.140.15.15" ];
-      #   # Bootstrap DNS: used only to resolve the upstream hostnames
-      #   bootstrap_dns = [ "9.9.9.10" "149.112.112.10" "2620:fe::10" "2620:fe::fe:10" ];
-      # };
+      dns = {
+        bind_hosts = [ "0.0.0.0" ];
+        port = 53;
+        upstream_dns = [
+          "94.140.14.14"
+          "94.140.15.15"
+        ];
+        # Bootstrap DNS: used only to resolve the upstream hostnames
+        bootstrap_dns = [
+          "9.9.9.10"
+          "149.112.112.10"
+          "2620:fe::10"
+          "2620:fe::fe:10"
+        ];
+      };
 
       # DHCP
       dhcp = {
         enabled = true;
         interface = "enp3s0";
         dhcpv4 = {
-          gateway_ip = "192.168.1.1";
+          gateway_ip = "192.168.8.1";
           subnet_mask = "255.255.255.0";
-          range_start = "192.168.1.100";
-          range_end = "192.168.1.200";
+          range_start = "192.168.8.100";
+          range_end = "192.168.8.200";
           lease_duration = 0;
         };
 
         static_leases = {
-          "AA:BB:CC:DD:EE:FF" = "192.168.1.50"; # TV’s MAC → .50
+          "A8:23:FE:FD:19:ED" = "192.168.8.50"; # TV’s MAC → .50
         };
       };
 
