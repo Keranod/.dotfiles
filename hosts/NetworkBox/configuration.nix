@@ -13,6 +13,10 @@
     fsType = "vfat";
   };
 
+  boot.kernel.sysctl."net.ipv6.conf.all.disable_ipv6" = true;
+  boot.kernel.sysctl."net.ipv6.conf.default.disable_ipv6" = true;
+  boot.kernel.sysctl."net.ipv6.conf.lo.disable_ipv6" = true;
+
   # Networking
   networking = {
     hostName = "NetworkBox";
@@ -49,6 +53,11 @@
         67
         68
       ];
+      extraInputRules = ''
+        ip6tables -P INPUT DROP
+        ip6tables -P FORWARD DROP
+        ip6tables -P OUTPUT DROP
+      '';
     };
   };
 
@@ -87,21 +96,20 @@
       dns = {
         bind_hosts = [
           "0.0.0.0"
-          "::"
         ];
         port = 53;
         upstream_dns = [
           "94.140.14.14"
           "94.140.15.15"
-          "2a10:50c0::ad1:ff"
-          "2a10:50c0::ad2:ff"
+          # "2a10:50c0::ad1:ff"
+          # "2a10:50c0::ad2:ff"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
           "9.9.9.10"
           "149.112.112.10"
-          "2620:fe::10"
-          "2620:fe::fe:10"
+          # "2620:fe::10"
+          # "2620:fe::fe:10"
         ];
       };
 
@@ -111,7 +119,7 @@
         interface_name = "enp3s0";
         local_domain_name = "lan";
         dhcpv4 = {
-          gateway_ip = "192.168.8.1";
+          gateway_ip = "192.168.8.2";
           subnet_mask = "255.255.255.0";
           range_start = "192.168.8.100";
           range_end = "192.168.8.200";
