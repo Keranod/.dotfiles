@@ -31,6 +31,13 @@
       ];
     };
 
+    nat = {
+      enable = true;
+      internalInterfaces = [ ]; # your LAN side interface
+      externalInterface = "enp3s0"; # same interface because Huawei is upstream
+      enableIPv6 = false; # no IPv6
+    };
+
     defaultGateway = "192.168.8.1";
     nameservers = [ "127.0.0.1" ];
 
