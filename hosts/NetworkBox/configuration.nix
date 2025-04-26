@@ -94,6 +94,41 @@
           "2620:fe::10"
           "2620:fe::fe:10"
         ];
+        # Example: redirect each Apple-DoH domain to 0.0.0.0 (acts like NXDOMAIN)
+        rewrites = [
+          {
+            domain = "doh.dns.apple.com";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "doh.dns.apple.com.v.aaplimg.com";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "mask-t.apple-dns.net";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "mask.apple-dns.net";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "mask.icloud.com";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "mask-h2.icloud.com";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "mask-api.icloud.com";
+            answer = "0.0.0.0";
+          }
+          {
+            domain = "token.safebrowsing.apple.com";
+            answer = "0.0.0.0";
+          }
+        ];
       };
 
       # DHCP
@@ -107,9 +142,6 @@
           range_start = "192.168.8.100";
           range_end = "192.168.8.200";
           lease_duration = 0;
-        };
-        dhcpv6 = {
-          ra_slaac_only = true;
         };
 
         static_leases = {
