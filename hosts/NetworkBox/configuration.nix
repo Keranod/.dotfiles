@@ -87,7 +87,6 @@
 
   # DHCP
   services.kea = {
-    enable = true;
     dhcp4 = {
       enable = true;
       settings = {
