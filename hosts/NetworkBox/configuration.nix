@@ -18,6 +18,8 @@
     hostName = "NetworkBox";
     networkmanager.enable = false;
 
+    enableIPv6 = false;
+
     # Static IP on enp3s0
     interfaces.enp3s0 = {
       useDHCP = false;
@@ -93,41 +95,6 @@
           "149.112.112.10"
           "2620:fe::10"
           "2620:fe::fe:10"
-        ];
-        # Example: redirect each Apple-DoH domain to 0.0.0.0 (acts like NXDOMAIN)
-        rewrites = [
-          {
-            domain = "doh.dns.apple.com";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "doh.dns.apple.com.v.aaplimg.com";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "mask-t.apple-dns.net";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "mask.apple-dns.net";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "mask.icloud.com";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "mask-h2.icloud.com";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "mask-api.icloud.com";
-            answer = "0.0.0.0";
-          }
-          {
-            domain = "token.safebrowsing.apple.com";
-            answer = "0.0.0.0";
-          }
         ];
       };
 
