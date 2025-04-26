@@ -13,16 +13,6 @@
     fsType = "vfat";
   };
 
-  # Disalbe RA and SLAAC
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.accept_ra" = 0;
-    "net.ipv6.conf.default.accept_ra" = 0;
-    "net.ipv6.conf.enp3s0.accept_ra" = 0;
-    "net.ipv6.conf.all.autoconf" = 0;
-    "net.ipv6.conf.default.autoconf" = 0;
-    "net.ipv6.conf.enp3s0.autoconf" = 0;
-  };
-
   # Networking
   networking = {
     hostName = "NetworkBox";
@@ -49,6 +39,10 @@
         53
         67
         68
+      ];
+      allowedICMPTypes = [
+        "router-advertisement"
+        "router-solicitation"
       ];
     };
   };
@@ -86,11 +80,16 @@
     settings = {
       # DNS
       dns = {
-        bind_hosts = [ "0.0.0.0" ];
+        bind_hosts = [
+          "0.0.0.0"
+          "::"
+        ];
         port = 53;
         upstream_dns = [
           "94.140.14.14"
           "94.140.15.15"
+          "2a10:50c0::ad1:ff"
+          "2a10:50c0::ad2:ff"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
@@ -112,6 +111,9 @@
           range_start = "192.168.8.100";
           range_end = "192.168.8.200";
           lease_duration = 0;
+        };
+        dhcpv6 = {
+          ra_slaac_only = true;
         };
 
         static_leases = {
