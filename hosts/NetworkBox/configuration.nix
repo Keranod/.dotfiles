@@ -85,25 +85,48 @@
     };
   };
 
-  services.dhcpd4 = {
+  # DHCP
+  services.kea = {
     enable = true;
-    interfaces = [ "enp3s0" ];
-    extraConfig = ''
-      default-lease-time 86400;
-      max-lease-time 172800;
-      authoritative;
-
-      subnet 192.168.8.0 netmask 255.255.255.0 {
-        range 192.168.8.100 192.168.8.200;
-        option routers 192.168.8.2;
-        option domain-name-servers 192.168.8.2;
-      }
-
-      host Xiaomi {
-        hardware ethernet e0:cc:f8:fa:fb:42;
-        fixed-address 192.168.8.50;
-      }
-    '';
+    dhcp4 = {
+      enable = true;
+      settings = {
+        interfaces-config = {
+          interfaces = [ "enp3s0" ]; # your LAN interface
+        };
+        lease-database = {
+          type = "memfile"; # memory + disk file (simple)
+          persist = true;
+          name = "/var/lib/kea/dhcp4.leases";
+        };
+        subnet4 = [
+          {
+            subnet = "192.168.8.0/24";
+            pools = [
+              {
+                pool = "192.168.8.100 - 192.168.8.200";
+              }
+            ];
+            option-data = [
+              {
+                name = "routers";
+                data = "192.168.8.2"; # gateway
+              }
+              {
+                name = "domain-name-servers";
+                data = "192.168.8.2"; # DNS server (your AdGuard box)
+              }
+            ];
+            reservations = [
+              {
+                hw-address = "e0:cc:f8:fa:fb:42";
+                ip-address = "192.168.8.50";
+              }
+            ];
+          }
+        ];
+      };
+    };
   };
 
   # AdGuard Home: DNS
