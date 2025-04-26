@@ -124,10 +124,9 @@
           range_start = "192.168.8.100";
           range_end = "192.168.8.200";
           lease_duration = 0;
-        };
-
-        static_leases = {
-          "A8:23:FE:FD:19:ED" = "192.168.8.50"; # TV’s MAC → .50
+          static_leases = {
+            "A8:23:FE:FD:19:ED" = "192.168.8.50"; # TV’s MAC → .50
+          };
         };
       };
 
