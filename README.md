@@ -50,5 +50,6 @@ sudo systemctl restart nix-daemon
 - remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
 - reneable `Secure Boot`
 - `home-manager switch --flake ~/.dotfiles` -> username and machine pulled from current machine and user who is running, no need to specify as long as flake is using "username@hostname"
+- `SSH` allowed by default after installing `home-manager` to `TufNix`
 - Errors:
   - `Failed to write LoaderSystemToken efi variable input/output error` -> Set `boot.loader.efi.canTouchEfiVariables = false;`
