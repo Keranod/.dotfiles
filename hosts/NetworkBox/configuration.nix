@@ -53,7 +53,6 @@
         67
         68
       ];
-      allowedTCPPorts = [ 3000 ];
       extraInputRules = ''
         ip6tables -P INPUT DROP
         ip6tables -P FORWARD DROP
@@ -86,30 +85,23 @@
     };
   };
 
-  # DHCP
   services.dnsmasq = {
     enable = true;
     settings = {
-      interface = "enp3s0"; # your LAN interface
+      interface = "enp3s0";
       bind-interfaces = true;
 
-      # DHCP settings
+      # Only DHCP
+      port = 0; # <--- this disables the DNS server in dnsmasq!
+
       dhcp-range = "192.168.8.100,192.168.8.200,255.255.255.0,24h";
       dhcp-option = [
-        "3,192.168.8.2" # router/gateway option (code 3)
-        "6,192.168.8.2" # DNS server option (code 6)
+        "3,192.168.8.2" # router/gateway
+        "6,192.168.8.2" # DNS server (AdGuard)
       ];
       dhcp-host = [
-        "e0:cc:f8:fa:fb:42,192.168.8.50" # static lease for TV MAC
+        "e0:cc:f8:fa:fb:42,192.168.8.50"
       ];
-
-      # DNS settings (optional)
-      server = [
-        "94.140.14.14"
-        "94.140.15.15"
-      ];
-      no-resolv = true; # don't use /etc/resolv.conf
-      listen-address = "127.0.0.1";
     };
   };
 
