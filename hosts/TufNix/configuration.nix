@@ -22,7 +22,7 @@ in
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowUnfree = true;
 
   # Networking
   networking.hostName = "TufNix";
@@ -32,22 +32,22 @@ in
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  time.timeZone = "Europe/London";
+  # time.timeZone = "Europe/London";
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_GB.UTF-8";
+  # # Select internationalisation properties.
+  # i18n.defaultLocale = "en_GB.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_GB.UTF-8";
-    LC_IDENTIFICATION = "en_GB.UTF-8";
-    LC_MEASUREMENT = "en_GB.UTF-8";
-    LC_MONETARY = "en_GB.UTF-8";
-    LC_NAME = "en_GB.UTF-8";
-    LC_NUMERIC = "en_GB.UTF-8";
-    LC_PAPER = "en_GB.UTF-8";
-    LC_TELEPHONE = "en_GB.UTF-8";
-    LC_TIME = "en_GB.UTF-8";
-  };
+  # i18n.extraLocaleSettings = {
+  #   LC_ADDRESS = "en_GB.UTF-8";
+  #   LC_IDENTIFICATION = "en_GB.UTF-8";
+  #   LC_MEASUREMENT = "en_GB.UTF-8";
+  #   LC_MONETARY = "en_GB.UTF-8";
+  #   LC_NAME = "en_GB.UTF-8";
+  #   LC_NUMERIC = "en_GB.UTF-8";
+  #   LC_PAPER = "en_GB.UTF-8";
+  #   LC_TELEPHONE = "en_GB.UTF-8";
+  #   LC_TIME = "en_GB.UTF-8";
+  # };
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
@@ -128,12 +128,12 @@ in
   # networking.firewall.enable = false;
 
   # https://mynixos.com/
-  system.stateVersion = "24.11";
+  # system.stateVersion = "24.11";
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  # nix.settings.experimental-features = [
+  #   "nix-command"
+  #   "flakes"
+  # ];
 
   # Postgres Global setup
   services.postgresql = {

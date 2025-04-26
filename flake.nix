@@ -42,7 +42,7 @@
       };
       pkgsUnstable_ = import nixpkgs-unstable {
         inherit system;
-        config.allowUnfree = true;
+        #config.allowUnfree = true;
       };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
@@ -58,6 +58,7 @@
           modules = [
             ./hosts/TufNix/configuration.nix
             ./modules/users.nix
+            ./modules/commonConfig.nix
           ];
         };
         NixOSVMEFI = lib.nixosSystem {
@@ -104,7 +105,7 @@
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
             ./modules/gnome.nix
-            ./modules/common.nix
+            ./modules/commonHome.nix
             ./modules/vscode.nix
             ./modules/godot.nix
             ./hosts/TufNix/home.nix
@@ -113,7 +114,7 @@
         "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./modules/common.nix
+            ./modules/commonHome.nix
             ./hosts/MainServer/home.nix
           ];
         };
@@ -122,7 +123,7 @@
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
             ./modules/gnome.nix
-            ./modules/common.nix
+            ./modules/commonHome.nix
             ./modules/vscode.nix
             ./modules/godot.nix
             ./hosts/VMNixOSWork/home.nix
@@ -131,7 +132,7 @@
         "keranod@NetworkBox" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./modules/common.nix
+            ./modules/commonHome.nix
             ./hosts/NetworkBox/home.nix
           ];
         };
