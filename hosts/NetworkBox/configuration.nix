@@ -40,10 +40,6 @@
         67
         68
       ];
-      allowedICMPTypes = [
-        "router-advertisement"
-        "router-solicitation"
-      ];
     };
   };
 
