@@ -57,13 +57,6 @@ in
       gnome-initial-setup
     ]
   );
-  programs.dconf.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "gb";
-    variant = "";
-  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;

@@ -15,23 +15,26 @@
 
   # Networking
   networking = {
-    hostName             = "NetworkBox";
+    hostName = "NetworkBox";
     networkmanager.enable = false;
 
     # Static IP on enp3s0
     interfaces.enp3s0 = {
-      useDHCP       = false;
+      useDHCP = false;
       ipv4.addresses = [
-        { address = "192.168.1.2"; prefixLength = 24; }
+        {
+          address = "192.168.1.2";
+          prefixLength = 24;
+        }
       ];
     };
 
     defaultGateway = "192.168.1.1";
-    nameservers    = [ "127.0.0.1" ];
+    nameservers = [ "127.0.0.1" ];
 
     firewall = {
-      enable         = true;
-      allowedUDPPorts = [ 53 ];   # DNS
+      enable = true;
+      allowedUDPPorts = [ 53 ]; # DNS
     };
   };
 
@@ -41,48 +44,6 @@
 
   time.timeZone = "Europe/London";
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_GB.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_GB.UTF-8";
-    LC_IDENTIFICATION = "en_GB.UTF-8";
-    LC_MEASUREMENT = "en_GB.UTF-8";
-    LC_MONETARY = "en_GB.UTF-8";
-    LC_NAME = "en_GB.UTF-8";
-    LC_NUMERIC = "en_GB.UTF-8";
-    LC_PAPER = "en_GB.UTF-8";
-    LC_TELEPHONE = "en_GB.UTF-8";
-    LC_TIME = "en_GB.UTF-8";
-  };
-
-  programs.dconf.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "gb";
-    variant = "";
-  };
-
-  # Configure console keymap
-  console.keyMap = "uk";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  # hardware.pulseaudio.enable = false;
-  # security.rtkit.enable = true;
-  # services.pipewire = {
-  #   enable = true;
-  #   alsa.enable = true;
-  #   alsa.support32Bit = true;
-  #   pulse.enable = true;
-  # };
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [
@@ -91,14 +52,6 @@
     nodePackages_latest.nodejs
     home-manager
     htop
-  ];
-
-  # https://mynixos.com/
-  system.stateVersion = "24.11";
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
   ];
 
   # Enable the OpenSSH service
@@ -113,9 +66,9 @@
 
   # AdGuard Home: DNS + DHCP
   services.adguardhome = {
-    enable         = true;
-    openFirewall   = true;   # auto-opens 53 & 3000
-    mutableSettings = false;  # re-seed on service start
+    enable = true;
+    openFirewall = true; # auto-opens 53 & 3000
+    mutableSettings = false; # re-seed on service start
 
     settings = {
       # DNS
@@ -129,26 +82,26 @@
 
       # DHCP
       dhcp = {
-        enabled     = true;
-        interface   = "enp3s0";
+        enabled = true;
+        interface = "enp3s0";
         dhcpv4 = {
-          gateway_ip  = "192.168.1.1";
+          gateway_ip = "192.168.1.1";
           subnet_mask = "255.255.255.0";
           range_start = "192.168.1.100";
-          range_end   = "192.168.1.200";
-          lease_duration  = 0;
+          range_end = "192.168.1.200";
+          lease_duration = 0;
         };
 
         static_leases = {
-          "AA:BB:CC:DD:EE:FF" = "192.168.1.50";  # TV’s MAC → .50
+          "AA:BB:CC:DD:EE:FF" = "192.168.1.50"; # TV’s MAC → .50
         };
       };
 
       # Blocklists / filtering (defaults)
       filtering = {
         protection_enabled = true;
-        filtering_enabled  = true;
-        parental           = false;
+        filtering_enabled = true;
+        parental = false;
       };
     };
   };
