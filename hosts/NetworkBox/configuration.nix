@@ -34,7 +34,12 @@
 
     firewall = {
       enable = true;
-      allowedUDPPorts = [ 53 ]; # DNS
+      # DNS + DHCP (67 & 68) + AdGuard UI (3000)
+      allowedUDPPorts = [
+        53
+        67
+        68
+      ];
     };
   };
 
@@ -89,7 +94,8 @@
       # DHCP
       dhcp = {
         enabled = true;
-        interface = "enp3s0";
+        interface_name = "enp3s0";
+        local_domain_name = "lan";
         dhcpv4 = {
           gateway_ip = "192.168.8.1";
           subnet_mask = "255.255.255.0";
