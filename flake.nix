@@ -66,6 +66,7 @@
           modules = [
             ./hosts/NixOSVMEFI/configuration.nix
             ./modules/users.nix
+            ./modules/commonConfig.nix
           ];
         };
         MainServer = lib.nixosSystem {
@@ -75,6 +76,7 @@
           modules = [
             ./hosts/MainServer/configuration.nix
             ./modules/users.nix
+            ./modules/commonConfig.nix
           ];
         };
         VMNixOSWork = lib.nixosSystem {
@@ -85,6 +87,7 @@
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
             ./modules/users.nix
+            ./modules/commonConfig.nix
           ];
         };
         NetworkBox = lib.nixosSystem {
@@ -94,6 +97,7 @@
           modules = [
             ./hosts/NetworkBox/configuration.nix
             ./modules/users.nix
+            ./modules/commonConfig.nix
           ];
         };
       };
