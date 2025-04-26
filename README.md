@@ -47,7 +47,7 @@ sudo systemctl restart nix-daemon
 - `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`
 - after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
 - `PROXY` - after install and home manager done, change git origin for `~/.dotfiles` to use `https` instead `ssh` by first doing `git remote -v` and doing `git remote set-url origin https://github.com/username/reponame.git`
-- remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github
+- remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github (add pub rsa to github `cat ~/.dotfiles/.ssh/id_rsa.pub` or using vscode ext)
 - reneable `Secure Boot`
 - `home-manager switch --flake ~/.dotfiles` -> username and machine pulled from current machine and user who is running, no need to specify as long as flake is using "username@hostname"
 - `SSH` allowed by default after installing `home-manager` to `TufNix`
