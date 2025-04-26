@@ -53,6 +53,7 @@
         67
         68
       ];
+      allowedTCPPorts = [ 3000 ];
       extraInputRules = ''
         ip6tables -P INPUT DROP
         ip6tables -P FORWARD DROP
