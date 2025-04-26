@@ -100,6 +100,7 @@
         "6,192.168.8.2" # DNS server (AdGuard)
       ];
       dhcp-host = [
+        "7C:F1:7E:6C:60:00,192.168.8.3" # TP-Link
         "A8:23:FE:FD:19:ED,192.168.8.50" # TV
       ];
     };
@@ -136,18 +137,6 @@
       # DHCP
       dhcp = {
         enabled = false;
-        # interface_name = "enp3s0";
-        # local_domain_name = "lan";
-        # dhcpv4 = {
-        #   gateway_ip = "192.168.8.2";
-        #   subnet_mask = "255.255.255.0";
-        #   range_start = "192.168.8.100";
-        #   range_end = "192.168.8.200";
-        #   lease_duration = 0;
-        # };
-        # static_leases = {
-        #   "e0:cc:f8:fa:fb:42" = "192.168.8.50"; # TV’s MAC → .50
-        # };
       };
 
       # Blocklists / filtering (defaults)
