@@ -86,45 +86,29 @@
   };
 
   # DHCP
-  services.kea = {
-    dhcp4 = {
-      enable = true;
-      settings = {
-        interfaces-config = {
-          interfaces = [ "enp3s0" ]; # your LAN interface
-        };
-        lease-database = {
-          type = "memfile"; # memory + disk file (simple)
-          persist = true;
-          name = "/var/lib/kea/dhcp4.leases";
-        };
-        subnet4 = [
-          {
-            subnet = "192.168.8.0/24";
-            pools = [
-              {
-                pool = "192.168.8.100 - 192.168.8.200";
-              }
-            ];
-            option-data = [
-              {
-                name = "routers";
-                data = "192.168.8.2"; # gateway
-              }
-              {
-                name = "domain-name-servers";
-                data = "192.168.8.2"; # DNS server (your AdGuard box)
-              }
-            ];
-            reservations = [
-              {
-                hw-address = "e0:cc:f8:fa:fb:42";
-                ip-address = "192.168.8.50";
-              }
-            ];
-          }
-        ];
-      };
+  services.dnsmasq = {
+    enable = true;
+    settings = {
+      interface = "enp3s0"; # your LAN interface
+      bind-interfaces = true;
+
+      # DHCP settings
+      dhcp-range = "192.168.8.100,192.168.8.200,255.255.255.0,24h";
+      dhcp-option = [
+        "3,192.168.8.2" # router/gateway option (code 3)
+        "6,192.168.8.2" # DNS server option (code 6)
+      ];
+      dhcp-host = [
+        "e0:cc:f8:fa:fb:42,192.168.8.50" # static lease for TV MAC
+      ];
+
+      # DNS settings (optional)
+      server = [
+        "94.140.14.14"
+        "94.140.15.15"
+      ];
+      no-resolv = true; # don't use /etc/resolv.conf
+      listen-address = "127.0.0.1";
     };
   };
 
