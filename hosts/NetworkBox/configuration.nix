@@ -13,6 +13,16 @@
     fsType = "vfat";
   };
 
+  # Disalbe RA and SLAAC
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.accept_ra" = 0;
+    "net.ipv6.conf.default.accept_ra" = 0;
+    "net.ipv6.conf.enp3s0.accept_ra" = 0;
+    "net.ipv6.conf.all.autoconf" = 0;
+    "net.ipv6.conf.default.autoconf" = 0;
+    "net.ipv6.conf.enp3s0.autoconf" = 0;
+  };
+
   # Networking
   networking = {
     hostName = "NetworkBox";
