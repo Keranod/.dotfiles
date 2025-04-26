@@ -85,7 +85,28 @@
     };
   };
 
-  # AdGuard Home: DNS + DHCP
+  services.dhcpd4 = {
+    enable = true;
+    interfaces = [ "enp3s0" ];
+    extraConfig = ''
+      default-lease-time 86400;
+      max-lease-time 172800;
+      authoritative;
+
+      subnet 192.168.8.0 netmask 255.255.255.0 {
+        range 192.168.8.100 192.168.8.200;
+        option routers 192.168.8.2;
+        option domain-name-servers 192.168.8.2;
+      }
+
+      host Xiaomi {
+        hardware ethernet e0:cc:f8:fa:fb:42;
+        fixed-address 192.168.8.50;
+      }
+    '';
+  };
+
+  # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
     openFirewall = true; # auto-opens 53 & 3000
@@ -115,19 +136,19 @@
 
       # DHCP
       dhcp = {
-        enabled = true;
-        interface_name = "enp3s0";
-        local_domain_name = "lan";
-        dhcpv4 = {
-          gateway_ip = "192.168.8.2";
-          subnet_mask = "255.255.255.0";
-          range_start = "192.168.8.100";
-          range_end = "192.168.8.200";
-          lease_duration = 0;
-        };
-        static_leases = {
-          "e0:cc:f8:fa:fb:42" = "192.168.8.50"; # TV’s MAC → .50
-        };
+        enabled = false;
+        # interface_name = "enp3s0";
+        # local_domain_name = "lan";
+        # dhcpv4 = {
+        #   gateway_ip = "192.168.8.2";
+        #   subnet_mask = "255.255.255.0";
+        #   range_start = "192.168.8.100";
+        #   range_end = "192.168.8.200";
+        #   lease_duration = 0;
+        # };
+        # static_leases = {
+        #   "e0:cc:f8:fa:fb:42" = "192.168.8.50"; # TV’s MAC → .50
+        # };
       };
 
       # Blocklists / filtering (defaults)
