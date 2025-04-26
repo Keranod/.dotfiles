@@ -38,11 +38,9 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
-        #config.allowUnfree = true;
       };
       pkgsUnstable_ = import nixpkgs-unstable {
         inherit system;
-        #config.allowUnfree = true;
       };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
