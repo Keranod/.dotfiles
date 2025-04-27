@@ -13,6 +13,8 @@
     fsType = "vfat";
   };
 
+  boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
+
   # Networking
   networking = {
     hostName = "NetworkBox";
