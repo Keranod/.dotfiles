@@ -42,7 +42,6 @@ in
             prefixLength = 64;
           }
         ];
-        ${vpnInterface}.useDHCP = false;
       };
     };
 
@@ -57,7 +56,6 @@ in
 
     firewall = {
       enable = true;
-      trustedInterfaces = [ vpnInterface ];
       # DNS + DHCP (67 & 68) + AdGuard UI (3000)
       allowedUDPPorts = [
         53
