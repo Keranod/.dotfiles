@@ -8,7 +8,7 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  vpnConfig = builtins.readFile /etc/openvpn/airvpn.conf;
+  vpnConfig = builtins.readFile ../../AirVPN_Taiwan_UDP-443-Entry3.ovpn;
 in
 {
   imports = [
