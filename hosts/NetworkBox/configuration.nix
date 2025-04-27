@@ -81,6 +81,7 @@
     nodePackages_latest.nodejs
     home-manager
     htop
+    radvd
   ];
 
   # Enable the OpenSSH service
