@@ -21,7 +21,7 @@
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
     private_configs = {
-      url = "path:./private_configs";
+      url = "path:./privateConfigs";
       flake = false; # just raw files, not a flake
     };
   };
