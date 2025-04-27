@@ -190,7 +190,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = builtins.readFile ./.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
+    config = (builtins.readFile ../../.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn);
     autoStart = true;
   };
 
