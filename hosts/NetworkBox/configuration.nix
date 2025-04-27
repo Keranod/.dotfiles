@@ -1,8 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
-  vpnInterface = "tun0"; # OpenVPN will create tun0
-  tvIp = "192.168.8.50"; # your TV IP
+  tvIp = "192.168.8.50"; # your TV’s static IP
+  vpnInterface = "tun0"; # OpenVPN interface
+  tableNum = 100; # custom routing table
 in
 {
   imports = [
@@ -17,6 +18,7 @@ in
     fsType = "vfat";
   };
 
+  boot.kernel.sysctl."net.ipv4.ip_forward" = true;
   boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
 
   # Networking
@@ -75,16 +77,6 @@ in
 
       '';
     };
-
-    extraCommands = ''
-      ip rule add from ${tvIp} table 100
-      ip route add default dev ${vpnInterface} table 100
-    '';
-
-    extraStopCommands = ''
-      ip rule del from ${tvIp} table 100
-      ip route del default dev ${vpnInterface} table 100
-    '';
   };
 
   # Configure network proxy if necessary
@@ -202,5 +194,32 @@ in
   services.openvpn.servers.airvpn = {
     config = builtins.readFile ./.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
     autoStart = true;
+  };
+
+  systemd.services.vpn-split-tv = {
+    description = "Split-tunnel TV → AirVPN";
+    wants = [ "openvpn-airvpn.service" ];
+    after = [
+      "network-online.target"
+      "openvpn-airvpn.service"
+    ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      # run these commands when the service starts
+      ExecStart = lib.mkForce ''
+        # create a default route via tun0 in table 100
+        ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${toString tableNum}
+        # tell the kernel: any packet from $tvIp uses table 100
+        ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${toString tableNum} priority 100
+      '';
+      # run these on stop/reboot to clean up
+      ExecStop = lib.mkForce ''
+        ${pkgs.iproute2}/bin/ip rule del from ${tvIp} lookup ${toString tableNum} priority 100
+        ${pkgs.iproute2}/bin/ip route del default dev ${vpnInterface} table ${toString tableNum}
+      '';
+    };
   };
 }
