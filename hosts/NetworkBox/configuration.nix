@@ -21,6 +21,11 @@ in
   boot.kernel.sysctl."net.ipv4.ip_forward" = true;
   boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
 
+  environment.etc."openvpn/airvpn.conf" = {
+    source = ../../.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
+    mode = "0400";
+  };
+
   # Networking
   networking = {
     hostName = "NetworkBox";
@@ -73,6 +78,20 @@ in
         # …then your final DROP policy
         ip6tables -P INPUT DROP
 
+      '';
+      extraCommands = ''
+        # mark TV → fwmark 1
+        ${pkgs.iptables}/bin/iptables -t mangle \
+          -A PREROUTING -s ${tvIp} -j MARK --set-mark 1
+        # NAT TV out tun0
+        ${pkgs.iptables}/bin/iptables -t nat \
+          -A POSTROUTING -o ${vpnInterface} -s ${tvIp} -j MASQUERADE
+      '';
+      networking.firewall.extraStopCommands = ''
+        ${pkgs.iptables}/bin/iptables -t mangle \
+          -D PREROUTING -s ${tvIp} -j MARK --set-mark 1
+        ${pkgs.iptables}/bin/iptables -t nat \
+          -D POSTROUTING -o ${vpnInterface} -s ${tvIp} -j MASQUERADE
       '';
     };
   };
@@ -190,7 +209,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = (builtins.readFile /home/keranod/.dotfiles/.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn);
+    config = "config /etc/openvpn/airvpn.conf";
     autoStart = true;
   };
 
