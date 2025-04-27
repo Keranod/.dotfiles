@@ -9,7 +9,7 @@ let
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
   vpnConfig = builtins.toFile "airvpn-config.ovpn" (
-    builtins.readFile /home/keranod/.dotfiles/AirVPN_Taiwan_UDP-443-Entry3.ovpn
+    builtins.readFile ../../AirVPN_Taiwan_UDP-443-Entry3.ovpn
   );
 in
 {
