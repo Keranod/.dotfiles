@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  vpnProfileDir,
+  ...
+}:
 
 let
   tvIp = "192.168.8.50"; # your TV’s static IP
@@ -22,7 +27,7 @@ in
   boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
 
   environment.etc."openvpn/airvpn.conf" = {
-    source = ../../.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
+    source = "${vpnProfileDir}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
     mode = "0400";
   };
 
