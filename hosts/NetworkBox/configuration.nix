@@ -82,6 +82,7 @@
     home-manager
     htop
     radvd
+    tcpdump
   ];
 
   # Enable the OpenSSH service
@@ -120,6 +121,7 @@
     config = ''
       interface enp3s0 {
         AdvSendAdvert on;
+        AdvOtherConfigFlag on;
         MinRtrAdvInterval 30;
         MaxRtrAdvInterval 100;
 
