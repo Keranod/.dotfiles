@@ -214,7 +214,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = vpnConfig;
+    config = builtins.toFile "airvpn.conf" vpnConfig;
     autoStart = true;
   };
 
