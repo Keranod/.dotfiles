@@ -116,20 +116,22 @@
     enable = true;
     # This string is exactly what goes into /etc/radvd.conf
     config = ''
-      interface enp3s0 {
+        interface enp3s0 {
         AdvSendAdvert on;
-        # clients will SLAAC their own address
+
         prefix fd00:1234:5678:1::/64 {
-          AdvOnLink on;
-          AdvAutonomous on;
+          AdvOnLink      on;
+          AdvAutonomous  on;
         };
-        # tell them “use me for DNS”
+
+        # your DNS server (AdGuardHome) lives at ::1
         RDNSS fd00:1234:5678:1::1 {
           AdvRDNSSLifetime 600;
         };
-        # (optional) advertise a local search domain
-        DNSSL "lan.local" {
-          AdvDNSSLLifetime 600;
+
+        # advertise “lan.local” as the search domain – no quotes around the name
+        DNSSL lan.local {
+          AdvDNSSLifetime 600;
         };
       };
     '';
