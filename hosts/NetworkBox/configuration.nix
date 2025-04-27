@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  private_configs,
   ...
 }:
 
@@ -8,9 +9,8 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  vpnConfig = builtins.toFile "airvpn-config.ovpn" (
-    builtins.readFile ../../AirVPN_Taiwan_UDP-443-Entry3.ovpn
-  );
+  ovpnPath = toString private_configs + "/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+  vpnConfig = builtins.readFile ovpnPath;
 in
 {
   imports = [

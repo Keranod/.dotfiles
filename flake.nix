@@ -20,6 +20,10 @@
     sambaPkgs = {
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
+    private_configs = {
+      url = "path:./private_configs";
+      flake = false; # just raw files, not a flake
+    };
   };
 
   # Importing self ans nixpkgs
@@ -30,6 +34,7 @@
       home-manager,
       bindPkgs,
       sambaPkgs,
+      private_configs,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
@@ -93,6 +98,7 @@
         NetworkBox = lib.nixosSystem {
           # Architecture
           inherit system;
+          specialArgs = { inherit private_configs; };
           # List/Array of modules
           modules = [
             ./hosts/NetworkBox/configuration.nix
