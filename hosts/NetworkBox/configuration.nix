@@ -124,7 +124,7 @@
           AdvAutonomous on;
         };
         # tell them “use me for DNS”
-        RDNSS fd00:1234:5678:1::53 {
+        RDNSS fd00:1234:5678:1::1 {
           AdvRDNSSLifetime 600;
         };
         # (optional) advertise a local search domain
