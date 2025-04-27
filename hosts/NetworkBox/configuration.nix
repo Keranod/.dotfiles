@@ -13,16 +13,10 @@
     fsType = "vfat";
   };
 
-  boot.kernel.sysctl."net.ipv6.conf.all.disable_ipv6" = true;
-  boot.kernel.sysctl."net.ipv6.conf.default.disable_ipv6" = true;
-  boot.kernel.sysctl."net.ipv6.conf.lo.disable_ipv6" = true;
-
   # Networking
   networking = {
     hostName = "NetworkBox";
     networkmanager.enable = false;
-
-    enableIPv6 = false;
 
     # Static IP on enp3s0
     interfaces.enp3s0 = {
@@ -33,13 +27,18 @@
           prefixLength = 24;
         }
       ];
+      ipv6.addresses = [
+        {
+          address = "fd00:1234:5678:1::1";
+          prefixLength = 64;
+        }
+      ];
     };
 
     nat = {
       enable = true;
       internalInterfaces = [ ]; # your LAN side interface
       externalInterface = "enp3s0"; # same interface because Huawei is upstream
-      enableIPv6 = false; # no IPv6
     };
 
     defaultGateway = "192.168.8.1";
@@ -54,9 +53,16 @@
         68
       ];
       extraInputRules = ''
+         # Accept ICMPv6/NDP so RAs get through
+        ip6tables -A INPUT -p ipv6-icmp -j ACCEPT
+
+        # Accept DNS (UDP & TCP 53)
+        ip6tables -A INPUT -p udp --dport 53 -j ACCEPT
+        ip6tables -A INPUT -p tcp --dport 53 -j ACCEPT
+
+        # …then your final DROP policy
         ip6tables -P INPUT DROP
-        ip6tables -P FORWARD DROP
-        ip6tables -P OUTPUT DROP
+
       '';
     };
   };
@@ -106,6 +112,29 @@
     };
   };
 
+  services.radvd = {
+    enable = true;
+    # This string is exactly what goes into /etc/radvd.conf
+    config = ''
+      interface enp3s0 {
+        AdvSendAdvert on;
+        # clients will SLAAC their own address
+        prefix fd00:1234:5678:1::/64 {
+          AdvOnLink on;
+          AdvAutonomous on;
+        };
+        # tell them “use me for DNS”
+        RDNSS fd00:1234:5678:1::53 {
+          AdvRDNSSLifetime 600;
+        };
+        # (optional) advertise a local search domain
+        DNSSL "lan.local" {
+          AdvDNSSLLifetime 600;
+        };
+      };
+    '';
+  };
+
   # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
@@ -117,6 +146,7 @@
       dns = {
         bind_hosts = [
           "0.0.0.0"
+          "::"
         ];
         port = 53;
         upstream_dns = [
