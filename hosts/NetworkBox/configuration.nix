@@ -1,5 +1,9 @@
 { pkgs, ... }:
 
+let
+  vpnInterface = "tun0"; # OpenVPN will create tun0
+  tvIp = "192.168.8.50"; # your TV IP
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -21,20 +25,23 @@
     networkmanager.enable = false;
 
     # Static IP on enp3s0
-    interfaces.enp3s0 = {
-      useDHCP = false;
-      ipv4.addresses = [
-        {
-          address = "192.168.8.2";
-          prefixLength = 24;
-        }
-      ];
-      ipv6.addresses = [
-        {
-          address = "fd00:1234:5678:1::1";
-          prefixLength = 64;
-        }
-      ];
+    interfaces = {
+      enp3s0 = {
+        useDHCP = false;
+        ipv4.addresses = [
+          {
+            address = "192.168.8.2";
+            prefixLength = 24;
+          }
+        ];
+        ipv6.addresses = [
+          {
+            address = "fd00:1234:5678:1::1";
+            prefixLength = 64;
+          }
+        ];
+        ${vpnInterface}.useDHCP = false;
+      };
     };
 
     nat = {
@@ -48,6 +55,7 @@
 
     firewall = {
       enable = true;
+      trustedInterfaces = [ vpnInterface ];
       # DNS + DHCP (67 & 68) + AdGuard UI (3000)
       allowedUDPPorts = [
         53
@@ -67,6 +75,16 @@
 
       '';
     };
+
+    extraCommands = ''
+      ip rule add from ${tvIp} table 100
+      ip route add default dev ${vpnInterface} table 100
+    '';
+
+    extraStopCommands = ''
+      ip rule del from ${tvIp} table 100
+      ip route del default dev ${vpnInterface} table 100
+    '';
   };
 
   # Configure network proxy if necessary
@@ -178,5 +196,11 @@
         parental = false;
       };
     };
+  };
+
+  # VPN
+  services.openvpn.servers.airvpn = {
+    config = builtins.readFile ./.vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
+    autoStart = true;
   };
 }
