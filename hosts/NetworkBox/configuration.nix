@@ -8,7 +8,7 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  vpnConfig = ./AirVPN_Taiwan_UDP-443-Entry3.ovpn;
+  vpnConfig = builtins.readFile /home/keranod/.dotfiles/hosts/NetworkBox/AirVPN_Taiwan_UDP-443-Entry3.ovpn;
 in
 {
   imports = [
@@ -214,7 +214,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = "/etc/openvpn/airvpn.conf";
+    config = vpnConfig;
     autoStart = true;
   };
 
