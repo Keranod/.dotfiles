@@ -114,24 +114,19 @@
 
   services.radvd = {
     enable = true;
-    # This string is exactly what goes into /etc/radvd.conf
     config = ''
-        interface enp3s0 {
+      interface enp3s0 {
         AdvSendAdvert on;
+        MinRtrAdvInterval 30;
+        MaxRtrAdvInterval 100;
 
         prefix fd00:1234:5678:1::/64 {
-          AdvOnLink      on;
-          AdvAutonomous  on;
+          AdvOnLink on;
+          AdvAutonomous on;
         };
 
-        # your DNS server (AdGuardHome) lives at ::1
         RDNSS fd00:1234:5678:1::1 {
           AdvRDNSSLifetime 600;
-        };
-
-        # advertise “lan.local” as the search domain – no quotes around the name
-        DNSSL lan.local {
-          AdvDNSSLifetime 600;
         };
       };
     '';
