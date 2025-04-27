@@ -87,7 +87,7 @@ in
         ${pkgs.iptables}/bin/iptables -t nat \
           -A POSTROUTING -o ${vpnInterface} -s ${tvIp} -j MASQUERADE
       '';
-      networking.firewall.extraStopCommands = ''
+      extraStopCommands = ''
         ${pkgs.iptables}/bin/iptables -t mangle \
           -D PREROUTING -s ${tvIp} -j MARK --set-mark 1
         ${pkgs.iptables}/bin/iptables -t nat \
