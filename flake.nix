@@ -44,8 +44,6 @@
       };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
-      dotfiles = ./.;
-      vpnFiles = dotfiles + "/.vpn";
     in
     {
       # Can specify multiple configurations
@@ -100,9 +98,6 @@
             ./hosts/NetworkBox/configuration.nix
             ./modules/users.nix
             ./modules/commonConfig.nix
-            (import ./hosts/NetworkBox/configuration.nix {
-              vpnProfileDir = vpnFiles;
-            })
           ];
         };
       };

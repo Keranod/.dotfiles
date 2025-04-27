@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  vpnProfileDir,
   ...
 }:
 
@@ -9,6 +8,7 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
+  vpnConfig = ./AirVPN_Taiwan_UDP-443-Entry3.ovpn;
 in
 {
   imports = [
@@ -27,7 +27,7 @@ in
   boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
 
   environment.etc."openvpn/airvpn.conf" = {
-    source = "${vpnProfileDir}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+    source = vpnConfig;
     mode = "0400";
   };
 
@@ -214,7 +214,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = "config /etc/openvpn/airvpn.conf";
+    config = "/etc/openvpn/airvpn.conf";
     autoStart = true;
   };
 
