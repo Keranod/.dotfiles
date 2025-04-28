@@ -133,11 +133,21 @@ in
     "openvpn/tvVpn.ovpn".mode   = "0600";
   };
 
-  # Only start the OpenVPN service if the config exists
-  services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
-    config    = ''config ${tvVpnConf}'';  # Corrected syntax
-    autoStart = true;
+  # Print a message to debug
+  systemd.services.tvVpnDebug = {
+    description = "Debug TV VPN";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.ExecStart = ''
+      echo "tvVpnConf exists: ${builtins.pathExists tvVpnConf}" > /var/log/tvVpnConf.log
+      echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log
+    '';
   };
+
+  # Only start the OpenVPN service if the config exists
+  # services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
+  #   config    = ''config ${tvVpnConf}'';  # Corrected syntax
+  #   autoStart = true;
+  # };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
