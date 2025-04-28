@@ -56,7 +56,10 @@
       };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
-      privateConfigsStore = pkgs.runCommandDir "privateConfigs" { } ./privateConfigs;
+      privateConfigsStore = pkgs.symlinkJoin {
+        name = "privateConfigs";
+        paths = [ ./privateConfigs ];
+      };
     in
     {
       # Can specify multiple configurations
