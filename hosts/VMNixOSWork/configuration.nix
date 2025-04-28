@@ -137,7 +137,7 @@ in
 
   services.openvpn.servers.airvpn = {
     # point to the .ovpn inside the bind-mount:
-    configFile = "/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+    config = ''config /etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn'';
     autoStart  = true;
   };
 
