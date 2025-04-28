@@ -1,7 +1,5 @@
 { pkgsUnstable_, ... }:
 {
-  
-  pkgsUnstable_.config.allowUnfree = true;
   home.packages = with pkgsUnstable_; [
     icu
     dotnet-sdk_9
