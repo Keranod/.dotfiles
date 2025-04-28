@@ -130,7 +130,7 @@ in
   ];
 
   fileSystems."/etc/privateConfigs" = {
-    device  = privateConfigsStore;
+    device  = privateConfigsStore.outPath;
     fsType  = "none";
     options = [ "bind" "ro" ];
   };
