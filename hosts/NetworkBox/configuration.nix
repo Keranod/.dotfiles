@@ -5,11 +5,6 @@
   ...
 }:
 
-let
-  tvIp = "192.168.8.50"; # your TV’s static IP
-  vpnInterface = "tun0"; # OpenVPN interface
-  tableNum = 100; # custom routing table
-in
 {
   imports = [
     # Include the results of the hardware scan.
