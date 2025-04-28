@@ -34,7 +34,7 @@
       home-manager,
       bindPkgs,
       sambaPkgs,
-      private_configs,
+      privateConfigs,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
