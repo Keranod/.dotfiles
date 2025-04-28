@@ -60,7 +60,7 @@
         name = "privateConfigs";
         paths = [
           (builtins.path {
-            path = ./privateConfigs;
+            path = ../privateConfigs;
             name = "privateConfigs";
             filter = _: _: true; # <- IMPORTANT, disables gitignore filtering
           })
