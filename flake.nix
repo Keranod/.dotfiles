@@ -58,7 +58,12 @@
       sambaPkgs_ = import sambaPkgs { inherit system; };
       privateConfigsStore = pkgs.symlinkJoin {
         name = "privateConfigs";
-        paths = [ ./privateConfigs ];
+        paths = [
+          (builtins.path {
+            path = ./privateConfigs;
+            name = "privateConfigs";
+          })
+        ];
       };
     in
     {
