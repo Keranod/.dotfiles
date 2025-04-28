@@ -62,6 +62,7 @@
           (builtins.path {
             path = ./privateConfigs;
             name = "privateConfigs";
+            filter = _: _: true; # <- IMPORTANT, disables gitignore filtering
           })
         ];
       };
