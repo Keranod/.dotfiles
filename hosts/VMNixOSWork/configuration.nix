@@ -138,7 +138,7 @@ in
     description = "Debug TV VPN";
     wantedBy = [ "multi-user.target" ];
     serviceConfig.ExecStart = ''
-      echo "tvVpnConf exists: ${builtins.pathExists tvVpnConf}" > /var/log/tvVpnConf.log
+      echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" > /var/log/tvVpnConf.log
       echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log
     '';
   };
