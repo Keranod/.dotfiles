@@ -19,7 +19,6 @@ in
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  pkgsUnstable_.config.allowUnfree = true;
 
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
