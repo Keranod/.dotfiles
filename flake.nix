@@ -94,7 +94,7 @@
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit bindPkgs_ sambaPkgs_; };
+          specialArgs = { inherit bindPkgs_ sambaPkgs_ private_configs; };
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
