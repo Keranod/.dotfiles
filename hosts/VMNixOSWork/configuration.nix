@@ -11,7 +11,7 @@ let
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
   ovpnPath  = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  opnConfig = builtins.readFile ovpnPath;
+  ovpnConfig = builtins.readFile ovpnPath;
 in
 {
   imports = [
@@ -130,7 +130,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = vpnConfig;
+    config = ovpnConfig;
     autoStart = true;
   };
 
