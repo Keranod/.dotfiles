@@ -1,9 +1,6 @@
 { ... }:
 
 {
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   time.timeZone = "Europe/London";
 
   # Select internationalisation properties.

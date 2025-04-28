@@ -17,9 +17,6 @@ in
   # release notes.
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # List packages installed in user profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   # home.packages = with pkgs; [
