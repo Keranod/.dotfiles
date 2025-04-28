@@ -107,7 +107,7 @@
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit bindPkgs_ sambaPkgs_ privateConfigs privateConfigsStore; };
+          specialArgs = { inherit bindPkgs_ sambaPkgs_ privateConfigsStore; };
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
@@ -118,7 +118,6 @@
         NetworkBox = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit privateConfigs; };
           # List/Array of modules
           modules = [
             ./hosts/NetworkBox/configuration.nix
