@@ -2,8 +2,6 @@
   pkgs,
   bindPkgs_,
   sambaPkgs_,
-  privateConfigs,
-  privateConfigsStore,
   ...
 }:
 
@@ -129,16 +127,8 @@ in
     gnome-online-accounts
   ];
 
-  fileSystems."/etc/privateConfigs" = {
-    device  = privateConfigsStore.outPath;
-    fsType  = "none";
-    options = [ "bind" "ro" ];
-  };
-
-  services.openvpn.servers.airvpn = {
-    # point to the .ovpn inside the bind-mount:
-    config = ''config /etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn'';
-    autoStart  = true;
+  services.openvpn.servers = {
+    airvpn = { config = ''/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn''; };
   };
 
   # Enable the OpenSSH daemon.

@@ -9,8 +9,6 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  ovpnPath = toString privateConfigs + "/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  vpnConfig = builtins.readFile ovpnPath;
 in
 {
   imports = [
@@ -27,11 +25,6 @@ in
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = true;
   boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
-
-  environment.etc."openvpn/airvpn.conf" = {
-    source = vpnConfig;
-    mode = "0400";
-  };
 
   # Networking
   networking = {
