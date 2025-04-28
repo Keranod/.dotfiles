@@ -1,3 +1,17 @@
+# Contents
+
+- Modulrized falke config
+- Main Channel stable
+- Extra unstable channel
+- Specific version of `bind` and `samba`
+- Semi automatic installation on `Legacy` and `EFI`
+- Useful commands
+- Home-manager
+- Working `Godot` and `VSCode` with `C#`
+- Working properly external Ultrawide screen and laptop screen at the same time `TufNix`
+- Selfhosted web server using `ngnix` and `strapi`
+- Useful aliases in bash
+
 # Links
 
 - [MyNixOS Options](https://mynixos.com)
