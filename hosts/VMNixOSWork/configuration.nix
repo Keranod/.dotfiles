@@ -127,9 +127,9 @@ in
     gnome-online-accounts
   ];
 
-  services.openvpn.servers = {
-    airvpn = { config = ''/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn''; };
-  };
+  # services.openvpn.servers = {
+  #   airvpn = { config = ''/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn''; };
+  # };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
