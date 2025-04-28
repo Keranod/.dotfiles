@@ -4,14 +4,6 @@
   ...
 }:
 
-let
-  tvIp = "192.168.8.50"; # your TV’s static IP
-  vpnInterface = "tun0"; # OpenVPN interface
-  tableNum = 100; # custom routing table
-  tvVpnConf = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.conf";
-  # ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  # vpnConfig = builtins.readFile ovpnPath;
-in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -125,23 +117,8 @@ in
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
+    openvpn
   ];
-
-  # Only add if the local file exists
-  environment.etc = lib.optionalAttrs (builtins.pathExists (builtins.toString tvVpnConf)) {
-    "openvpn/tvVpn.ovpn".source = tvVpnConf;
-    "openvpn/tvVpn.ovpn".mode   = "0600";
-  };
-
-  # Print a message to debug
-  systemd.services.tvVpnDebug = {
-    description = "Debug TV VPN";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig.ExecStart = ''
-      /run/current-system/sw/bin/bash -c 'echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" >> /var/log/tvVpnConf.log'
-      /run/current-system/sw/bin/bash -c 'echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log'
-    '';
-  };
 
   # Only start the OpenVPN service if the config exists
   # services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {

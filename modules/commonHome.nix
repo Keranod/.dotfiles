@@ -101,6 +101,68 @@ in
           echo "Connecting to $ip..."
           ssh -i ~/.dotfiles/.ssh/id_rsa "keranod@$ip"
       }
+
+      vpnroute() {
+        IP="$1"
+        CONFIG="$2"
+
+        if [[ -z "$IP" || -z "$CONFIG" ]]; then
+          echo "Usage: $0 <IP_ADDRESS> <OPENVPN_CONFIG_PATH>"
+          exit 1
+        fi
+
+        IFACE="tun-$IP"  # Create custom interface name (example: tun-192.168.8.50)
+        TABLE_ID=$(echo "$IP" | awk -F'.' '{print $3$4}') # Example: 50 for 192.168.8.50 -> 850
+
+        start_vpn() {
+          echo "Starting OpenVPN for IP $IP with config $CONFIG..."
+
+          # Launch OpenVPN (give it a specific dev tun name)
+          openvpn --config "$CONFIG" --dev "$IFACE" --daemon --writepid "/run/vpn-${IP}.pid"
+
+          # Wait for interface
+          while ! ip link show "$IFACE" > /dev/null 2>&1; do
+            echo "Waiting for interface $IFACE to come up..."
+            sleep 1
+          done
+
+          # Setup routing
+          echo "Setting up routing table $TABLE_ID for $IP over $IFACE"
+          ip route add default dev "$IFACE" table "$TABLE_ID"
+          ip rule add from "$IP" lookup "$TABLE_ID" priority 100
+        }
+
+        stop_vpn() {
+          echo "Stopping OpenVPN and cleaning up routes for IP $IP..."
+
+          # Remove rules
+          ip rule del from "$IP" lookup "$TABLE_ID" priority 100 || true
+          ip route del default dev "$IFACE" table "$TABLE_ID" || true
+
+          # Kill OpenVPN
+          if [ -f "/run/vpn-${IP}.pid" ]; then
+            kill "$(cat /run/vpn-${IP}.pid)" || true
+            rm -f "/run/vpn-${IP}.pid"
+          fi
+        }
+
+        case "$3" in
+          start)
+            start_vpn
+            ;;
+          stop)
+            stop_vpn
+            ;;
+          restart)
+            stop_vpn
+            start_vpn
+            ;;
+          *)
+            echo "Usage: $0 <IP_ADDRESS> <OPENVPN_CONFIG_PATH> {start|stop|restart}"
+            exit 1
+            ;;
+        esac
+      }
     '';
   };
 
