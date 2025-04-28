@@ -73,7 +73,15 @@
 
       # Masquerade/NAT is handled separately; make sure forwarding is on:
       # (NixOS will auto–allow established+related on forwarded packets)
-    };
+      extraCommands = let
+        tbl = "${toString tableNum}";
+      in ''
+        # add a rule: from tvIp → tableNum
+        ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
+        # in that table, send default → tun0
+        ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
+      '';  # :contentReference[oaicite:1]{index=1}
+      };
   };
 
   # Configure network proxy if necessary
@@ -155,5 +163,19 @@
         parental = false;
       };
     };
+  };
+
+  # Tell NixOS to symlink your private VPN file into /etc/openvpn
+  environment.etc."openvpn/vpn.conf" = {
+    source = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.conf";
+  };
+
+  # Then later, set up the OpenVPN client:
+  services.openvpn.servers.vpn = {
+    autoStart = true;
+    config    = ''
+      config /etc/openvpn/vpn.conf
+      pull-filter ignore redirect-gateway
+    '';
   };
 }
