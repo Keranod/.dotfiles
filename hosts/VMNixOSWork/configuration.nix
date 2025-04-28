@@ -128,54 +128,60 @@ in
     gnome-online-accounts
   ];
 
+  # VPN
+  services.openvpn.servers.airvpn = {
+    config = vpnConfig;
+    autoStart = true;
+  };
+
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
   # Samba
   # `testparm` to test config after rebuilding and switching
-  services.samba = {
-    enable = true;
-    package = sambaPkgs_.samba;
-    openFirewall = true;
+  # services.samba = {
+  #   enable = true;
+  #   package = sambaPkgs_.samba;
+  #   openFirewall = true;
 
-    settings = {
-      global = {
-        "workgroup" = "TESTDOMAIN";
-        "netbios name" = "VMNixOSWork"; # Use the DC's NetBIOS name as desired.
-        "server string" = "Samba NT4 DC for TESTDOMAIN";
-        "security" = "user";
-        "domain logons" = "yes"; # Crucial for domain controller functionality.
-        "domain master" = "yes";
-        "ntlm auth" = "yes";
-        "passdb backend" = "tdbsam";
+  #   settings = {
+  #     global = {
+  #       "workgroup" = "TESTDOMAIN";
+  #       "netbios name" = "VMNixOSWork"; # Use the DC's NetBIOS name as desired.
+  #       "server string" = "Samba NT4 DC for TESTDOMAIN";
+  #       "security" = "user";
+  #       "domain logons" = "yes"; # Crucial for domain controller functionality.
+  #       "domain master" = "yes";
+  #       "ntlm auth" = "yes";
+  #       "passdb backend" = "tdbsam";
 
-        # WINS support (ensure Windows clients use this DC for WINS):
-        "wins support" = "yes";
+  #       # WINS support (ensure Windows clients use this DC for WINS):
+  #       "wins support" = "yes";
 
-        "add user script" = "sudo /usr/sbin/useradd -d /home/%u -s /bin/bash %u";
-        "add group script" = "sudo /usr/sbin/groupadd %g";
-        "delete user script" = "/usr/sbin/userdel %u";
-        "delete group script" = "/usr/sbin/groupdel %g";
+  #       "add user script" = "sudo /usr/sbin/useradd -d /home/%u -s /bin/bash %u";
+  #       "add group script" = "sudo /usr/sbin/groupadd %g";
+  #       "delete user script" = "/usr/sbin/userdel %u";
+  #       "delete group script" = "/usr/sbin/groupdel %g";
 
-        # Logon information:
-        "logon drive" = "P:";
-        "logon home" = "\\\\VMNixOSWork\\%U";
-        "logon path" = "";
-        "max log size" = "50";
+  #       # Logon information:
+  #       "logon drive" = "P:";
+  #       "logon home" = "\\\\VMNixOSWork\\%U";
+  #       "logon path" = "";
+  #       "max log size" = "50";
 
-        "socket options" = "TCP_NODELAY";
-        "time server" = "yes";
-      };
-    };
-    shares = {
-      Publiczny = {
-        "path" = "/home/franz/publiczny";
-        "writable" = "yes";
-        "guest ok" = "yes";
-        # Need to chmod 777 the path directory
-      };
-    };
-  };
+  #       "socket options" = "TCP_NODELAY";
+  #       "time server" = "yes";
+  #     };
+  #   };
+  #   shares = {
+  #     Publiczny = {
+  #       "path" = "/home/franz/publiczny";
+  #       "writable" = "yes";
+  #       "guest ok" = "yes";
+  #       # Need to chmod 777 the path directory
+  #     };
+  #   };
+  # };
 
   # Bind configuration
   # services.bind = {
@@ -202,18 +208,18 @@ in
   # };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    53 # for DNS
-    137
-    138
-    139
-    445
-  ];
-  networking.firewall.allowedUDPPorts = [
-    53 # for DNS
-    137
-    138
-  ];
+  # networking.firewall.allowedTCPPorts = [
+  #   53 # for DNS
+  #   137
+  #   138
+  #   139
+  #   445
+  # ];
+  # networking.firewall.allowedUDPPorts = [
+  #   53 # for DNS
+  #   137
+  #   138
+  # ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
