@@ -11,13 +11,15 @@ let
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
   ovpnPath = toString privateConfigs + "/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  vpnConfig = builtins.readFile ovpnPath;
+  #vpnConfig = builtins.readFile ovpnPath;
 in
 {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+
+  environment.variables.TEST_ENVIRONMENT = [ (builtins.readFile ../../privareConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn) ];
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
@@ -130,7 +132,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = vpnConfig;
+    #config = vpnConfig;
     autoStart = true;
   };
 
