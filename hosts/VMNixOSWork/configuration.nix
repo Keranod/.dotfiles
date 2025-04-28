@@ -131,10 +131,10 @@ in
   ];
 
   # VPN
-  services.openvpn.servers.airvpn = {
-    #config = vpnConfig;
-    autoStart = true;
-  };
+  # services.openvpn.servers.airvpn = {
+  #   #config = vpnConfig;
+  #   autoStart = true;
+  # };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
