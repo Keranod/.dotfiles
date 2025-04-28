@@ -10,8 +10,10 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  ovpnPath  = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  ovpnConfig = builtins.readFile ovpnPath;
+  ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+  _ = builtins.trace "DEBUG: ovpnPath = ${ovpnPath}" null;
+  vpnConfig = builtins.readFile ovpnPath;
+  _ = builtins.trace "DEBUG: vpnConfig = ${builtins.substring 0 200 vpnConfig}… (truncated)" null;
 in
 {
   imports = [
