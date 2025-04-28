@@ -20,7 +20,7 @@
     sambaPkgs = {
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
-    private_configs = {
+    privateConfigs = {
       url = "path:./privateConfigs";
       flake = false; # just raw files, not a flake
     };
@@ -94,7 +94,7 @@
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit bindPkgs_ sambaPkgs_ private_configs; };
+          specialArgs = { inherit bindPkgs_ sambaPkgs_ privateConfigs; };
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
@@ -105,7 +105,7 @@
         NetworkBox = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit private_configs; };
+          specialArgs = { inherit privateConfigs; };
           # List/Array of modules
           modules = [
             ./hosts/NetworkBox/configuration.nix

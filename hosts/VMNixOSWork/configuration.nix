@@ -2,7 +2,7 @@
   pkgs,
   bindPkgs_,
   sambaPkgs_,
-  private_configs,
+  privateConfigs,
   ...
 }:
 
