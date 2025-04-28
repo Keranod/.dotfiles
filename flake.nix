@@ -20,10 +20,11 @@
     sambaPkgs = {
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
-    privateConfigs = {
-      url = "path:./privateConfigs";
-      flake = false; # just raw files, not a flake
-    };
+    # privateConfigs = {
+    #   url = "path:./privateConfigs";
+    #   flake = false; # just raw files, not a flake
+    # };
+    privateConfigs = ./privateConfigs;
   };
 
   # Importing self ans nixpkgs
