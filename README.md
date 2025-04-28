@@ -8,7 +8,7 @@
 - Useful commands
 - Home-manager
 - Working `Godot` and `VSCode` with `C#`
-- Working properly external Ultrawide screen and laptop screen at the same time `TufNix`
+- Working properly external Ultrawide screen and laptop screen at the same time `TufNix` on `Nvidia` GPU
 - Selfhosted web server using `ngnix` and `strapi`
 - Useful aliases in bash
 

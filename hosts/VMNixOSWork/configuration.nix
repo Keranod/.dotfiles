@@ -9,6 +9,7 @@ let
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
+  tvVpnConf = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
   # ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
   # vpnConfig = builtins.readFile ovpnPath;
 in
@@ -127,9 +128,17 @@ in
     gnome-online-accounts
   ];
 
-  # services.openvpn.servers = {
-  #   airvpn = { config = ''/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn''; };
-  # };
+  # Only add if the local file exists
+  environment.etc = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
+    "openvpn/tvVpn.ovpn".source = tvVpnConf;
+    "openvpn/tvVpn.ovpn".mode   = "0600";
+  };
+
+  # Only start the OpenVPN service if the config exists
+  services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
+    config    = ''config /etc/openvpn/.ovpn'';
+    autoStart = true;
+  };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
