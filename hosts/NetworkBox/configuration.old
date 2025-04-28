@@ -24,60 +24,49 @@ in
   };
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = true;
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.disable_ipv6"     = 1;
-    "net.ipv6.conf.default.disable_ipv6" = 1;
-  };
+  boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = true;
 
   # Networking
   networking = {
     hostName = "NetworkBox";
     networkmanager.enable = false;
 
-    # physical uplink, no IP here
-    interfaces.enp3s0.useDHCP = false;
-
-     # define VLAN devices
-    vlans = {
-      vlan8 = { id = 8;  interface = "enp3s0"; };
-      vlan9 = { id = 9;  interface = "enp3s0"; };
+    # Static IP on enp3s0
+    interfaces = {
+      enp3s0 = {
+        useDHCP = false;
+        ipv4.addresses = [
+          {
+            address = "192.168.8.2";
+            prefixLength = 24;
+          }
+        ];
+        ipv6.addresses = [
+          {
+            address = "fd00:1234:5678:1::1";
+            prefixLength = 64;
+          }
+        ];
+      };
     };
 
-    # WAN: get static IP on VLAN 8
-    interfaces.vlan8.ipv4.addresses = [{
-      address      = "192.168.8.2";
-      prefixLength = 24;
-    }];
-    defaultGateway = "192.168.8.1";
-
-    # LAN: serve 192.168.9.0/24 on VLAN 9
-    interfaces.vlan9.ipv4.addresses = [{
-      address      = "192.168.9.1";
-      prefixLength = 24;
-    }];
-
-    # 3) NAT IPv4 from LAN → WAN
     nat = {
-      enable             = true;
-      internalInterfaces = [ "vlan9" ];
-      externalInterface  = "vlan8";
+      enable = true;
+      internalInterfaces = [ ]; # your LAN side interface
+      externalInterface = "enp3s0"; # same interface because Huawei is upstream
     };
 
-    # Firewall
+    defaultGateway = "192.168.8.1";
+    nameservers = [ "127.0.0.1" ];
+
     firewall = {
       enable = true;
-
-      # Only listen on your LAN VLAN
-      interfaces = [ "vlan9" ];
-
-      # Allow DHCP (67,68) and DNS (53) on LAN
-      allowedUDPPorts = [ 53 67 68 ];
-
-      # If you want the AdGuard Home UI reachable:
-      allowedTCPPorts = [ 22 3000 ];
-
-      # Masquerade/NAT is handled separately; make sure forwarding is on:
-      # (NixOS will auto–allow established+related on forwarded packets)
+      # DNS + DHCP (67 & 68) + AdGuard UI (3000)
+      allowedUDPPorts = [
+        53
+        67
+        68
+      ];
     };
   };
 
@@ -93,6 +82,7 @@ in
     nodePackages_latest.nodejs
     home-manager
     htop
+    radvd
     tcpdump
   ];
 
@@ -109,19 +99,43 @@ in
   services.dnsmasq = {
     enable = true;
     settings = {
-      interface = "vlan9";
+      interface = "enp3s0";
       bind-interfaces = true;
 
       # Only DHCP
       port = 0; # <--- this disables the DNS server in dnsmasq!
 
-      dhcp-range    = "192.168.9.100,192.168.9.200,24h";
-      dhcp-option   = [ "3,192.168.9.1" "6,192.168.9.1" ];
+      dhcp-range = "192.168.8.100,192.168.8.200,255.255.255.0,24h";
+      dhcp-option = [
+        "3,192.168.8.2" # router/gateway
+        "6,192.168.8.2" # DNS server (AdGuard)
+      ];
       dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
-        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
+        "7C:F1:7E:6C:60:00,192.168.8.3" # TP-Link
+        "A8:23:FE:FD:19:ED,192.168.8.50" # TV
       ];
     };
+  };
+
+  services.radvd = {
+    enable = true;
+    config = ''
+      interface enp3s0 {
+        AdvSendAdvert on;
+        AdvOtherConfigFlag on;
+        MinRtrAdvInterval 30;
+        MaxRtrAdvInterval 100;
+
+        prefix fd00:1234:5678:1::/64 {
+          AdvOnLink on;
+          AdvAutonomous on;
+        };
+
+        RDNSS fd00:1234:5678:1::1 {
+          AdvRDNSSLifetime 600;
+        };
+      };
+    '';
   };
 
   # AdGuard Home: DNS
@@ -134,17 +148,22 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          "192.168.9.1"
+          "0.0.0.0"
+          "::"
         ];
         port = 53;
         upstream_dns = [
           "94.140.14.14"
           "94.140.15.15"
+          # "2a10:50c0::ad1:ff"
+          # "2a10:50c0::ad2:ff"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
           "9.9.9.10"
           "149.112.112.10"
+          # "2620:fe::10"
+          # "2620:fe::fe:10"
         ];
       };
 
