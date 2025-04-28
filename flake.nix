@@ -21,7 +21,7 @@
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
     privateConfigs = {
-      url = "path:/home/Keranod/.dotfiles/privateConfig";
+      url = "path:/home/Keranod/.dotfiles/privateConfigs";
       flake = false; # just raw files, not a flake
     };
   };
