@@ -13,7 +13,7 @@ let
   ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
   _ = builtins.trace "DEBUG: ovpnPath = ${ovpnPath}" null;
   vpnConfig = builtins.readFile ovpnPath;
-  _ = builtins.trace "DEBUG: vpnConfig = ${builtins.substring 0 200 vpnConfig}… (truncated)" null;
+  __ = builtins.trace "DEBUG: vpnConfig = ${builtins.substring 0 200 vpnConfig}… (truncated)" null;
 in
 {
   imports = [
