@@ -53,22 +53,22 @@
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
       
-      # try to find the secrets path
       privateConfigsPath =
-        if builtins.pathExists ../privateConfigs
-        then ../privateConfigs
-        else abort "privateConfigs not found!";
+        let
+          # Optionally use an environment variable or a fallback path
+          secretDir = builtins.getEnv "PRIVATE_CONFIGS_DIR";
+        in
+          if secretDir != "" then secretDir
+          else if builtins.pathExists /home/keranod/privateConfigs
+          then /home/keranod/privateConfigs
+          else null;
 
-      privateConfigsStore = pkgs.symlinkJoin {
+      privateConfigsStore = if privateConfigsPath != null then pkgs.symlinkJoin {
         name = "privateConfigs";
         paths = [
-          (builtins.path {
-            name = "privateConfigs";
-            path = privateConfigsPath;
-            filter = _: _: true;
-          })
+          privateConfigsPath
         ];
-      };
+      } else null;
     in
     {
       # Can specify multiple configurations
