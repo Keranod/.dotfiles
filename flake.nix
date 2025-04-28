@@ -56,6 +56,7 @@
       };
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
+      privateConfigsStore = pkgs.runCommandDir "privateConfigs" { } ./privateConfigs;
     in
     {
       # Can specify multiple configurations
@@ -94,7 +95,7 @@
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit bindPkgs_ sambaPkgs_ privateConfigs; };
+          specialArgs = { inherit bindPkgs_ sambaPkgs_ privateConfigs privateConfigsStore; };
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix

@@ -3,25 +3,28 @@
   bindPkgs_,
   sambaPkgs_,
   privateConfigs,
+  privateConfigsStore,
   ...
 }:
 
 let
-  privateConfigsStore = pkgs.runCommand "privateConfigs" { } ''
-    mkdir -p $out
-    cp -r /home/keranod/.dotfiles/privateConfigs/* $out
-  '';
   tvIp = "192.168.8.50"; # your TV’s static IP
   vpnInterface = "tun0"; # OpenVPN interface
   tableNum = 100; # custom routing table
-  ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
-  vpnConfig = builtins.readFile ovpnPath;
+  # ovpnPath = "${privateConfigs}/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+  # vpnConfig = builtins.readFile ovpnPath;
 in
 {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+
+  fileSystems."/etc/privateConfigs" = {
+    device  = privateConfigsStore;
+    fsType  = "none";
+    options = [ "bind" "ro" ];
+  };
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
@@ -132,10 +135,16 @@ in
     gnome-online-accounts
   ];
 
-  # VPN
+  fileSystems."/etc/privateConfigs" = {
+    device  = privateConfigsStore;
+    fsType  = "none";
+    options = [ "bind" "ro" ];
+  };
+
   services.openvpn.servers.airvpn = {
-    config = vpnConfig;
-    autoStart = true;
+    # point to the .ovpn inside the bind-mount:
+    configFile = "/etc/privateConfigs/AirVPN_Taiwan_UDP-443-Entry3.ovpn";
+    autoStart  = true;
   };
 
   # Enable the OpenSSH daemon.
