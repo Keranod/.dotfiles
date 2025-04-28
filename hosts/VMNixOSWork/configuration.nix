@@ -135,7 +135,7 @@ in
 
   # Only start the OpenVPN service if the config exists
   services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
-    config    = ''config /etc/openvpn/.ovpn'';
+    config    = "config ${tvVpnConf}";
     autoStart = true;
   };
 
