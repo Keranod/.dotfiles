@@ -134,16 +134,15 @@ in
   };
 
   # Print a message to debug
-  # Print a message to debug
-  # Print a message to debug
-  systemd.services.tvVpnDebug = {
-    description = "Debug TV VPN";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig.ExecStart = ''
-      /run/current-system/sw/bin/bash -c 'echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" > /var/log/tvVpnConf.log'
-      /run/current-system/sw/bin/bash -c 'echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log'
-    '';
-  };
+systemd.services.tvVpnDebug = {
+  description = "Debug TV VPN";
+  wantedBy = [ "multi-user.target" ];
+  serviceConfig.ExecStart = ''
+    /run/current-system/sw/bin/bash -c 'echo "tvVpnConf variable: ${tvVpnConf}" > /var/log/tvVpnConf.log'
+    /run/current-system/sw/bin/bash -c 'echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" >> /var/log/tvVpnConf.log'
+    /run/current-system/sw/bin/bash -c 'echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log'
+  '';
+};
 
   # Only start the OpenVPN service if the config exists
   # services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
