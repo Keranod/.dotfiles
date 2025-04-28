@@ -132,7 +132,7 @@ in
 
   # VPN
   services.openvpn.servers.airvpn = {
-    config = ovpnConfig;
+    config = vpnConfig;
     autoStart = true;
   };
 
