@@ -134,12 +134,13 @@ in
   };
 
   # Print a message to debug
+  # Print a message to debug
   systemd.services.tvVpnDebug = {
     description = "Debug TV VPN";
     wantedBy = [ "multi-user.target" ];
     serviceConfig.ExecStart = ''
-      echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" > /var/log/tvVpnConf.log
-      echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log
+      bash -c 'echo "tvVpnConf exists: ${toString (builtins.pathExists tvVpnConf)}" > /var/log/tvVpnConf.log'
+      bash -c 'echo "tvVpnConf path: ${tvVpnConf}" >> /var/log/tvVpnConf.log'
     '';
   };
 
