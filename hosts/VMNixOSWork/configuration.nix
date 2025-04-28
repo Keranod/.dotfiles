@@ -17,9 +17,6 @@
     fsType = "vfat";
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # Virtualbox guest additions
   systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
   # Enable VirtualBox guest additions
@@ -119,12 +116,6 @@
     gnome-online-accounts
     openvpn
   ];
-
-  # Only start the OpenVPN service if the config exists
-  # services.openvpn.servers.tvVpn = lib.optionalAttrs (builtins.pathExists tvVpnConf) {
-  #   config    = ''config ${tvVpnConf}'';  # Corrected syntax
-  #   autoStart = true;
-  # };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;

@@ -118,7 +118,7 @@ in
           echo "Starting OpenVPN for IP $IP with config $CONFIG..."
 
           # Launch OpenVPN (give it a specific dev tun name)
-          openvpn --config "$CONFIG" --dev "$IFACE" --daemon --writepid "/run/vpn-${IP}.pid"
+          openvpn --config "$CONFIG" --dev "$IFACE" --daemon --writepid "/run/vpn-\${IP}.pid"
 
           # Wait for interface
           while ! ip link show "$IFACE" > /dev/null 2>&1; do
@@ -140,9 +140,9 @@ in
           ip route del default dev "$IFACE" table "$TABLE_ID" || true
 
           # Kill OpenVPN
-          if [ -f "/run/vpn-${IP}.pid" ]; then
-            kill "$(cat /run/vpn-${IP}.pid)" || true
-            rm -f "/run/vpn-${IP}.pid"
+          if [ -f "/run/vpn-\${IP}.pid" ]; then
+            kill "$(cat /run/vpn-\${IP}.pid)" || true
+            rm -f "/run/vpn-\${IP}.pid"
           fi
         }
 
