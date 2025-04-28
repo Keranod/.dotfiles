@@ -20,12 +20,6 @@ in
     ./hardware-configuration.nix
   ];
 
-  fileSystems."/etc/privateConfigs" = {
-    device  = privateConfigsStore;
-    fsType  = "none";
-    options = [ "bind" "ro" ];
-  };
-
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
