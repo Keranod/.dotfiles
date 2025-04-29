@@ -51,7 +51,7 @@
 
     firewall = {
       enable = true;
-      interfaces.[ "enp0s3" ] = {
+      interfaces."enp0s3" = {
         allowedTCPPorts = [ 80 ];
         extraCommands = ''
           # redirect all HTTP traffic from LAN through external proxy at 192.9.253.50:80
