@@ -29,18 +29,20 @@
   # Networking
   networking = {
     hostName = "VMNixOSWork";
-    networkmanager.enable = true;
-    proxy = {
-      default = "192.9.253.10:80";
-      httpsProxy = "192.9.253.10:80";
-      httpProxy = "192.9.253.10:80";
-      noProxy = "127.0.0.1,localhost,192.168.56.10"
-    };
+    networkmanager.enable = false;
+
+    interfaces.enp0s3.useDHCP = true;
 
     interfaces.enp0s8 = {
       useDHCP = false;
       address = "192.168.56.10";
       prefixLength = 24;
+    };
+
+     nat = {
+      enable             = true;
+      internalInterfaces = [ "enp0s8" ];
+      externalInterface  = "enp0s3";
     };
   };
 
@@ -67,17 +69,14 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  systemd.services.set-proxy = {
-  wantedBy = [ "multi-user.target" ];
-  serviceConfig = {
-    Type = "oneshot";
-    ExecStart = pkgs.writeShellScript "set-proxy" ''
-      if ip link show enp0s3 | grep -q "state UP"; then
-        echo 'http_proxy=http://192.9.253.10:80' >> /etc/environment
-        echo 'https_proxy=http://192.9.253.10:80' >> /etc/environment
+  # === only set proxy vars in shells when enp0s3 is actually up ===
+    environment.etc."profile.d/proxy-enp0s3.sh".text = ''
+      #!/usr/bin/env bash
+      if ip -4 addr show enp0s3 | grep -q "inet "; then
+        export http_proxy="http://192.9.253.10:80"
+        export https_proxy="$http_proxy"
+        export no_proxy="127.0.0.1,localhost,192.168.56.10"
       fi
     '';
-  };
-};
-
+    environment.etc."profile.d/proxy-enp0s3.sh".mode = "0755";
 }
