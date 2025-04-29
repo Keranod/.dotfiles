@@ -34,6 +34,7 @@
 
   # Networking
   networking = {
+    hostName = "VMNixOSWork";
     # turn off legacy iptables/NAT
     firewall.enable = false;
     nat.enable      = false;
