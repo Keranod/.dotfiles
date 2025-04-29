@@ -51,24 +51,16 @@
 
     firewall = {
       enable = true;
-      interfaces = [ "enp0s3" ];
-      allowedTCPPorts = [ 3128 ];
-      extraCommands = ''
-        iptables -t nat -A PREROUTING -i enp0s3 -p tcp --dport 80 -j REDIRECT --to-port 3128
-      '';
-      extraStopCommands = ''
-        iptables -t nat -D PREROUTING -i enp0s3 -p tcp --dport 80 -j REDIRECT --to-port 3128
-      '';
-    };
-  };
-
-  services.tinyproxy = {
-    enable = true;
-    settings = {
-      Port = 3128;
-      Listen = "0.0.0.0";  # listen on all interfaces
-      Allow = "192.168.0.0/16";  # adjust to match your LAN
-      ConnectPort = [ 80 ]; # only allow HTTP
+      interfaces.[ "enp0s3" ] = {
+        allowedTCPPorts = [ 80 ];
+        extraCommands = ''
+          # redirect all HTTP traffic from LAN through external proxy at 192.9.253.50:80
+          iptables -t nat -A PREROUTING -i enp0s8 -p tcp --dport 80 -j DNAT --to-destination 192.9.253.50:80
+        '';
+        extraStopCommands = ''
+          iptables -t nat -D PREROUTING -i enp0s8 -p tcp --dport 80 -j DNAT --to-destination 192.9.253.50:80
+        '';
+      };
     };
   };
 
