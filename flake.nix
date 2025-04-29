@@ -67,16 +67,6 @@
             ./modules/commonConfig.nix
           ];
         };
-        NixOSVMEFI = lib.nixosSystem {
-          # Architecture
-          inherit system;
-          # List/Array of modules
-          modules = [
-            ./hosts/NixOSVMEFI/configuration.nix
-            ./modules/users.nix
-            ./modules/commonConfig.nix
-          ];
-        };
         MainServer = lib.nixosSystem {
           # Architecture
           inherit system;
