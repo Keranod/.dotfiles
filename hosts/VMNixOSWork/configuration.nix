@@ -53,6 +53,7 @@
         chain prerouting {
           type nat hook prerouting priority 0;
           iifname "enp0s3" tcp dport 80 redirect to :12345
+          iifname "enp0s3" tcp dport 443 redirect to :12346
         }
       }
     '';
@@ -62,18 +63,31 @@
     enable = true;
     config = {
       base = {
-        log_debug = on;
-        log_info = on;
-        daemon = on;
+        log_debug = "on";
+        log_info = "on";
+        daemon = "on";
         redirector = "iptables";
       };
-      redsocks = {
-        local_ip = "127.0.0.1";
-        local_port = 12345;  # local port to capture traffic
-        ip = "192.9.253.50";
-        port = 80;
-        type = "http-relay";
-      };
+      redsocks = [
+        {
+          local_ip = "127.0.0.1";
+          local_port = 12345;
+          ip = "192.9.253.50";
+          port = 80;
+          type = "http-relay";
+          redirectCondition = "--dport 80";
+          doNotRedirect = [ "-d 192.168.0.0/16" ];
+        }
+        {
+          local_ip = "127.0.0.1";
+          local_port = 12346;
+          ip = "192.9.253.50";
+          port = 443;
+          type = "http-connect";
+          redirectCondition = "--dport 443";
+          doNotRedirect = [ "-d 192.168.0.0/16" ];
+        }
+      ];
     };
   };
 
