@@ -43,20 +43,22 @@
       ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
     };
 
-     nat = {
-      enable             = true;
-      internalInterfaces = [ "enp0s8" ];
-      externalInterface  = "enp0s3";
-    };
-
-    firewall = {
+    nftables = {
       enable = true;
-      extraCommands = ''
-      # redirect all HTTP traffic from LAN through external proxy at 192.9.253.50:80
-        iptables -t nat -A PREROUTING -i enp0s8 -p tcp --dport 80 -j DNAT --to-destination 192.9.253.50:80
-      '';
-      extraStopCommands = ''
-        iptables -t nat -D PREROUTING -i enp0s8 -p tcp --dport 80 -j DNAT --to-destination 192.9.253.50:80
+      # This is your complete nftables ruleset
+      rules = ''
+        table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority 0; policy accept;
+            # redirect port 80 on enp0s8 → your external proxy
+            iifname "enp0s8" tcp dport 80 dnat to 192.9.253.50:80
+          }
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            # masquerade everything going out enp0s3
+            oifname "enp0s3" masquerade
+          }
+        }
       '';
     };
   };
