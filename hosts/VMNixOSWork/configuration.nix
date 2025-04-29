@@ -61,13 +61,8 @@
 
   services.redsocks = {
     enable = true;
-    config = {
-      base = {
-        log_debug = "on";
-        log_info = "on";
-        daemon = "on";
-        redirector = "iptables";
-      };
+    log_debug = true;
+    log_info = true;
       redsocks = [
         {
           local_ip = "127.0.0.1";
@@ -88,7 +83,6 @@
           doNotRedirect = [ "-d 192.168.0.0/16" ];
         }
       ];
-    };
   };
 
   # services.dnsmasq = {
