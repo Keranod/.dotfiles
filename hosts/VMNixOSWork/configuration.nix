@@ -30,6 +30,18 @@
   networking = {
     hostName = "VMNixOSWork";
     networkmanager.enable = true;
+    proxy = {
+      default = "192.9.253.10:80";
+      httpsProxy = "192.9.253.10:80";
+      httpProxy = "192.9.253.10:80";
+      noProxy = "127.0.0.1,localhost,192.168.56.10"
+    };
+
+    interfaces.enp0s8 = {
+      useDHCP = false;
+      address = "192.168.56.10";
+      prefixLength = 24;
+    };
   };
 
   # List packages installed in system profile.
