@@ -31,6 +31,7 @@
     "net.ipv6.conf.all.disable_ipv6"     = 1;
     "net.ipv6.conf.default.disable_ipv6" = 1;
   };
+
   # Networking
   networking = {
     # turn off legacy iptables/NAT
@@ -43,10 +44,11 @@
       useDHCP        = false;
       ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
     };
+  };
 
-    networking.nftables.enable = true;
-
-    networking.nftables.ruleset = ''
+  nftables = {
+    enable = true;
+    ruleset = ''
       table ip nat {
         chain prerouting {
           type nat hook prerouting priority 0;
