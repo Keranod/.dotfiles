@@ -46,23 +46,23 @@
     };
   };
 
-  # services.dnsmasq = {
-  #   enable = true;
-  #   settings = {
-  #     interface = "enp0s8";
-  #     bind-interfaces = true;
+  services.dnsmasq = {
+    enable = true;
+    settings = {
+      interface = "enp0s8";
+      bind-interfaces = true;
 
-  #     # Only DHCP
-  #     port = 0; # <--- this disables the DNS server in dnsmasq!
+      # Only DHCP
+      port = 0; # <--- this disables the DNS server in dnsmasq!
 
-  #     dhcp-range    = "192.168.56.100,192.168.56.200,24h";
-  #     dhcp-option   = [ "3,192.168.56.10" "6,192.168.56.10" ];
-  #     dhcp-host = [
-  #       "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
-  #       "A8:23:FE:FD:19:ED,192.168.9.50" # TV
-  #     ];
-  #   };
-  # };
+      dhcp-range    = "192.168.56.100,192.168.56.200,24h";
+      dhcp-option   = [ "3,192.168.56.10" "6,192.168.56.10" ];
+      dhcp-host = [
+        "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
+        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
+      ];
+    };
+  };
 
   # # AdGuard Home: DNS
   # services.adguardhome = {
