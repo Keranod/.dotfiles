@@ -35,8 +35,7 @@
 
     interfaces.enp0s8 = {
       useDHCP = false;
-      address = "192.168.56.10";
-      prefixLength = 24;
+      ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
     };
 
      nat = {
