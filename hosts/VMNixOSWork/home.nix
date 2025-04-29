@@ -4,6 +4,10 @@ let
   username = "keranod";
 in
 {
+  imports = [
+    ../../modules/commonHome.nix
+  ];
+
   # Infomration for home-manager which path to manage
   home.username = username;
   home.homeDirectory = "/home/${username}";
