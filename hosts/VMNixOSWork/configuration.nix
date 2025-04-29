@@ -44,19 +44,19 @@
       useDHCP        = false;
       ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
     };
-  };
 
-  nftables = {
-    enable = true;
-    ruleset = ''
-      table ip nat {
-        chain prerouting {
-          type nat hook prerouting priority 0;
-          iifname "enp0s3" tcp dport 80 redirect to :12345
-          iifname "enp0s3" tcp dport 443 redirect to :12346
+    nftables = {
+      enable = true;
+      ruleset = ''
+        table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority 0;
+            iifname "enp0s3" tcp dport 80 redirect to :12345
+            iifname "enp0s3" tcp dport 443 redirect to :12346
+          }
         }
-      }
-    '';
+      '';
+    };
   };
 
   services.redsocks = {
