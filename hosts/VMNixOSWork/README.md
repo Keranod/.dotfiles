@@ -1,1 +1,0 @@
-- `. /etc/profile.d/proxy-enp0s3.sh` -> to get proxy
