@@ -65,43 +65,54 @@
     };
   };
 
-  # # AdGuard Home: DNS
-  # services.adguardhome = {
-  #   enable = true;
-  #   openFirewall = true; # auto-opens 53 & 3000
-  #   mutableSettings = false; # re-seed on service start
+  # AdGuard Home: DNS
+  services.adguardhome = {
+    enable = true;
+    openFirewall = true; # auto-opens 53 & 3000
+    mutableSettings = false; # re-seed on service start
 
-  #   settings = {
-  #     # DNS
-  #     dns = {
-  #       bind_hosts = [
-  #         "192.168.56.10"
-  #       ];
-  #       port = 53;
-  #       upstream_dns = [
-  #         "94.140.14.14"
-  #         "94.140.15.15"
-  #       ];
-  #       # Bootstrap DNS: used only to resolve the upstream hostnames
-  #       bootstrap_dns = [
-  #         "9.9.9.10"
-  #         "149.112.112.10"
-  #       ];
-  #     };
+    settings = {
+      # DNS
+      dns = {
+        bind_hosts = [
+          "192.168.56.10"
+        ];
+        port = 53;
+        upstream_dns = [
+          {
+            url = "https://dns.adguard-dns.com/dns-query";
+            name = "AdGuard DoH";
+          }
+          # "94.140.14.14"
+          # "94.140.15.15"
+        ];
+        # Bootstrap DNS: used only to resolve the upstream hostnames
+        bootstrap_dns = [
+          {
+            url = "https://dns.adguard-dns.com/dns-query";
+            name = "AdGuard DoH";
+          }
+          # "9.9.9.10"
+          # "149.112.112.10"
+        ];
+      };
 
-  #     # DHCP
-  #     dhcp = {
-  #       enabled = false;
-  #     };
+      # Proxy
+      http_proxy = "http://192.9.253.10:80"
 
-  #     # Blocklists / filtering (defaults)
-  #     filtering = {
-  #       protection_enabled = true;
-  #       filtering_enabled = true;
-  #       parental = false;
-  #     };
-  #   };
-  # };
+      # DHCP
+      dhcp = {
+        enabled = false;
+      };
+
+      # Blocklists / filtering (defaults)
+      filtering = {
+        protection_enabled = true;
+        filtering_enabled = true;
+        parental = false;
+      };
+    };
+  };
 
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
