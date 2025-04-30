@@ -74,46 +74,46 @@
   };
 
   # AdGuard Home: DNS
-  services.adguardhome = {
-    enable = true;
-  #  openFirewall = true; # auto-opens 53 & 3000
-  #  mutableSettings = true; # re-seed on service start
+  # services.adguardhome = {
+  #   enable = true;
+  # #  openFirewall = true; # auto-opens 53 & 3000
+  # #  mutableSettings = true; # re-seed on service start
 
-    settings = {
-      # DNS
-      dns = {
-        bind_hosts = [
-          "192.168.56.10"
-        ];
-        port = 53;
-        upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "94.140.14.14"
-          "94.140.15.15"
-        ];
-        # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
-      };
+  #   settings = {
+  #     # DNS
+  #     dns = {
+  #       bind_hosts = [
+  #         "192.168.56.10"
+  #       ];
+  #       port = 53;
+  #       upstream_dns = [
+  #         "https://dns.adguard-dns.com/dns-query"
+  #         "94.140.14.14"
+  #         "94.140.15.15"
+  #       ];
+  #       # Bootstrap DNS: used only to resolve the upstream hostnames
+  #       bootstrap_dns = [
+  #         "9.9.9.10"
+  #         "149.112.112.10"
+  #       ];
+  #     };
 
-      # Proxy
-      http_proxy = "http://192.9.253.50:80";
+  #     # Proxy
+  #     http_proxy = "http://192.9.253.50:80";
 
-      # DHCP
-      dhcp = {
-        enabled = false;
-      };
+  #     # DHCP
+  #     dhcp = {
+  #       enabled = false;
+  #     };
 
-      # Blocklists / filtering (defaults)
-      filtering = {
-        protection_enabled = true;
-        filtering_enabled = true;
-        parental = false;
-      };
-    };
-  };
+  #     # Blocklists / filtering (defaults)
+  #     filtering = {
+  #       protection_enabled = true;
+  #       filtering_enabled = true;
+  #       parental = false;
+  #     };
+  #   };
+  # };
 
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
