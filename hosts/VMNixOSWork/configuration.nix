@@ -69,7 +69,7 @@
   services.adguardhome = {
     enable = true;
     openFirewall = true; # auto-opens 53 & 3000
-    mutableSettings = false; # re-seed on service start
+    mutableSettings = true; # re-seed on service start
 
     settings = {
       # DNS
@@ -79,26 +79,18 @@
         ];
         port = 53;
         upstream_dns = [
-          {
-            url = "https://dns.adguard-dns.com/dns-query";
-            name = "AdGuard DoH";
-          }
-          # "94.140.14.14"
-          # "94.140.15.15"
+          "94.140.14.14"
+          "94.140.15.15"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
-          {
-            url = "https://dns.adguard-dns.com/dns-query";
-            name = "AdGuard DoH";
-          }
-          # "9.9.9.10"
-          # "149.112.112.10"
+          "9.9.9.10"
+          "149.112.112.10"
         ];
       };
 
       # Proxy
-      http_proxy = "http://192.9.253.10:80";
+      #http_proxy = "http://192.9.253.50:80";
 
       # DHCP
       dhcp = {
