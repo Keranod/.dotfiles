@@ -69,9 +69,9 @@
     };
   };
 
-  # services.ntopng = {
-  #   enable = true;
-  # };
+  services.ntopng = {
+    enable = true;
+  };
 
   # AdGuard Home: DNS
   # services.adguardhome = {
