@@ -98,7 +98,7 @@
       };
 
       # Proxy
-      http_proxy = "http://192.9.253.10:80"
+      http_proxy = "http://192.9.253.10:80";
 
       # DHCP
       dhcp = {
