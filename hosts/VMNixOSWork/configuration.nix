@@ -35,15 +35,19 @@
   # Networking
   networking = {
     hostName = "VMNixOSWork";
-    # turn off legacy iptables/NAT
     firewall.enable = false;
-    nat.enable      = false;
 
     # bring up interfaces
     interfaces.enp0s3.useDHCP = true;
     interfaces.enp0s8 = {
       useDHCP        = false;
       ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
+    };
+
+    nat = {
+      enable = true;
+      externalInterface = "enp0s3";
+      internalInterfaces = [ "enp0s8" ];
     };
   };
 
@@ -66,10 +70,10 @@
   };
 
   # AdGuard Home: DNS
-  services.adguardhome = {
-    enable = true;
-    openFirewall = true; # auto-opens 53 & 3000
-    mutableSettings = true; # re-seed on service start
+  #services.adguardhome = {
+  #  enable = true;
+  #  openFirewall = true; # auto-opens 53 & 3000
+  #  mutableSettings = true; # re-seed on service start
 
     # settings = {
     #   # DNS
@@ -104,7 +108,7 @@
     #     parental = false;
     #   };
     # };
-  };
+  #};
 
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
