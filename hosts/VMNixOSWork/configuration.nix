@@ -69,9 +69,13 @@
     };
   };
 
+  services.ntopng = {
+    enable = true;
+  };
+
   # AdGuard Home: DNS
   services.adguardhome = {
-   enable = true;
+    enable = true;
   #  openFirewall = true; # auto-opens 53 & 3000
   #  mutableSettings = true; # re-seed on service start
 
