@@ -50,6 +50,7 @@
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
     # Use advances generator and use only IPv4
+    # Modify confg to include specific IP only like 192.168.9.50/32 <- needs to be /32 so that only specific IP not whole range is used
     # DO NOT COMMIT CONFIG FILES
     #wg-quick.interfaces = {
     #  wg0 = {
@@ -83,6 +84,25 @@
       PermitRootLogin = "no"; # Root login disabled
       PubkeyAuthentication = true; # Ensure pubkey authentication is enabled
     };
+  };
+
+  # Persistent routing table setup
+  systemd.services.iproute2-rt-tables = {
+    enable = true;
+    wantedBy = [ "multi-user.target" ];
+    script = ''
+      echo "100 vpn1" >> /etc/iproute2/rt_tables
+    '';
+  };
+
+  # Service to set up the routing rules for specific IPs
+  systemd.services.setup-vpn-routes = {
+    enable = true;
+    wantedBy = [ "multi-user.target" ]; # Run after networking is available
+    script = ''
+      ip rule add from 192.168.9.60 table vpn1
+      ip route add default dev wg0 table vpn1
+    '';
   };
 
   services.dnsmasq = {
