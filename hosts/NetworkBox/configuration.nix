@@ -51,12 +51,12 @@
     # https://airvpn.org/generator/
     # Use advances generator and use only IPv4
     # DO NOT COMMIT CONFIG FILES
-    wg-quick.interfaces = {
-      wg0 = {
-        configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
-        autostart = true;
-      };
-    };
+    #wg-quick.interfaces = {
+    #  wg0 = {
+    #    configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
+    #    autostart = true;
+    #  };
+    #};
 
     # NAT IPv4 from LAN → WAN
     nat = {
