@@ -74,6 +74,7 @@
     home-manager
     htop
     tcpdump
+    iproute2
   ];
 
   # Enable the OpenSSH service
@@ -89,7 +90,6 @@
   # Define a custom routing table for VPN traffic
   systemd.services.iproute2-rt-tables = {
     enable = true;
-    buildInputs = [ pkgs.iproute2 ];
     script = ''
       if [ ! -f /etc/iproute2/rt_tables ]; then
         echo "100 vpn" > /etc/iproute2/rt_tables
