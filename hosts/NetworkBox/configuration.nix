@@ -1,7 +1,5 @@
 {
   pkgs,
-  lib,
-  privateConfigs,
   ...
 }:
 
@@ -20,7 +18,7 @@
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = true;
   boot.kernel.sysctl = {
-    "net.ipv6.conf.all.disable_ipv6"     = 1;
+    "net.ipv6.conf.all.disable_ipv6" = 1;
     "net.ipv6.conf.default.disable_ipv6" = 1;
   };
 
@@ -32,30 +30,40 @@
     # physical uplink, no IP here
     interfaces.enp3s0.useDHCP = false;
 
-     # define VLAN devices
+    # define VLAN devices
     vlans = {
-      vlan8 = { id = 8;  interface = "enp3s0"; };
-      vlan9 = { id = 9;  interface = "enp3s0"; };
+      vlan8 = {
+        id = 8;
+        interface = "enp3s0";
+      };
+      vlan9 = {
+        id = 9;
+        interface = "enp3s0";
+      };
     };
 
     # WAN: get static IP on VLAN 8
-    interfaces.vlan8.ipv4.addresses = [{
-      address      = "192.168.8.2";
-      prefixLength = 24;
-    }];
+    interfaces.vlan8.ipv4.addresses = [
+      {
+        address = "192.168.8.2";
+        prefixLength = 24;
+      }
+    ];
     defaultGateway = "192.168.8.1";
 
     # LAN: serve 192.168.9.0/24 on VLAN 9
-    interfaces.vlan9.ipv4.addresses = [{
-      address      = "192.168.9.1";
-      prefixLength = 24;
-    }];
+    interfaces.vlan9.ipv4.addresses = [
+      {
+        address = "192.168.9.1";
+        prefixLength = 24;
+      }
+    ];
 
     # 3) NAT IPv4 from LAN → WAN
     nat = {
-      enable             = true;
+      enable = true;
       internalInterfaces = [ "vlan9" ];
-      externalInterface  = "vlan8";
+      externalInterface = "vlan8";
     };
 
     # Firewall
@@ -66,22 +74,29 @@
       interfaces = [ "vlan9" ];
 
       # Allow DHCP (67,68) and DNS (53) on LAN
-      allowedUDPPorts = [ 53 67 68 ];
+      allowedUDPPorts = [
+        53
+        67
+        68
+      ];
 
       # If you want the AdGuard Home UI reachable:
-      allowedTCPPorts = [ 22 3000 ];
+      allowedTCPPorts = [
+        22
+        3000
+      ];
 
       # Masquerade/NAT is handled separately; make sure forwarding is on:
       # (NixOS will auto–allow established+related on forwarded packets)
-      extraCommands = let
-        tbl = "${toString tableNum}";
-      in ''
-        # add a rule: from tvIp → tableNum
-        ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
-        # in that table, send default → tun0
-        ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
-      '';  # :contentReference[oaicite:1]{index=1}
-      };
+      # extraCommands = let
+      #   tbl = "${toString tableNum}";
+      # in ''
+      #   # add a rule: from tvIp → tableNum
+      #   ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
+      #   # in that table, send default → tun0
+      #   ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
+      # '';  # :contentReference[oaicite:1]{index=1}
+    };
   };
 
   # Configure network proxy if necessary
@@ -118,8 +133,11 @@
       # Only DHCP
       port = 0; # <--- this disables the DNS server in dnsmasq!
 
-      dhcp-range    = "192.168.9.100,192.168.9.200,24h";
-      dhcp-option   = [ "3,192.168.9.1" "6,192.168.9.1" ];
+      dhcp-range = "192.168.9.100,192.168.9.200,24h";
+      dhcp-option = [
+        "3,192.168.9.1"
+        "6,192.168.9.1"
+      ];
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
         "A8:23:FE:FD:19:ED,192.168.9.50" # TV
@@ -173,7 +191,7 @@
   # Then later, set up the OpenVPN client:
   services.openvpn.servers.vpn = {
     autoStart = true;
-    config    = ''
+    config = ''
       config /etc/openvpn/vpn.conf
       pull-filter ignore redirect-gateway
     '';
