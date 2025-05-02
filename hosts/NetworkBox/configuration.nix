@@ -39,7 +39,7 @@
     };
     defaultGateway = "192.168.8.1";
 
-    # LAN: serve 192.168.9.0/24 on VLAN 9
+    # LAN: serve 192.168.9.0/24 on enp0s20u1c2
     interfaces.enp0s20u1c2.ipv4.addresses = [
       {
         address = "192.168.9.1";
@@ -87,12 +87,6 @@
     #};
   };
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # List packages installed in system profile.
-  # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [
     vim
     git
@@ -169,6 +163,10 @@
         parental = false;
       };
     };
+  };
+
+  services.ntopng = {
+    enable = true;
   };
 
   # Tell NixOS to symlink your private VPN file into /etc/openvpn
