@@ -168,6 +168,9 @@
 
   services.ntopng = {
     enable = true;
+    extraConfig = ''
+      --http-port=3001
+    '';
   };
 
   # Tell NixOS to symlink your private VPN file into /etc/openvpn
