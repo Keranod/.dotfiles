@@ -86,12 +86,14 @@
     };
   };
 
-  # Persistent routing table setup
+  # Define a custom routing table for VPN traffic
   systemd.services.iproute2-rt-tables = {
     enable = true;
-    wantedBy = [ "multi-user.target" ];
+    buildInputs = [ pkgs.iproute2 ];
     script = ''
-      echo "100 vpn1" >> /etc/iproute2/rt_tables
+      if [ ! -f /etc/iproute2/rt_tables ]; then
+        echo "100 vpn" > /etc/iproute2/rt_tables
+      fi
     '';
   };
 
