@@ -25,78 +25,66 @@
   # Networking
   networking = {
     hostName = "NetworkBox";
-    networkmanager.enable = false;
+    firewall.enable = false;
 
     # physical uplink, no IP here
-    interfaces.enp3s0.useDHCP = false;
-
-    # define VLAN devices
-    vlans = {
-      vlan8 = {
-        id = 8;
-        interface = "enp3s0";
-      };
-      vlan9 = {
-        id = 9;
-        interface = "enp3s0";
-      };
+    interfaces.enp3s0 = {
+      useDHCP = false;
+      ipv4.addresses = [
+        {
+          address = "192.168.8.2";
+          prefixLength = 24;
+        }
+      ];
     };
-
-    # WAN: get static IP on VLAN 8
-    interfaces.vlan8.ipv4.addresses = [
-      {
-        address = "192.168.8.2";
-        prefixLength = 24;
-      }
-    ];
     defaultGateway = "192.168.8.1";
 
     # LAN: serve 192.168.9.0/24 on VLAN 9
-    interfaces.vlan9.ipv4.addresses = [
+    interfaces.enp0s20u1c2.ipv4.addresses = [
       {
         address = "192.168.9.1";
         prefixLength = 24;
       }
     ];
 
-    # 3) NAT IPv4 from LAN → WAN
+    # NAT IPv4 from LAN → WAN
     nat = {
       enable = true;
-      internalInterfaces = [ "vlan9" ];
-      externalInterface = "vlan8";
+      internalInterfaces = [ "enp0s20u1c2" ];
+      externalInterface = "enp3s0";
     };
 
     # Firewall
-    firewall = {
-      enable = true;
+    # firewall = {
+    #   enable = true;
 
-      # Only listen on your LAN VLAN
-      interfaces = [ "vlan9" ];
+    #   # Only listen on your LAN VLAN
+    #   interfaces = [ "vlan9" ];
 
-      # Allow DHCP (67,68) and DNS (53) on LAN
-      allowedUDPPorts = [
-        53
-        67
-        68
-      ];
+    #   # Allow DHCP (67,68) and DNS (53) on LAN
+    #   allowedUDPPorts = [
+    #     53
+    #     67
+    #     68
+    #   ];
 
-      # If you want the AdGuard Home UI reachable:
-      allowedTCPPorts = [
-        22
-        3000
-      ];
+    #   # If you want the AdGuard Home UI reachable:
+    #   allowedTCPPorts = [
+    #     22
+    #     3000
+    #   ];
 
-      # Masquerade/NAT is handled separately; make sure forwarding is on:
-      # (NixOS will auto–allow established+related on forwarded packets)
-      # extraCommands = let
-      #   tbl = "${toString tableNum}";
-      # in ''
-      #   # add a rule: from tvIp → tableNum
-      #   ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
-      #   # in that table, send default → tun0
-      #   ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
-      # '';  # :contentReference[oaicite:1]{index=1}
-    };
+    # Masquerade/NAT is handled separately; make sure forwarding is on:
+    # (NixOS will auto–allow established+related on forwarded packets)
+    # extraCommands = let
+    #   tbl = "${toString tableNum}";
+    # in ''
+    #   # add a rule: from tvIp → tableNum
+    #   ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
+    #   # in that table, send default → tun0
+    #   ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
+    # '';  # :contentReference[oaicite:1]{index=1}
+    #};
   };
 
   # Configure network proxy if necessary
@@ -127,7 +115,7 @@
   services.dnsmasq = {
     enable = true;
     settings = {
-      interface = "vlan9";
+      interface = "enp0s20u1c2";
       bind-interfaces = true;
 
       # Only DHCP
@@ -184,16 +172,16 @@
   };
 
   # Tell NixOS to symlink your private VPN file into /etc/openvpn
-  environment.etc."openvpn/vpn.conf" = {
-    source = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.conf";
-  };
+  # environment.etc."openvpn/vpn.conf" = {
+  #   source = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.conf";
+  # };
 
   # Then later, set up the OpenVPN client:
-  services.openvpn.servers.vpn = {
-    autoStart = true;
-    config = ''
-      config /etc/openvpn/vpn.conf
-      pull-filter ignore redirect-gateway
-    '';
-  };
+  # services.openvpn.servers.vpn = {
+  #   autoStart = true;
+  #   config = ''
+  #     config /etc/openvpn/vpn.conf
+  #     pull-filter ignore redirect-gateway
+  #   '';
+  # };
 }
