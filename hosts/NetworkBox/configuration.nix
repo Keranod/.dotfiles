@@ -16,8 +16,8 @@
     fsType = "vfat";
   };
 
-  boot.kernel.sysctl."net.ipv4.ip_forward" = true;
   boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
     "net.ipv6.conf.all.disable_ipv6" = 1;
     "net.ipv6.conf.default.disable_ipv6" = 1;
   };
@@ -53,38 +53,6 @@
       internalInterfaces = [ "enp0s20u1c2" ];
       externalInterface = "enp3s0";
     };
-
-    # Firewall
-    # firewall = {
-    #   enable = true;
-
-    #   # Only listen on your LAN VLAN
-    #   interfaces = [ "vlan9" ];
-
-    #   # Allow DHCP (67,68) and DNS (53) on LAN
-    #   allowedUDPPorts = [
-    #     53
-    #     67
-    #     68
-    #   ];
-
-    #   # If you want the AdGuard Home UI reachable:
-    #   allowedTCPPorts = [
-    #     22
-    #     3000
-    #   ];
-
-    # Masquerade/NAT is handled separately; make sure forwarding is on:
-    # (NixOS will auto–allow established+related on forwarded packets)
-    # extraCommands = let
-    #   tbl = "${toString tableNum}";
-    # in ''
-    #   # add a rule: from tvIp → tableNum
-    #   ${pkgs.iproute2}/bin/ip rule add from ${tvIp} lookup ${tbl} priority 100
-    #   # in that table, send default → tun0
-    #   ${pkgs.iproute2}/bin/ip route add default dev ${vpnInterface} table ${tbl}
-    # '';  # :contentReference[oaicite:1]{index=1}
-    #};
   };
 
   environment.systemPackages = with pkgs; [
@@ -123,6 +91,8 @@
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
         "A8:23:FE:FD:19:ED,192.168.9.50" # TV
+        "E0:CC:F8:FA:FB:42,192.168.9.60" # moj android
+
       ];
     };
   };
@@ -172,18 +142,4 @@
       --http-port=3001
     '';
   };
-
-  # Tell NixOS to symlink your private VPN file into /etc/openvpn
-  # environment.etc."openvpn/vpn.conf" = {
-  #   source = "/etc/vpn/AirVPN_Taiwan_UDP-443-Entry3.conf";
-  # };
-
-  # Then later, set up the OpenVPN client:
-  # services.openvpn.servers.vpn = {
-  #   autoStart = true;
-  #   config = ''
-  #     config /etc/openvpn/vpn.conf
-  #     pull-filter ignore redirect-gateway
-  #   '';
-  # };
 }
