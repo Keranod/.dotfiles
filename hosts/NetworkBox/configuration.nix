@@ -137,6 +137,7 @@
       # DNS
       dns = {
         bind_hosts = [
+          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
         ];
         port = 53;
