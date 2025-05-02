@@ -97,16 +97,6 @@
     '';
   };
 
-  # Service to set up the routing rules for specific IPs
-  systemd.services.setup-vpn-routes = {
-    enable = true;
-    wantedBy = [ "multi-user.target" ]; # Run after networking is available
-    script = ''
-      ip rule add from 192.168.9.60 table vpn1
-      ip route add default dev wg0 table vpn1
-    '';
-  };
-
   services.dnsmasq = {
     enable = true;
     settings = {
