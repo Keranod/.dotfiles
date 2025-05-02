@@ -49,7 +49,7 @@
 
     wg-quick.interfaces = {
       wg0 = {
-        configFile = "/home/keranod/Downloads/wg0.conf"; # Put your real file path here (outside repo)
+        configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
         autostart = true;
       };
     };
