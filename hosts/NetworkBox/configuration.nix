@@ -56,22 +56,29 @@ in
 
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
-    # Use advances generator and use only IPv4
+    # Use advances generator and use only IPv4, if not working try different IPs, select server not country for more control over IP
+    # [Interface]
+    # [...] <- other config
+    # Table = off
+
+    # # after wg0 is up, create routing table & rule:
+    # PostUp   = /run/current-system/sw/bin/ip route add default dev %i table 200
+    # PostUp   = /run/current-system/sw/bin/ip rule  add from 192.168.9.60/32 table 200 priority 1000
+
+    # # on teardown, clean up:
+    # PostDown = /run/current-system/sw/bin/ip rule  del from 192.168.9.60/32 table 200 priority 1000
+    # PostDown = /run/current-system/sw/bin/ip route del default dev %i table 200
+
     # Modify confg to include specific IP only like 192.168.9.50/32 <- needs to be /32 so that only specific IP not whole range is used
     # DO NOT COMMIT CONFIG FILES
+    # sudo wg-quick down wg0 -> stop connection
+    # sudo wg-quick up wg0 -> start connection
     wg-quick.interfaces = {
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
         autostart = true;
       };
     };
-
-    # NAT IPv4 from LAN → WAN
-    # nat = {
-    #   enable = true;
-    #   internalInterfaces = [ "enp0s20u1c2" ];
-    #   externalInterface = "enp3s0";
-    # };
 
     nftables = {
       enable = true;
@@ -91,17 +98,6 @@ in
     };
   };
 
-  # Policy‑based routing: force 192.168.9.60 out wg0
-  # system.activationScripts.pbr = ''
-  #     # Ensure table 200 routes via wg0
-  #   ${ip} route show table 200 | grep -q "default.*wg0" \
-  #     || ${ip} route add default dev wg0 table 200
-
-  #   # Only add the rule if missing
-  #   ${ip} rule show | grep -q "from 192.168.9.60/32 lookup 200" \
-  #     || ${ip} rule add from 192.168.9.60/32 table 200 priority 1000
-  # '';
-
   environment.systemPackages = with pkgs; [
     vim
     git
@@ -109,6 +105,7 @@ in
     home-manager
     htop
     tcpdump
+    dig
   ];
 
   # Enable the OpenSSH service
