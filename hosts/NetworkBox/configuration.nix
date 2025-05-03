@@ -125,21 +125,47 @@
       interface = "enp0s20u1c2";
       bind-interfaces = true;
 
-      # Only DHCP
-      port = 0; # <--- this disables the DNS server in dnsmasq!
-
-      dhcp-range = "192.168.9.100,192.168.9.200,24h";
-      dhcp-option = [
-        "3,192.168.9.1"
-        "6,192.168.9.1"
+      # keep your IPv4 DHCP range/hosts...
+      dhcp-range = [
+        # IPv4
+        "192.168.9.100,192.168.9.200,24h"
+        # IPv6: a /64 slice of your WG v6 prefix
+        "fd7d:76ee:e68f:a993::100,fd7d:76ee:e68f:a993::200,64,24h"
       ];
+
       dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
-        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
-        "E0:CC:F8:FA:FB:42,192.168.9.60" # moj android
-
+        # your existing static IPv4 for the phone
+        "E0:CC:F8:FA:FB:42,192.168.9.60"
+        # new static IPv6 lease for the same MAC
+        "E0:CC:F8:FA:FB:42,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]"
       ];
+
+      # ensure DHCPv6 hands out your DNS
+      dhcp-option = [
+        "option6:dns-server,[fd7d:76ee:e68f:a993::1]"
+      ];
+
+      port = 0; # you can leave this if you still want DNS by AdGuard
     };
+  };
+
+  services.ndppd = {
+    enable = true;
+    daemons = [
+      {
+        interface = "enp0s20u1c2"; # your LAN interface
+        proxy = [
+          {
+            router = true; # respond as a router
+            timeout = 500; # cache timeout (ms)
+            rule = {
+              ip = "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed"; # your single /128
+              dev = "wg0"; # the WG tunnel
+            };
+          }
+        ];
+      }
+    ];
   };
 
   # AdGuard Home: DNS
