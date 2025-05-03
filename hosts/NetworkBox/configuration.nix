@@ -3,9 +3,6 @@
   ...
 }:
 
-let
-  ip = "${pkgs.iproute2}/bin/ip";
-in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -20,12 +17,11 @@ in
   };
 
   boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-    "net.ipv6.conf.all.disable_ipv6" = 0; # ✅ Ensure IPv6 is enabled globally
-    "net.ipv6.conf.default.disable_ipv6" = 0; # ✅ Ensure IPv6 is enabled on default interfaces
-    "net.ipv6.conf.wg0.disable_ipv6" = 0; # ✅ (optional: make sure WireGuard itself allows IPv6)
+    "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
+    "net.ipv6.conf.all.disable_ipv6" = 0; # Disable IPv6 globally
+    "net.ipv6.conf.default.disable_ipv6" = 0; # Disable IPv6 on default interfaces
 
-    # Keep your other settings:
+    # Enable routing through local networks (needed for the WireGuard VPN setup)
     "net.ipv4.conf.all.route_localnet" = 1;
     "net.ipv4.conf.default.route_localnet" = 1;
   };
@@ -74,6 +70,7 @@ in
     # DO NOT COMMIT CONFIG FILES
     # sudo wg-quick down wg0 -> stop connection
     # sudo wg-quick up wg0 -> start connection
+
     wg-quick.interfaces = {
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
@@ -93,6 +90,13 @@ in
 
             # Phone → VPN (should be wg0 not enp3s0)
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
+          }
+        }
+        table ip6 nat {
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+
+            ip6 saddr 192.168.9.0/24 oifname "wg0" masquerade
           }
         }
       '';
