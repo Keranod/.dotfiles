@@ -67,10 +67,28 @@ in
     };
 
     # NAT IPv4 from LAN → WAN
-    nat = {
+    # nat = {
+    #   enable = true;
+    #   internalInterfaces = [ "enp0s20u1c2" ];
+    #   externalInterface = "enp3s0";
+    # };
+
+    nftables = {
       enable = true;
-      internalInterfaces = [ "enp0s20u1c2" ];
-      externalInterface = "enp3s0";
+      ruleset = ''
+        table ip nat {
+          # LAN→WAN
+          chain postrouting_wan {
+            type nat hook postrouting priority 100;
+            oifname "enp3s0" masquerade;
+          }
+          # Phone (.60) → VPN
+          chain postrouting_vpn {
+            type nat hook postrouting priority 100;
+            ip saddr 192.168.9.60/32 oifname "wg0" masquerade;
+          }
+        }
+      '';
     };
   };
 
