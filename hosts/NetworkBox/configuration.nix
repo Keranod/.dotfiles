@@ -77,15 +77,14 @@ in
       enable = true;
       ruleset = ''
         table ip nat {
-          # LAN→WAN
-          chain postrouting_wan {
-            type nat hook postrouting priority 100;
-            oifname "enp3s0" masquerade;
-          }
-          # Phone (.60) → VPN
-          chain postrouting_vpn {
-            type nat hook postrouting priority 100;
-            ip saddr 192.168.9.60/32 oifname "enp3s0" masquerade;
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+
+            # LAN → WAN (default NAT)
+            ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
+
+            # Phone → VPN (should be wg0 not enp3s0)
+            ip saddr 192.168.9.60/32 oifname "wg0" masquerade
           }
         }
       '';
