@@ -59,12 +59,12 @@ in
     # Use advances generator and use only IPv4
     # Modify confg to include specific IP only like 192.168.9.50/32 <- needs to be /32 so that only specific IP not whole range is used
     # DO NOT COMMIT CONFIG FILES
-    # wg-quick.interfaces = {
-    #   wg0 = {
-    #     configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
-    #     autostart = true;
-    #   };
-    # };
+    wg-quick.interfaces = {
+      wg0 = {
+        configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
+        autostart = true;
+      };
+    };
 
     # NAT IPv4 from LAN → WAN
     nat = {
