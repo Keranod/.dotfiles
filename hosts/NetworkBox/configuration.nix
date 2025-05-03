@@ -85,7 +85,7 @@ in
           # Phone (.60) → VPN
           chain postrouting_vpn {
             type nat hook postrouting priority 100;
-            ip saddr 192.168.9.60/32 oifname "wg0" masquerade;
+            ip saddr 192.168.9.60/32 oifname "enp3s0" masquerade;
           }
         }
       '';
