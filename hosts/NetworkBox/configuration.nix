@@ -126,20 +126,65 @@
       interface = "enp0s20u1c2";
       bind-interfaces = true;
 
-      # Only DHCP
-      port = 0; # <--- this disables the DNS server in dnsmasq!
+      # disable dnsmasq’s DNS (AdGuard handles DNS)
+      port = 0;
 
-      dhcp-range = "192.168.9.100,192.168.9.200,24h";
+      # DHCP ranges: IPv4 + small IPv6 pool (only phone will match the static below)
+      dhcp-range = [
+        "192.168.9.100,192.168.9.200,24h"
+        "[fd7d:76ee:e68f:a993::100],[fd7d:76ee:e68f:a993::200],64,24h"
+      ];
+
+      # Global DHCP options:
+      # 3 = default gateway, 6 = IPv4 DNS server
       dhcp-option = [
         "3,192.168.9.1"
         "6,192.168.9.1"
+        # push your IPv6 DNS via DHCPv6
+        "option6:dns-server,[fd7d:76ee:e68f:a993::1]"
       ];
-      dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
-        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
-        "E0:CC:F8:FA:FB:42,192.168.9.60" # moj android
 
+      # Static leases (MAC → IPv4 [,IPv6]):
+      dhcp-host = [
+        "7C:F1:7E:6C:60:00,192.168.9.2" # TP‑Link
+        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
+        "E0:CC:F8:FA:FB:42,192.168.9.60,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]" # your phone
       ];
+    };
+  };
+
+  services.radvd = {
+    enable = true;
+    interfaces = [
+      {
+        interface = "enp0s20u1c2"; # your LAN NIC
+        prefix = "fd7d:76ee:e68f:a993::/64"; # the /64 that contains your phone’s /128
+        options = {
+          AdvDefaultLifetime = 1800; # how long this router is “good for”
+          AdvManagedFlag = false; # we’re using DHCPv6 for addresses
+          AdvOtherConfigFlag = false; # no extra DHCPv6 options besides DNS
+          AdvOnLinkFlag = true; # prefix is on‑link
+          AdvAutonomousFlag = false; # don’t let clients auto‑SLAAC a full /64
+          # push your AdGuard‑Home v6 DNS too:
+          RDNSS_lifetime = 600;
+          RDNSS = [ "fd7d:76ee:e68f:a993::1" ];
+        };
+      }
+    ];
+  };
+
+  services.ndppd = {
+    enable = true;
+    proxies = {
+      enp0s20u1c2 = {
+        rules = {
+          # your AirVPN /128
+          "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed" = {
+            dev = "wg0";
+            method = "static";
+          };
+        };
+      };
     };
   };
 
