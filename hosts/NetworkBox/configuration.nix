@@ -54,6 +54,26 @@
       }
     ];
 
+    # NDP proxy daemon (for your single /128)
+    ndppd = {
+      enable = true;
+      daemons = [
+        {
+          interface = "enp0s20u1c2"; # your LAN
+          proxy = [
+            {
+              router = true; # respond as a router
+              timeout = 500; # ms cache timeout
+              rule = {
+                ip = "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed";
+                dev = "wg0"; # where to send it
+              };
+            }
+          ];
+        }
+      ];
+    };
+
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
     # Use advances generator and use only IPv4, if not working try different IPs, select server not country for more control over IP
@@ -147,25 +167,6 @@
 
       port = 0; # you can leave this if you still want DNS by AdGuard
     };
-  };
-
-  services.ndppd = {
-    enable = true;
-    daemons = [
-      {
-        interface = "enp0s20u1c2"; # your LAN interface
-        proxy = [
-          {
-            router = true; # respond as a router
-            timeout = 500; # cache timeout (ms)
-            rule = {
-              ip = "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed"; # your single /128
-              dev = "wg0"; # the WG tunnel
-            };
-          }
-        ];
-      }
-    ];
   };
 
   # AdGuard Home: DNS
