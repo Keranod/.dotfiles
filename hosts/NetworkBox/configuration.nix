@@ -4,7 +4,7 @@
 }:
 
 let
-  ip = "${pkgs.iproute}/bin/ip";
+  ip = "${pkgs.iproute2}/bin/ip";
 in
 {
   imports = [
