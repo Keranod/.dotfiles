@@ -52,13 +52,6 @@
       }
     ];
 
-    interfaces.enp0s20u1c2.ipv6.addresses = [
-      {
-        address = "fd42:42:42:9::1";
-        prefixLength = 64;
-      }
-    ];
-
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
     # Use advances generator and use only IPv4, if not working try different IPs, select server not country for more control over IP
