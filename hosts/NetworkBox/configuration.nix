@@ -21,8 +21,8 @@ in
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
-    "net.ipv6.conf.all.disable_ipv6" = 1; # Disable IPv6 globally
-    "net.ipv6.conf.default.disable_ipv6" = 1; # Disable IPv6 on default interfaces
+    #"net.ipv6.conf.all.disable_ipv6" = 1; # Disable IPv6 globally
+    #"net.ipv6.conf.default.disable_ipv6" = 1; # Disable IPv6 on default interfaces
 
     # Enable routing through local networks (needed for the WireGuard VPN setup)
     "net.ipv4.conf.all.route_localnet" = 1;
@@ -83,17 +83,32 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        table ip nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # LAN → WAN (default NAT)
-            ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
-
-            # Phone → VPN (should be wg0 not enp3s0)
-            ip saddr 192.168.9.60/32 oifname "wg0" masquerade
+        table inet filter {
+          chain input {
+            type filter hook input priority 0; policy accept;
+            iifname != "wg0" ip6 drop
+          }
+          chain forward {
+            type filter hook forward priority 0; policy accept;
+            iifname != "wg0" ip6 drop
+          }
+          chain output {
+            type filter hook output priority 0; policy accept;
+            oifname != "wg0" ip6 drop
           }
         }
+
+          table ip nat {
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+
+              # LAN → WAN (default NAT)
+              ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
+
+              # Phone → VPN (should be wg0 not enp3s0)
+              ip saddr 192.168.9.60/32 oifname "wg0" masquerade
+            }
+          }
       '';
     };
   };
