@@ -93,11 +93,11 @@ in
 
   # Policy‑based routing: force 192.168.9.60 out wg0
   system.activationScripts.pbr = ''
-    # ensure table 200 routes via wg0
-    ${ip} route show table 200 2>/dev/null \
+      # Ensure table 200 routes via wg0
+    ${ip} route show table 200 | grep -q "default.*wg0" \
       || ${ip} route add default dev wg0 table 200
 
-    # only add the rule if missing
+    # Only add the rule if missing
     ${ip} rule show | grep -q "from 192.168.9.60/32 lookup 200" \
       || ${ip} rule add from 192.168.9.60/32 table 200 priority 1000
   '';
