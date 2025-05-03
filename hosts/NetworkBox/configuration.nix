@@ -3,6 +3,9 @@
   ...
 }:
 
+let
+  ip = "${pkgs.iproute}/bin/ip";
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -74,13 +77,14 @@
   # Policy‑based routing: force 192.168.9.60 out wg0
   system.activationScripts.pbr = ''
     # ensure table 200 routes via wg0
-    ip route show table 200 2>/dev/null \
-      || ip route add default dev wg0 table 200
+    ${ip} route show table 200 2>/dev/null \
+      || ${ip} route add default dev wg0 table 200
 
     # only add the rule if missing
-    ip rule show | grep -q "from 192.168.9.60/32 lookup 200" \
-      || ip rule add from 192.168.9.60/32 table 200 priority 1000
+    ${ip} rule show | grep -q "from 192.168.9.60/32 lookup 200" \
+      || ${ip} rule add from 192.168.9.60/32 table 200 priority 1000
   '';
+
   environment.systemPackages = with pkgs; [
     vim
     git
@@ -88,6 +92,7 @@
     home-manager
     htop
     tcpdump
+    iproute
   ];
 
   # Enable the OpenSSH service
