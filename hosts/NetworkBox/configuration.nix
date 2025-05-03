@@ -25,6 +25,7 @@
 
     # IPv6
     "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.conf.default.forwarding" = 1;
     "net.ipv6.conf.all.disable_ipv6" = 0;
     "net.ipv6.conf.default.disable_ipv6" = 0;
   };
@@ -53,26 +54,6 @@
         prefixLength = 24;
       }
     ];
-
-    # NDP proxy daemon (for your single /128)
-    ndppd = {
-      enable = true;
-      daemons = [
-        {
-          interface = "enp0s20u1c2"; # your LAN
-          proxy = [
-            {
-              router = true; # respond as a router
-              timeout = 500; # ms cache timeout
-              rule = {
-                ip = "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed";
-                dev = "wg0"; # where to send it
-              };
-            }
-          ];
-        }
-      ];
-    };
 
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
