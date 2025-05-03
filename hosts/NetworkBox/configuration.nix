@@ -24,10 +24,9 @@
     "net.ipv4.conf.default.route_localnet" = 1;
 
     # IPv6
-    "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.default.forwarding" = 1;
-    "net.ipv6.conf.all.disable_ipv6" = 0;
-    "net.ipv6.conf.default.disable_ipv6" = 0;
+    "net.ipv6.conf.all.forwarding" = 0;
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
   };
 
   # Networking
@@ -126,27 +125,20 @@
       interface = "enp0s20u1c2";
       bind-interfaces = true;
 
-      # keep your IPv4 DHCP range/hosts...
-      dhcp-range = [
-        # IPv4
-        "192.168.9.100,192.168.9.200,24h"
-        # IPv6: a /64 slice of your WG v6 prefix
-        "fd7d:76ee:e68f:a993::100,fd7d:76ee:e68f:a993::200,64,24h"
-      ];
+      # Only DHCP
+      port = 0; # <--- this disables the DNS server in dnsmasq!
 
-      dhcp-host = [
-        # your existing static IPv4 for the phone
-        "E0:CC:F8:FA:FB:42,192.168.9.60"
-        # new static IPv6 lease for the same MAC
-        "E0:CC:F8:FA:FB:42,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]"
-      ];
-
-      # ensure DHCPv6 hands out your DNS
+      dhcp-range = "192.168.9.100,192.168.9.200,24h";
       dhcp-option = [
-        "option6:dns-server,[fd7d:76ee:e68f:a993::1]"
+        "3,192.168.9.1"
+        "6,192.168.9.1"
       ];
+      dhcp-host = [
+        "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
+        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
+        "E0:CC:F8:FA:FB:42,192.168.9.60" # moj android
 
-      port = 0; # you can leave this if you still want DNS by AdGuard
+      ];
     };
   };
 
