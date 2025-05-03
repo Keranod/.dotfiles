@@ -92,13 +92,6 @@
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
           }
         }
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            ip6 saddr 192.168.9.0/24 oifname "wg0" masquerade
-          }
-        }
       '';
     };
   };
