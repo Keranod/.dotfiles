@@ -20,11 +20,12 @@ in
   };
 
   boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
-    "net.ipv6.conf.all.disable_ipv6" = 1; # Disable IPv6 globally
-    "net.ipv6.conf.default.disable_ipv6" = 1; # Disable IPv6 on default interfaces
+    "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.disable_ipv6" = 0; # ✅ Ensure IPv6 is enabled globally
+    "net.ipv6.conf.default.disable_ipv6" = 0; # ✅ Ensure IPv6 is enabled on default interfaces
+    "net.ipv6.conf.wg0.disable_ipv6" = 0; # ✅ (optional: make sure WireGuard itself allows IPv6)
 
-    # Enable routing through local networks (needed for the WireGuard VPN setup)
+    # Keep your other settings:
     "net.ipv4.conf.all.route_localnet" = 1;
     "net.ipv4.conf.default.route_localnet" = 1;
   };
