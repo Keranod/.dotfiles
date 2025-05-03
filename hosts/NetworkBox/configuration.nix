@@ -56,7 +56,6 @@
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
         autostart = true;
-        table = "100";
       };
     };
 
