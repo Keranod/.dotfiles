@@ -18,9 +18,9 @@
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
-    "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.all.disable_ipv6" = 0;
-    "net.ipv6.conf.default.disable_ipv6" = 0;
+    "net.ipv6.conf.all.forwarding" = 0;
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
 
     # Enable routing through local networks (needed for the WireGuard VPN setup)
     "net.ipv4.conf.all.route_localnet" = 1;
@@ -100,14 +100,6 @@
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
           }
         }
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # LAN → VPN (NAT66)
-            ip6 saddr fd42:42:42:9::/64 oifname "wg0" masquerade
-          }
-        }
       '';
     };
   };
@@ -149,7 +141,7 @@
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2" # TP-Link
         "A8:23:FE:FD:19:ED,192.168.9.50" # TV
-        "E0:CC:F8:FA:FB:42,192.168.9.60,[fd42:42:42:9::60]" # moj android
+        "E0:CC:F8:FA:FB:42,192.168.9.60" # moj android
 
       ];
     };
