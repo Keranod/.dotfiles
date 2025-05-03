@@ -86,15 +86,19 @@ in
         table inet filter {
           chain input {
             type filter hook input priority 0; policy accept;
-            iifname != "wg0" ip6 drop
+            ip6 protocol ipv6-icmp accept
+            ip6 saddr ::1 drop # Block local IPv6 addresses
+            ip6 drop
           }
           chain forward {
             type filter hook forward priority 0; policy accept;
-            iifname != "wg0" ip6 drop
+            ip6 protocol ipv6-icmp accept
+            ip6 drop
           }
           chain output {
             type filter hook output priority 0; policy accept;
-            oifname != "wg0" ip6 drop
+            ip6 protocol ipv6-icmp accept
+            ip6 drop
           }
         }
 
