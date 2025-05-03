@@ -21,14 +21,12 @@ in
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
-    #"net.ipv6.conf.all.disable_ipv6" = 1; # Disable IPv6 globally
-    #"net.ipv6.conf.default.disable_ipv6" = 1; # Disable IPv6 on default interfaces
+    "net.ipv6.conf.all.disable_ipv6" = 1; # Disable IPv6 globally
+    "net.ipv6.conf.default.disable_ipv6" = 1; # Disable IPv6 on default interfaces
 
     # Enable routing through local networks (needed for the WireGuard VPN setup)
     "net.ipv4.conf.all.route_localnet" = 1;
     "net.ipv4.conf.default.route_localnet" = 1;
-    "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.default.forwarding" = 1;
   };
 
   # Networking
@@ -38,31 +36,23 @@ in
 
     # physical uplink, no IP here
     interfaces.enp3s0 = {
-      useDHCP = true;
-      # ipv4.addresses = [
-      #   {
-      #     address = "192.168.8.2";
-      #     prefixLength = 24;
-      #   }
-      # ];
+      useDHCP = false;
+      ipv4.addresses = [
+        {
+          address = "192.168.8.2";
+          prefixLength = 24;
+        }
+      ];
     };
     defaultGateway = "192.168.8.1";
 
     # LAN: serve 192.168.9.0/24 on enp0s20u1c2
-    interfaces.enp0s20u1c2 = {
-      ipv4.addresses = [
-        {
-          address = "192.168.9.1";
-          prefixLength = 24;
-        }
-      ];
-      ipv6.addresses = [
-        {
-          address = "fd00::1";
-          prefixLength = 64;
-        }
-      ];
-    };
+    interfaces.enp0s20u1c2.ipv4.addresses = [
+      {
+        address = "192.168.9.1";
+        prefixLength = 24;
+      }
+    ];
 
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
