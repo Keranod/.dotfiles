@@ -92,7 +92,6 @@ in
     home-manager
     htop
     tcpdump
-    iproute
   ];
 
   # Enable the OpenSSH service
