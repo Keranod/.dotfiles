@@ -100,6 +100,14 @@
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
           }
         }
+
+        table ip6 nat {
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+
+            ip6 saddr fd00:9::/64 oifname "wg0" masquerade
+          }
+        }
       '';
     };
   };
@@ -153,7 +161,7 @@
           AdvOnLink      on;
           AdvAutonomous  on;   # clients auto‑SLAAC a ULA
         };
-        
+
         # tell clients to use your ULA DNS
         RDNSS fd00:9::1 {
           AdvRDNSSLifetime 600;
