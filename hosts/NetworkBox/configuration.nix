@@ -174,7 +174,7 @@
         rules = {
           "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed" = {
             method = "static"; # answer NDP immediately
-            iface = "wg0"; # ← correct key name
+            interface = "wg0";
             # timeout = 500;         # optional cache timeout (ms)
           };
         };
