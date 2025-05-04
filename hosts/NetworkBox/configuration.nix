@@ -142,11 +142,15 @@
         "option6:dns-server,[fd7d:76ee:e68f:a993::1]"
       ];
 
-      # Static leases (MAC → IPv4 [,IPv6]):
       dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.9.2" # TP‑Link
-        "A8:23:FE:FD:19:ED,192.168.9.50" # TV
-        "E0:CC:F8:FA:FB:42,192.168.9.60,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]" # your phone
+        # existing IPv4‐only static leases
+        "7C:F1:7E:6C:60:00,192.168.9.2"
+        "A8:23:FE:FD:19:ED,192.168.9.50"
+        # split your phone into two entries:
+        #  • one for IPv4…
+        "E0:CC:F8:FA:FB:42,192.168.9.60"
+        #  • …and one for IPv6
+        "E0:CC:F8:FA:FB:42,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]"
       ];
     };
   };
