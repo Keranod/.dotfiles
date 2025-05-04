@@ -149,11 +149,12 @@
     config = ''
       interface enp0s20u1c2 {
         AdvSendAdvert on;
-        prefix fd7d:76ee:e68f:a993::/64 {
-          AdvOnLink on;
-          AdvAutonomous off;      # we’re using DHCPv6 for addresses
+        prefix fd00:9::/64 {
+          AdvOnLink      on;
+          AdvAutonomous  on;   # clients auto‑SLAAC a ULA
         };
-        RDNSS fd7d:76ee:e68f:a993::1 {
+        # tell clients to use your ULA DNS
+        RDNSS fd00:9::1 {
           AdvRDNSSLifetime 600;
         };
       };
