@@ -153,10 +153,16 @@
           AdvOnLink      on;
           AdvAutonomous  on;   # clients auto‑SLAAC a ULA
         };
+        
         # tell clients to use your ULA DNS
         RDNSS fd00:9::1 {
           AdvRDNSSLifetime 600;
         };
+
+        # Add this to tell clients to route all IPv6 traffic via you
+        route ::/0 {
+        AdvRoutePreference medium;
+      };
       };
     '';
   };
