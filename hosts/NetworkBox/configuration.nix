@@ -57,7 +57,6 @@
 
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
-    # Use advances generator and use only IPv4, if not working try different IPs, select server not country for more control over IP
     # [Interface]
     # [...] <- other config
     # Table = off
@@ -70,7 +69,6 @@
     # PostDown = /run/current-system/sw/bin/ip rule  del from 192.168.9.60/32 table 200 priority 1000
     # PostDown = /run/current-system/sw/bin/ip route del default dev %i table 200
 
-    # Modify confg to include specific IP only like 192.168.9.50/32 <- needs to be /32 so that only specific IP not whole range is used
     # DO NOT COMMIT CONFIG FILES
     # sudo wg-quick down wg0 -> stop connection
     # sudo wg-quick up wg0 -> start connection
@@ -155,22 +153,18 @@
 
   services.radvd = {
     enable = true;
-    interfaces = [
-      {
-        interface = "enp0s20u1c2"; # your LAN NIC
-        prefix = "fd7d:76ee:e68f:a993::/64"; # the /64 that contains your phone’s /128
-        options = {
-          AdvDefaultLifetime = 1800; # how long this router is “good for”
-          AdvManagedFlag = false; # we’re using DHCPv6 for addresses
-          AdvOtherConfigFlag = false; # no extra DHCPv6 options besides DNS
-          AdvOnLinkFlag = true; # prefix is on‑link
-          AdvAutonomousFlag = false; # don’t let clients auto‑SLAAC a full /64
-          # push your AdGuard‑Home v6 DNS too:
-          RDNSS_lifetime = 600;
-          RDNSS = [ "fd7d:76ee:e68f:a993::1" ];
+    config = ''
+      interface enp0s20u1c2 {
+        AdvSendAdvert on;
+        prefix fd7d:76ee:e68f:a993::/64 {
+          AdvOnLink on;
+          AdvAutonomous off;      # we’re using DHCPv6 for addresses
         };
-      }
-    ];
+        RDNSS fd7d:76ee:e68f:a993::1 {
+          AdvRDNSSLifetime 600;
+        };
+      };
+    '';
   };
 
   services.ndppd = {
