@@ -172,10 +172,10 @@
     proxies = {
       enp0s20u1c2 = {
         rules = {
-          # your AirVPN /128
           "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed" = {
-            dev = "wg0";
-            method = "static";
+            method = "static"; # answer NDP immediately
+            iface = "wg0"; # ← correct key name
+            # timeout = 500;         # optional cache timeout (ms)
           };
         };
       };
