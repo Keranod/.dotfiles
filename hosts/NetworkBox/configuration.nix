@@ -54,6 +54,12 @@
         prefixLength = 24;
       }
     ];
+    interfaces.enp0s20u1c2.ipv6.addresses = [
+      {
+        address = "fd00:9::1";
+        prefixLength = 64;
+      }
+    ];
 
     # VPN - use wireguard config, create folder and config files in /etc/wireguard
     # https://airvpn.org/generator/
@@ -123,34 +129,17 @@
     settings = {
       interface = "enp0s20u1c2";
       bind-interfaces = true;
-
-      # disable dnsmasq’s DNS (AdGuard handles DNS)
       port = 0;
 
-      # DHCP ranges: IPv4 + small IPv6 pool (only phone will match the static below)
-      dhcp-range = [
-        "192.168.9.100,192.168.9.200,24h"
-        "[fd7d:76ee:e68f:a993::100],[fd7d:76ee:e68f:a993::200],64,24h"
-      ];
-
-      # Global DHCP options:
-      # 3 = default gateway, 6 = IPv4 DNS server
+      dhcp-range = [ "192.168.9.100,192.168.9.200,24h" ];
       dhcp-option = [
         "3,192.168.9.1"
         "6,192.168.9.1"
-        # push your IPv6 DNS via DHCPv6
-        "option6:dns-server,[fd7d:76ee:e68f:a993::1]"
       ];
-
       dhcp-host = [
-        # existing IPv4‐only static leases
         "7C:F1:7E:6C:60:00,192.168.9.2"
         "A8:23:FE:FD:19:ED,192.168.9.50"
-        # split your phone into two entries:
-        #  • one for IPv4…
         "E0:CC:F8:FA:FB:42,192.168.9.60"
-        #  • …and one for IPv6
-        "E0:CC:F8:FA:FB:42,[fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed]"
       ];
     };
   };
@@ -198,6 +187,7 @@
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
+          "fd00:9::1"
         ];
         port = 53;
         upstream_dns = [
