@@ -96,8 +96,11 @@
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
-            # Phone → VPN (should be wg0 not enp3s0)
+            # Phone → VPN
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
+
+            # TV → VPN
+            ip saddr 192.168.9.50/32 oifname "wg0" masquerade
           }
         }
 
@@ -146,8 +149,8 @@
       ];
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2"
-        "A8:23:FE:FD:19:ED,192.168.9.50"
-        "E0:CC:F8:FA:FB:42,192.168.9.60"
+        "A8:23:FE:FD:19:ED,192.168.9.50" # Tv
+        "E0:CC:F8:FA:FB:42,192.168.9.60" # Moj Android
       ];
     };
   };
