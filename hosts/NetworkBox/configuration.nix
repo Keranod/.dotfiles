@@ -5,8 +5,8 @@
 
 let
   phoneMAC = "E0:CC:F8:FA:FB:42";
-  phoneFwmark = 300;
-  phoneTable = toString phoneFwmark;
+  phoneFwmark = "300";
+  phoneTable = phoneFwmark;
   phonePriority = 1001;
   phoneInterface = "wg1";
 in
