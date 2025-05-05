@@ -3,6 +3,13 @@
   ...
 }:
 
+let
+  phoneMAC = "E0:CC:F8:FA:FB:42";
+  phoneFwmark = 300;
+  phoneTable = phoneFwmark;
+  phonePriority = 1001;
+  phoneInterface = "wg1";
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -85,29 +92,10 @@
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
-        # table = "main";
-
-        # postUp = ''
-        #   # nuke any stale wg-quick defaults
-        #   ip -4 rule del table 51820                2>/dev/null || true
-        #   ip -4 rule del table main suppress_prefixlength 0 2>/dev/null || true
-        #   ip -6 rule del table 51820                2>/dev/null || true
-        #   ip -6 rule del table main suppress_prefixlength 0 2>/dev/null || true
-
-        #   # now your policy routing for fwmark=60:
-        #   ip rule add   fwmark 60 table 200 priority 1000
-        #   ip route add  default dev %i table 200
-
-        #   ip -6 rule add fwmark 60 table 200 priority 1000
-        #   ip -6 route add default dev %i table 200
-        # '';
-        # postDown = ''
-        #   ip rule del   fwmark 60 table 200 priority 1000
-        #   ip route del  default dev %i table 200
-
-        #   ip -6 rule del fwmark 60 table 200 priority 1000
-        #   ip -6 route del default dev %i table 200
-        # '';
+      };
+      "${phoneInterface}" = {
+        configFile = "/etc/wireguard/${phoneInterface}.conf";
+        autostart = true;
       };
     };
 
@@ -119,7 +107,7 @@
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
             ether saddr A8:23:FE:FD:19:ED counter mark set 50 # Moj TV
-            ether saddr E0:CC:F8:FA:FB:42 counter mark set 60 # Moj Android
+            ether saddr ${phoneMAC} counter mark set ${phoneFwmark}
           }
         }
 
@@ -131,7 +119,7 @@
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
             # Phone → VPN
-            meta mark 60 oifname "wg0" masquerade
+            meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
 
             # TV → VPN
             meta mark 50 oifname "wg0" masquerade
@@ -143,7 +131,7 @@
             type nat hook postrouting priority 100; policy accept;
 
             meta mark 50 oifname "wg0" masquerade
-            meta mark 60 oifname "wg0" masquerade
+            meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
           }
         }
       '';
@@ -185,7 +173,7 @@
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2"
         "A8:23:FE:FD:19:ED,192.168.9.50" # Tv
-        "E0:CC:F8:FA:FB:42,192.168.9.60" # Moj Android
+        #"E0:CC:F8:FA:FB:42,192.168.9.60" # Moj Android
       ];
     };
   };
