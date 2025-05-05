@@ -9,6 +9,12 @@ let
   phoneTable = phoneFwmark;
   phonePriority = "1001";
   phoneInterface = "wg1";
+
+  mlodejMAC = "58:41:46:ED:9C:3B";
+  mlodejFwmark = "400";
+  mlodejTable = phoneFwmark;
+  mlodejPriority = "1002";
+  mlodejInterface = "wg2";
 in
 {
   imports = [
@@ -68,7 +74,7 @@ in
       }
     ];
 
-    # VPN - use wireguard config, create folder and config files in /etc/wireguard
+    # VPN - use wireguard config, if different interface change/create connection/device , create folder and config files in /etc/wireguard/wg<number>.conf
     # https://airvpn.org/generator/
     # [Interface]
     # [...] <- other config
@@ -97,6 +103,10 @@ in
         configFile = "/etc/wireguard/${phoneInterface}.conf";
         autostart = true;
       };
+      "${mlodejInterface}" = {
+        configFile = "/etc/wireguard/${mlodejInterface}.conf";
+        autostart = true;
+      };
     };
 
     nftables = {
@@ -108,6 +118,7 @@ in
             type filter hook prerouting priority raw; policy accept;
             ether saddr A8:23:FE:FD:19:ED counter mark set 50 # Moj TV
             ether saddr ${phoneMAC} counter mark set ${phoneFwmark}
+            ether saddr ${mlodejMAC} counter mark set ${mlodejFwmark}
           }
         }
 
@@ -120,6 +131,7 @@ in
 
             # Phone → VPN
             meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
+            meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
 
             # TV → VPN
             meta mark 50 oifname "wg0" masquerade
@@ -132,6 +144,7 @@ in
 
             meta mark 50 oifname "wg0" masquerade
             meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
+            meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
           }
         }
       '';
