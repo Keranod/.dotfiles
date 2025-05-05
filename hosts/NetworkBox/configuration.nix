@@ -93,10 +93,10 @@ in
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
       };
-      # "${phoneInterface}" = {
-      #   configFile = "/etc/wireguard/${phoneInterface}.conf";
-      #   autostart = true;
-      # };
+      "${phoneInterface}" = {
+        configFile = "/etc/wireguard/${phoneInterface}.conf";
+        autostart = true;
+      };
     };
 
     nftables = {
