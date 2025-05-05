@@ -85,40 +85,12 @@
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
         autostart = true;
-        table = "off";
-        # hook into the wg-quick up/down
-        postUp = ''
-          # mark packets & set up routing table
-
-          # IPv4
-          ip rule add fwmark 60 table 200 priority 1000
-          ip route add default dev %i table 200
-
-          # IPv6
-          ip -6 rule add fwmark 60 table 200 priority 1000
-          ip -6 route add default dev %i table 200
-        '';
-        postDown = ''
-                    ip rule del fwmark 60 table 200 priority 1000
-          ip route del default dev %i table 200
-
-          ip -6 rule del fwmark 60 table 200 priority 1000
-          ip -6 route del default dev %i table 200
-        '';
       };
     };
 
     nftables = {
       enable = true;
       ruleset = ''
-        # 1) mangle table: mark all ingress packets from your phone's MAC
-        table inet mangle {
-          chain prerouting {
-            type filter hook prerouting priority raw; policy accept;
-            ether saddr E0:CC:F8:FA:FB:42 counter mark set 60
-          }
-        }
-
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
@@ -130,7 +102,7 @@
             ip saddr 192.168.9.60/32 oifname "wg0" masquerade
 
             # TV → VPN
-            meta mark 60 oifname "wg0" masquerade
+            ip saddr 192.168.9.50/32 oifname "wg0" masquerade
           }
         }
 
@@ -138,8 +110,7 @@
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
-            #ip6 saddr fd00:9::/64 oifname "wg0" masquerade
-            meta mark 60 oifname "wg0" masquerade
+            ip6 saddr fd00:9::/64 oifname "wg0" masquerade
           }
         }
       '';
@@ -209,20 +180,20 @@
     '';
   };
 
-  # services.ndppd = {
-  #   enable = true;
-  #   proxies = {
-  #     enp0s20u1c2 = {
-  #       rules = {
-  #         "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed" = {
-  #           method = "static"; # answer NDP immediately
-  #           interface = "wg0";
-  #           # timeout = 500;         # optional cache timeout (ms)
-  #         };
-  #       };
-  #     };
-  #   };
-  # };
+  services.ndppd = {
+    enable = true;
+    proxies = {
+      enp0s20u1c2 = {
+        rules = {
+          "fd7d:76ee:e68f:a993:8ed5:faf4:b85c:13ed" = {
+            method = "static"; # answer NDP immediately
+            interface = "wg0";
+            # timeout = 500;         # optional cache timeout (ms)
+          };
+        };
+      };
+    };
+  };
 
   # AdGuard Home: DNS
   services.adguardhome = {
