@@ -86,10 +86,18 @@
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
 
-        # ← must be an integer 0, not the string "off"
-        table = 0;
-
         postUp = ''
+          # ────────────────────────────────────────────────
+          # 1) remove wg-quick’s default IPv4 & IPv6 rules/routes
+          ip -4 rule del table 51820        2>/dev/null || true
+          ip -4 rule del table main suppress_prefixlength 0 2>/dev/null || true
+
+          ip -6 rule del table 51820        2>/dev/null || true
+          ip -6 rule del table main suppress_prefixlength 0 2>/dev/null || true
+
+          # ────────────────────────────────────────────────
+          # 2) your mark → policy routing
+          #    (only marked fwmark=60 packets go via table 200)
           ip rule add   fwmark 60 table 200 priority 1000
           ip route add  default dev %i table 200
 
@@ -97,6 +105,7 @@
           ip -6 route add default dev %i table 200
         '';
         postDown = ''
+          # tear down your rules:
           ip rule del   fwmark 60 table 200 priority 1000
           ip route del  default dev %i table 200
 
