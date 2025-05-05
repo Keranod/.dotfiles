@@ -81,36 +81,29 @@
     # sudo wg-quick down wg0 -> stop connection
     # sudo wg-quick up wg0 -> start connection
 
-    wireguard.interfaces = {
+    wg-quick.interfaces = {
       wg0 = {
-        # your keys/addresses come from the same wg0.conf or inline here
-        configFile = "/etc/wireguard/wg0.conf";
+        configFile = "/etc/wireguard/wg0.conf"; # Put your real file path here (outside repo)
         autostart = true;
-
-        # table = 0 disables all wg‑quick default routes/rules
-        table = 0;
-
-        preUp = ''
-          # just in case some old rules are lying around
-          ip -4 rule del table 200            2>/dev/null || true
-          ip -6 rule del table 200            2>/dev/null || true
-        '';
-
+        # table = "off";
+        # hook into the wg-quick up/down
         postUp = ''
-          # only marked (MAC‑matched) packets get routed via VPN:
-          ip rule add   fwmark 60 table 200 priority 1000
-          ip route add  default dev wg0 table 200
+          # mark packets & set up routing table
 
+          # IPv4
+          ip rule add fwmark 60 table 200 priority 1000
+          ip route add default dev %i table 200
+
+          # IPv6
           ip -6 rule add fwmark 60 table 200 priority 1000
-          ip -6 route add default dev wg0 table 200
+          ip -6 route add default dev %i table 200
         '';
-
         postDown = ''
-          ip rule del   fwmark 60 table 200 priority 1000
-          ip route del  default dev wg0 table 200
+          ip rule del fwmark 60 table 200 priority 1000
+          ip route del default dev %i table 200
 
           ip -6 rule del fwmark 60 table 200 priority 1000
-          ip -6 route del default dev wg0 table 200
+          ip -6 route del default dev %i table 200
         '';
       };
     };
