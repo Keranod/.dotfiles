@@ -85,29 +85,29 @@
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
-        table = "main";
+        # table = "main";
 
-        postUp = ''
-          # nuke any stale wg-quick defaults
-          ip -4 rule del table 51820                2>/dev/null || true
-          ip -4 rule del table main suppress_prefixlength 0 2>/dev/null || true
-          ip -6 rule del table 51820                2>/dev/null || true
-          ip -6 rule del table main suppress_prefixlength 0 2>/dev/null || true
+        # postUp = ''
+        #   # nuke any stale wg-quick defaults
+        #   ip -4 rule del table 51820                2>/dev/null || true
+        #   ip -4 rule del table main suppress_prefixlength 0 2>/dev/null || true
+        #   ip -6 rule del table 51820                2>/dev/null || true
+        #   ip -6 rule del table main suppress_prefixlength 0 2>/dev/null || true
 
-          # now your policy routing for fwmark=60:
-          ip rule add   fwmark 60 table 200 priority 1000
-          ip route add  default dev %i table 200
+        #   # now your policy routing for fwmark=60:
+        #   ip rule add   fwmark 60 table 200 priority 1000
+        #   ip route add  default dev %i table 200
 
-          ip -6 rule add fwmark 60 table 200 priority 1000
-          ip -6 route add default dev %i table 200
-        '';
-        postDown = ''
-          ip rule del   fwmark 60 table 200 priority 1000
-          ip route del  default dev %i table 200
+        #   ip -6 rule add fwmark 60 table 200 priority 1000
+        #   ip -6 route add default dev %i table 200
+        # '';
+        # postDown = ''
+        #   ip rule del   fwmark 60 table 200 priority 1000
+        #   ip route del  default dev %i table 200
 
-          ip -6 rule del fwmark 60 table 200 priority 1000
-          ip -6 route del default dev %i table 200
-        '';
+        #   ip -6 rule del fwmark 60 table 200 priority 1000
+        #   ip -6 route del default dev %i table 200
+        # '';
       };
     };
 
@@ -118,7 +118,8 @@
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
-            ether saddr E0:CC:F8:FA:FB:42 counter mark set 60
+            ether saddr A8:23:FE:FD:19:ED counter mark set 50 # Moj TV
+            ether saddr E0:CC:F8:FA:FB:42 counter mark set 60 # Moj Android
           }
         }
 
@@ -130,10 +131,10 @@
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
             # Phone → VPN
-            ip saddr 192.168.9.60/32 oifname "wg0" masquerade
+            meta mark 60 oifname "wg0" masquerade
 
             # TV → VPN
-            meta mark 60 oifname "wg0" masquerade
+            meta mark 50 oifname "wg0" masquerade
           }
         }
 
@@ -141,7 +142,7 @@
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
-            #ip6 saddr fd00:9::/64 oifname "wg0" masquerade
+            meta mark 50 oifname "wg0" masquerade
             meta mark 60 oifname "wg0" masquerade
           }
         }
