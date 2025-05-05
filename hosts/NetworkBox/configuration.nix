@@ -81,38 +81,28 @@
     # sudo wg-quick down wg0 -> stop connection
     # sudo wg-quick up wg0 -> start connection
 
-    wireguard = {
-      enable = true;
+    wg-quick.interfaces = {
+      wg0 = {
+        configFile = "/etc/wireguard/wg0.conf";
+        autostart = true;
 
-      interfaces = {
-        wg0 = {
-          enable = true; # ← this replaces “autostart”
-          configFile = "/etc/wireguard/wg0.conf";
-          table = 0; # disable default wg‑quick rules
+        # ← must be an integer 0, not the string "off"
+        table = 0;
 
-          preUp = ''
-            # clean out old rules just in case
-            ip rule del fwmark 60 table 200 2>/dev/null || true
-            ip -6 rule del fwmark 60 table 200 2>/dev/null || true
-          '';
+        postUp = ''
+          ip rule add   fwmark 60 table 200 priority 1000
+          ip route add  default dev %i table 200
 
-          postUp = ''
-            # policy‐route only your phone (fwmark 60 → table 200)
-            ip rule add   fwmark 60 table 200 priority 1000
-            ip route add  default dev wg0 table 200
+          ip -6 rule add fwmark 60 table 200 priority 1000
+          ip -6 route add default dev %i table 200
+        '';
+        postDown = ''
+          ip rule del   fwmark 60 table 200 priority 1000
+          ip route del  default dev %i table 200
 
-            ip -6 rule add fwmark 60 table 200 priority 1000
-            ip -6 route add default dev wg0 table 200
-          '';
-
-          postDown = ''
-            ip rule del   fwmark 60 table 200 priority 1000
-            ip route del  default dev wg0 table 200
-
-            ip -6 rule del fwmark 60 table 200 priority 1000
-            ip -6 route del default dev wg0 table 200
-          '';
-        };
+          ip -6 rule del fwmark 60 table 200 priority 1000
+          ip -6 route del default dev %i table 200
+        '';
       };
     };
 
