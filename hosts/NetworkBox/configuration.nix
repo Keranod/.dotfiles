@@ -150,6 +150,22 @@ in
             meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
           }
         }
+
+        table inet filter {
+          chain prerouting {
+            type filter hook prerouting priority filter; policy accept;
+
+            # Drop *all* IPv4 packets from your TV's MAC
+            ether saddr ${tvMAC} ip version 4 counter drop
+          }
+
+          chain forward {
+            type filter hook forward priority filter; policy accept;
+
+            # (Optional) also drop if it sneaks past prerouting
+            ether saddr ${tvMAC} ip version 4 counter drop
+          }
+        }
       '';
     };
   };
