@@ -85,9 +85,7 @@
       wg0 = {
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
-
-        # <<< add this! >>>
-        table = 0;
+        table = "main";
 
         postUp = ''
           # nuke any stale wg-quick defaults
