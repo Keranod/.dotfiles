@@ -4,6 +4,12 @@
 }:
 
 let
+  tvMAC = "A8:23:FE:FD:19:ED";
+  tvFwmark = "200";
+  tvTable = tvFwmark;
+  tvPriority = "1000";
+  tvInterface = "wg0";
+
   phoneMAC = "E0:CC:F8:FA:FB:42";
   phoneFwmark = "300";
   phoneTable = phoneFwmark;
@@ -95,8 +101,8 @@ in
     # sudo wg-quick up wg0 -> start connection
 
     wg-quick.interfaces = {
-      wg0 = {
-        configFile = "/etc/wireguard/wg0.conf";
+      "${tvInterface}" = {
+        configFile = "/etc/wireguard/${tvInterface}.conf";
         autostart = true;
       };
       "${phoneInterface}" = {
@@ -116,7 +122,7 @@ in
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
-            ether saddr A8:23:FE:FD:19:ED counter mark set 50 # Moj TV
+            ether saddr ${tvMAC} counter mark set ${tvFwmark}
             ether saddr ${phoneMAC} counter mark set ${phoneFwmark}
             ether saddr ${mlodejMAC} counter mark set ${mlodejFwmark}
           }
@@ -129,12 +135,9 @@ in
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
-            # Phone → VPN
             meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
             meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
-
-            # TV → VPN
-            meta mark 50 oifname "wg0" masquerade
+            meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
 
@@ -142,7 +145,7 @@ in
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
-            meta mark 50 oifname "wg0" masquerade
+            meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
             meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
             meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
           }
@@ -185,8 +188,6 @@ in
       ];
       dhcp-host = [
         "7C:F1:7E:6C:60:00,192.168.9.2"
-        "A8:23:FE:FD:19:ED,192.168.9.50" # Tv
-        #"E0:CC:F8:FA:FB:42,192.168.9.60" # Moj Android
       ];
     };
   };
