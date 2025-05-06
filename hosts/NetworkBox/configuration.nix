@@ -98,9 +98,9 @@ in
     # PostDown    = /run/current-system/sw/bin/ip rule del fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
     # PostDown    = /run/current-system/sw/bin/ip route del default dev %i table <tableNumber>
 
-    # ─ IPv6 teardown ────────────────────────────────────────────────────
-    # PostDown    = /run/current-system/sw/bin/ip -6 rule del fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
-    # PostDown    = /run/current-system/sw/bin/ip -6 route del default dev %i table <tableNumber>
+    # # 2) IPv6: default → main table
+    # PostUp   = /run/current-system/sw/bin/ip -6 route add default dev %i table 200 priority 1000
+    # PostDown = /run/current-system/sw/bin/ip -6 route del default dev %i table 200
 
     # DO NOT COMMIT CONFIG FILES
     # sudo wg-quick down wg0 -> stop connection
