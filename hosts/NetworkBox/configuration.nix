@@ -84,23 +84,7 @@ in
     # https://airvpn.org/generator/
     # [Interface]
     # [...] <- other config
-    # Table = off
-
-    # ─ IPv4 policy routing ────────────────────────────────────────────────
-    # PostUp      = /run/current-system/sw/bin/ip rule add fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
-    # PostUp      = /run/current-system/sw/bin/ip route add default dev %i table <tableNumber>
-
-    # ─ IPv6 policy routing ────────────────────────────────────────────────
-    # PostUp      = /run/current-system/sw/bin/ip -6 rule add fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
-    # PostUp      = /run/current-system/sw/bin/ip -6 route add default dev %i table <tableNumber>
-
-    # ─ IPv4 teardown ────────────────────────────────────────────────────
-    # PostDown    = /run/current-system/sw/bin/ip rule del fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
-    # PostDown    = /run/current-system/sw/bin/ip route del default dev %i table <tableNumber>
-
-    # # 2) IPv6: default → main table
-    # PostUp   = /run/current-system/sw/bin/ip -6 route add default dev %i table 200 priority 1000
-    # PostDown = /run/current-system/sw/bin/ip -6 route del default dev %i table 200
+    # Table = <tableNumber>
 
     # DO NOT COMMIT CONFIG FILES
     # sudo wg-quick down wg0 -> stop connection
@@ -113,7 +97,7 @@ in
       };
       "${phoneInterface}" = {
         configFile = "/etc/wireguard/${phoneInterface}.conf";
-        autostart = true;
+        autostart = false;
       };
       "${mlodejInterface}" = {
         configFile = "/etc/wireguard/${mlodejInterface}.conf";
