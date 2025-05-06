@@ -80,21 +80,27 @@ in
       }
     ];
 
-    # VPN - use wireguard config, if different interface change/create connection/device , create folder and config files in /etc/wireguard/wg<number>.conf
+    # VPN - use wireguard config, if different interface change/create connection/device , create folder and config files in /etc/wireguard/<interface>.conf
     # https://airvpn.org/generator/
     # [Interface]
     # [...] <- other config
     # Table = off
 
-    # 1) IPv4: default → table 200
-    # PostUp   = /run/current-system/sw/bin/ip route  add default dev %i table 200
-    # PostUp   = /run/current-system/sw/bin/ip rule   add from 192.168.9.50/32           table 200 priority 1000
-    # PostDown = /run/current-system/sw/bin/ip rule   del from 192.168.9.50/32           table 200 priority 1000
-    # PostDown = /run/current-system/sw/bin/ip route  del default dev %i table 200
+    # ─ IPv4 policy routing ────────────────────────────────────────────────
+    # PostUp      = /run/current-system/sw/bin/ip rule add fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
+    # PostUp      = /run/current-system/sw/bin/ip route add default dev %i table <tableNumber>
 
-    # # 2) IPv6: default → main table
-    # PostUp   = /run/current-system/sw/bin/ip -6 route add default dev %i 200 priority 1000
-    # PostDown = /run/current-system/sw/bin/ip -6 route del default dev %i
+    # ─ IPv6 policy routing ────────────────────────────────────────────────
+    # PostUp      = /run/current-system/sw/bin/ip -6 rule add fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
+    # PostUp      = /run/current-system/sw/bin/ip -6 route add default dev %i table <tableNumber>
+
+    # ─ IPv4 teardown ────────────────────────────────────────────────────
+    # PostDown    = /run/current-system/sw/bin/ip rule del fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
+    # PostDown    = /run/current-system/sw/bin/ip route del default dev %i table <tableNumber>
+
+    # ─ IPv6 teardown ────────────────────────────────────────────────────
+    # PostDown    = /run/current-system/sw/bin/ip -6 rule del fwmark <fwmarkNumber> table <tableNumber> priority <priorityNumber>
+    # PostDown    = /run/current-system/sw/bin/ip -6 route del default dev %i table <tableNumber>
 
     # DO NOT COMMIT CONFIG FILES
     # sudo wg-quick down wg0 -> stop connection
@@ -118,7 +124,6 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        # 1) mangle table: mark all ingress packets from your phone's MAC
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
