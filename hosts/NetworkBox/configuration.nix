@@ -108,20 +108,26 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        # Ensure the filter table & output chain exist
-        table inet filter {
-          chain output {
-            type filter hook output priority 0; policy accept;
-            # (we'll add the WG-specific rules at runtime)
-          }
-        }
-
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
             ether saddr ${tvMAC} counter mark set ${tvFwmark}
             ether saddr ${phoneMAC} counter mark set ${phoneFwmark}
             ether saddr ${mlodejMAC} counter mark set ${mlodejFwmark}
+          }
+        }
+
+        table inet filter {
+          chain forward {
+            type filter hook forward priority 0; policy accept;
+
+            # Allow TV’s DNS only if going to your VPN DNS (10.128.0.1)
+            meta mark ${tvFwmark} ip daddr 10.128.0.1 udp dport 53 accept
+            meta mark ${tvFwmark} ip daddr 10.128.0.1 tcp dport 53 accept
+
+            # Drop any other DNS (to your ISP or anywhere else)
+            meta mark ${tvFwmark} udp dport 53 drop
+            meta mark ${tvFwmark} tcp dport 53 drop
           }
         }
 
