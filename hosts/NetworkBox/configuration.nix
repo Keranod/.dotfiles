@@ -117,20 +117,6 @@ in
           }
         }
 
-        table inet filter {
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-
-            # Allow TV’s DNS only if going to your VPN DNS (10.128.0.1)
-            meta mark ${tvFwmark} ip daddr 10.128.0.1 udp dport 53 accept
-            meta mark ${tvFwmark} ip daddr 10.128.0.1 tcp dport 53 accept
-
-            # Drop any other DNS (to your ISP or anywhere else)
-            meta mark ${tvFwmark} udp dport 53 drop
-            meta mark ${tvFwmark} tcp dport 53 drop
-          }
-        }
-
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
