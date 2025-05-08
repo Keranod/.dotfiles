@@ -118,6 +118,13 @@ in
         }
 
         table ip nat {
+          # Create prerouting if it doesn’t exist (policy-routing uses table 200 for "all other traffic")
+          chain prerouting {
+            type nat hook prerouting priority dstnat; policy accept;
+            # catch only TV’s DNS (fwmark 200) and dnat it to the VPN’s DNS on wg0
+            meta mark ${tvFwmark} udp dport 53 dnat to 10.128.0.1:53
+            meta mark ${tvFwmark} tcp dport 53 dnat to 10.128.0.1:53
+          }
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
@@ -220,6 +227,7 @@ in
         ];
         port = 53;
         upstream_dns = [
+          "https://dns.adguard-dns.com/dns-query"
           "94.140.14.14"
           "94.140.15.15"
         ];
