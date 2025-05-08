@@ -108,6 +108,14 @@ in
     nftables = {
       enable = true;
       ruleset = ''
+        # Ensure the filter table & output chain exist
+        table inet filter {
+          chain output {
+            type filter hook output priority 0; policy accept;
+            # (we'll add the WG-specific rules at runtime)
+          }
+        }
+
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
