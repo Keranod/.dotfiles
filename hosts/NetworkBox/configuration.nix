@@ -93,7 +93,7 @@ in
     wg-quick.interfaces = {
       "${tvInterface}" = {
         configFile = "/etc/wireguard/${tvInterface}.conf";
-        autostart = true;
+        autostart = false;
       };
       "${phoneInterface}" = {
         configFile = "/etc/wireguard/${phoneInterface}.conf";
