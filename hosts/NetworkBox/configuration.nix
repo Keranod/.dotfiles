@@ -118,6 +118,14 @@ in
         }
 
         table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority 0; policy accept;
+
+            # intercept phone DNS and send it to 10.128.0.1
+            ether saddr ${phoneMAC} udp dport 53 dnat to 10.128.0.1:53
+            ether saddr ${phoneMAC} tcp dport 53 dnat to 10.128.0.1:53
+          }
+
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
