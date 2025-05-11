@@ -147,8 +147,8 @@ in
             type nat hook prerouting priority -100; policy accept;
 
             # intercept phone DNS and send it to 10.128.0.1
-            # ether saddr ${tvMAC} udp dport 53 dnat to fd7d:76ee:e68f:a993::1
-            # ether saddr ${tvMAC} tcp dport 53 dnat to fd7d:76ee:e68f:a993::1
+            ether saddr ${tvMAC} udp dport 53 dnat to fd7d:76ee:e68f:a993::1
+            ether saddr ${tvMAC} tcp dport 53 dnat to fd7d:76ee:e68f:a993::1
           }
 
           chain postrouting {
