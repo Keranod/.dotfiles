@@ -119,7 +119,7 @@ in
 
         table ip nat {
           chain prerouting {
-            type nat hook prerouting priority 0; policy accept;
+            type nat hook prerouting priority -100; policy accept;
 
             # intercept phone DNS and send it to 10.128.0.1
             ether saddr ${phoneMAC} udp dport 53 dnat to 10.128.0.1:53
@@ -139,6 +139,14 @@ in
         }
 
         table ip6 nat {
+          chain prerouting {
+            type nat hook prerouting priority 0; policy accept;
+
+            # intercept phone DNS and send it to 10.128.0.1
+            ether saddr ${phoneMAC} udp dport 53 dnat to fd7d:76ee:e68f:a993::1
+            ether saddr ${phoneMAC} tcp dport 53 dnat to fd7d:76ee:e68f:a993::1
+          }
+
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
