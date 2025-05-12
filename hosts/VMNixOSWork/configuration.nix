@@ -59,7 +59,6 @@
       atomix
       yelp
       gnome-initial-setup
-      rustdesk
     ]
   );
 
@@ -73,6 +72,7 @@
     htop
     tcpdump
     openvpn
+    rustdesk
   ];
 
   # Enable the OpenSSH daemon.
