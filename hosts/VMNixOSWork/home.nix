@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     vlc
+    rustdesk
   ];
 
   programs.bash = {
