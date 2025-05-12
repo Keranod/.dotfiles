@@ -125,7 +125,6 @@
             ./modules/gnome.nix
             ./modules/commonHome.nix
             ./modules/vscode.nix
-            ./modules/godot.nix
             ./hosts/VMNixOSWork/home.nix
           ];
         };

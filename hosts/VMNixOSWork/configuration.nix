@@ -26,94 +26,12 @@
     clipboard = true;
   };
 
-  boot.kernel.sysctl."net.ipv4.ip_forward" = true;
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.disable_ipv6"     = 1;
-    "net.ipv6.conf.default.disable_ipv6" = 1;
-  };
-
   # Networking
-  networking = {
-    hostName = "VMNixOSWork";
-    firewall.enable = false;
-
-    # bring up interfaces
-    interfaces.enp0s3.useDHCP = true;
-    interfaces.enp0s8 = {
-      useDHCP        = false;
-      ipv4.addresses = [ { address = "192.168.56.10"; prefixLength = 24; } ];
-    };
-
-    nat = {
-      enable = true;
-      externalInterface = "enp0s3";
-      internalInterfaces = [ "enp0s8" ];
-    };
-  };
-
-  services.dnsmasq = {
-    enable = true;
-    settings = {
-      interface = "enp0s8";
-      bind-interfaces = true;
-
-      # Only DHCP
-      port = 0; # <--- this disables the DNS server in dnsmasq!
-
-      dhcp-range    = "192.168.56.100,192.168.56.200,24h";
-      dhcp-option   = [ "3,192.168.56.10" "6,192.168.56.10" ];
-      dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.56.2" # TP-Link
-        "A8:23:FE:FD:19:ED,192.168.56.50" # TV
-      ];
-    };
-  };
-
-  services.ntopng = {
-    enable = true;
-  };
-
-  # AdGuard Home: DNS
-  services.adguardhome = {
-    enable = true;
-  #  openFirewall = true; # auto-opens 53 & 3000
-  #  mutableSettings = true; # re-seed on service start
-
-    settings = {
-      # DNS
-      dns = {
-        bind_hosts = [
-          "192.168.56.10"
-        ];
-        port = 53;
-        upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "94.140.14.14"
-          "94.140.15.15"
-        ];
-        # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
-      };
-
-      # Proxy
-      http_proxy = "http://192.9.253.50:80";
-
-      # DHCP
-      dhcp = {
-        enabled = false;
-      };
-
-      # Blocklists / filtering (defaults)
-      filtering = {
-        protection_enabled = true;
-        filtering_enabled = true;
-        parental = false;
-      };
-    };
-  };
+  networking.hostName = "VMNixOSWork";
+  networking.networkmanager.enable = true;
+  networking.proxy.default = "192.9.253.50:80";
+  networking.proxy.httpsProxy = "192.9.253.50:80";
+  networking.proxy.httpProxy = "192.9.253.50:80";
 
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
