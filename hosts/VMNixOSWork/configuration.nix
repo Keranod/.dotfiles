@@ -72,7 +72,6 @@
     htop
     tcpdump
     openvpn
-    rustdesk
   ];
 
   # Enable the OpenSSH daemon.
