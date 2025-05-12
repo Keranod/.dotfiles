@@ -33,6 +33,35 @@
   networking.proxy.httpsProxy = "192.9.253.50:80";
   networking.proxy.httpProxy = "192.9.253.50:80";
 
+  # Enable the X11 windowing system.
+  # You can disable this if you're only using the Wayland session.
+  services.xserver.enable = true;
+
+  # GNOME
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.wayland = false;
+  environment.gnome.excludePackages = (
+    with pkgs;
+    [
+      gnome-photos
+      gnome-tour
+      gnome-weather
+      gnome-maps
+      totem
+      gedit
+      cheese
+      gnome-music
+      gnome-characters
+      tali
+      iagno
+      hitori
+      atomix
+      yelp
+      gnome-initial-setup
+    ]
+  );
+
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=24.11&
   environment.systemPackages = with pkgs; [

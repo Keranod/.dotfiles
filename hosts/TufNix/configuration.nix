@@ -79,7 +79,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     git
-    nodejs_22
+    nodePackages_latest.nodejs
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
