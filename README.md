@@ -53,6 +53,7 @@ sudo systemctl restart nix-daemon
 # One line installer:
 
 - In `BIOS` disable `Secure Boot` otherwise cannot write to `EFI` variables
+- When rebuilding rename/remove `hardware-configuration.nix` and `id_rsa.pub`
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
