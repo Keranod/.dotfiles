@@ -74,6 +74,7 @@
     htop
     tcpdump
     openvpn
+    anydesk
   ];
 
   # Enable the OpenSSH daemon.
