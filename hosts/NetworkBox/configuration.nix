@@ -35,6 +35,8 @@ in
     fsType = "vfat";
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   boot.kernel.sysctl = {
     # IPv4
     "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
@@ -226,9 +228,9 @@ in
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
-          "1.1.1.1"      # Cloudflare
+          "1.1.1.1" # Cloudflare
           "1.0.0.1"
-          "9.9.9.9"      # Quad9
+          "9.9.9.9" # Quad9
           "149.112.112.9"
         ];
       };
