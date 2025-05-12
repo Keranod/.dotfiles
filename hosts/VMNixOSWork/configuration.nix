@@ -17,6 +17,8 @@
     fsType = "vfat";
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   # Virtualbox guest additions
   systemd.services.virtualbox.unitConfig.ConditionVirtualization = "oracle";
   # Enable VirtualBox guest additions
