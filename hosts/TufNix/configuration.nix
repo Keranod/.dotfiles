@@ -83,6 +83,7 @@ in
     home-manager
     gnome.gnome-tweaks
     gnome-online-accounts
+    anydesk
   ];
 
   # Enable the OpenSSH daemon.

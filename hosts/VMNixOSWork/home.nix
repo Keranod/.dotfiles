@@ -3,7 +3,6 @@
 {
   home.packages = with pkgs; [
     vlc
-    google-chrome
   ];
 
   programs.bash = {
