@@ -93,7 +93,7 @@ in
     wg-quick.interfaces = {
       "${tvInterface}" = {
         configFile = "/etc/wireguard/${tvInterface}.conf";
-        autostart = true;
+        autostart = false;
       };
       "${phoneInterface}" = {
         configFile = "/etc/wireguard/${phoneInterface}.conf";
@@ -101,7 +101,7 @@ in
       };
       "${mlodejInterface}" = {
         configFile = "/etc/wireguard/${mlodejInterface}.conf";
-        autostart = true;
+        autostart = false;
       };
     };
 
@@ -220,15 +220,9 @@ in
         ];
         port = 53;
         upstream_dns = [
-          # DoH
           "https://dns.adguard-dns.com/dns-query"
-          "https://dns.cloudflare.com/dns-query"
-          
-          #"94.140.14.14"
-          #"94.140.15.15"
-
-          # DoQ
-          "quic://dns.adguard-dns.com/dns-query"
+          "94.140.14.14"
+          "94.140.15.15"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
