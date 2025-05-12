@@ -59,6 +59,7 @@
       atomix
       yelp
       gnome-initial-setup
+      rustdesk
     ]
   );
 
