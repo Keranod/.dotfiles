@@ -220,13 +220,22 @@ in
         ];
         port = 53;
         upstream_dns = [
-          "94.140.14.14"
-          "94.140.15.15"
+          # DoH
+          "https://dns.adguard-dns.com/dns-query"
+          "https://dns.cloudflare.com/dns-query"
+          
+          #"94.140.14.14"
+          #"94.140.15.15"
+
+          # DoQ
+          "quic://dns.adguard-dns.com/dns-query"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
+          "1.1.1.1"      # Cloudflare
+          "1.0.0.1"
+          "9.9.9.9"      # Quad9
+          "149.112.112.9"
         ];
       };
 
