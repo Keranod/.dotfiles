@@ -149,6 +149,7 @@
         "franz@FranzNix" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
+            ./modules/homeManager/vscode.nix
             ./hosts/FranzNix/home.nix
           ];
         };
