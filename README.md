@@ -53,6 +53,28 @@ sudo systemctl restart nix-daemon
 
 # One line installer:
 
+- For `Legacy` in `configuration.nix`
+
+```nix
+  # Disable EFI bootloader and use GRUB for Legacy BIOS
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda"; # or the appropriate disk, replace /dev/sda with your disk name
+
+  # Set boot partition label for GRUB to use
+  boot.loader.grub.useOSProber = true;
+```
+
+- For `EFI` in `configuration.nix`
+
+```nix
+  # Default settings for EFI
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  fileSystems."/boot" = {
+    fsType = "vfat";
+  };
+```
+
 - When rebuilding rename/remove `hardware-configuration.nix` and `id_rsa.pub`
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
