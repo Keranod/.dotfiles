@@ -1,17 +1,14 @@
 #!/bin/bash
 
-# --- Positional args with “fail if missing” ---
-DISK="${1:?Error: you must specify a disk (eg. /dev/sda)}"
-HOSTNAME="${2:?Error: you must specify a hostname}"
-USERNAME="${3:?Error: you must specify a username}"                      
-EMAIL="${4:?Error: you must specify an email}"
-PROXY="${5:-}"                                
+# Ensure a disk name is provided
+if [ -z "$1" ]; then
+  echo "Specify disk to install on"
+  echo "Check which one using 'lsblk'"
+  echo "eg., /dev/sda or /dev/nvme0n1"
+  exit 1
+fi
 
-echo "Disk:     $DISK"
-echo "Host:     $HOSTNAME"
-echo "User:     $USERNAME"
-echo "Email:    $EMAIL"
-echo "Proxy:    ${PROXY:-<none>}"
+DISK="$1"
 
 # Determine partition suffix (p1/p2 for disks ending in a number)
 if [[ "$DISK" =~ [0-9]$ ]]; then
@@ -22,8 +19,17 @@ else
   PART2="${DISK}2"
 fi
 
+# Ensure a hostname is provided
+if [ -z "$2" ]; then
+  echo "Specify the hostname (machine name)"
+  exit 1
+fi
+
+HOSTNAME="$2"
+
 # Check if a proxy is provided
-if [ -n "$PROXY" ]; then
+if [ -n "$3" ]; then
+  PROXY="$3"
   echo "Setting proxy to $PROXY"
 
   # Set proxy for curl (for downloading or installing)
@@ -118,16 +124,16 @@ swapon /mnt/.swapfile
 
 # Install git and clone dotfiles
 echo "Installing git and cloning dotfiles..."
-nix-shell -p git && mkdir -p /mnt/home/$USERNAME && git clone https://github.com/keranod/.dotfiles /mnt/home/$USERNAME/.dotfiles && cd /mnt/home/$USERNAME/.dotfiles && git remote set-url origin git@github.com:Keranod/.dotfiles.git && git remote -v
+nix-shell -p git && mkdir -p /mnt/home/keranod && git clone https://github.com/keranod/.dotfiles /mnt/home/keranod/.dotfiles && cd /mnt/home/keranod/.dotfiles && git remote set-url origin git@github.com:Keranod/.dotfiles.git && git remote -v
 
 # Check if the hostname folder exists
-if [ ! -d "/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME" ]; then
+if [ ! -d "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME" ]; then
   echo "Error: Host configuration for '$HOSTNAME' not found in .dotfiles/hosts/"
   exit 1
 fi
 
 # Check if configuration.nix exists for the hostname
-if [ ! -f "/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; then
+if [ ! -f "/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; then
   echo "Error: configuration.nix not found for '$HOSTNAME'"
   exit 1
 fi
@@ -137,7 +143,7 @@ echo "Generating NixOS configuration..."
 nixos-generate-config --root /mnt
 
 CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
-TARGET_PATH="/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix"
+TARGET_PATH="/mnt/home/keranod/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix"
 
 # Skip copying if the file already exists
 if [ -f "$TARGET_PATH" ]; then
@@ -148,32 +154,34 @@ else
     cp "$CONFIG_PATH" "$TARGET_PATH"
 fi
 
+email="konrad.konkel@wp.pl"
+
 # Git commit to not cause errors during install
-cd /mnt/home/$USERNAME/.dotfiles
+cd /mnt/home/keranod/.dotfiles
 git add .
-git -c user.name="$USERNAME" -c user.email="$EMAIL" commit -m "Pre-install commit"
+git -c user.name="Keranod" -c user.email="$email" commit -m "Pre-install commit"
 
 # Start the NixOS installation
 echo "Starting NixOS installation..."
-nixos-install --flake /mnt/home/$USERNAME/.dotfiles#$HOSTNAME
+nixos-install --flake /mnt/home/keranod/.dotfiles#$HOSTNAME
 
 echo "NixOS installation complete."
 
 echo "Creating SSH Key"
-mkdir -p "/mnt/home/$USERNAME/.dotfiles/.ssh"
-ssh-keygen -t rsa -b 4096 -C "$EMAIL" -f "/mnt/home/$USERNAME/.dotfiles/.ssh/id_rsa" -N ""
-cp /mnt/home/$USERNAME/.dotfiles/.ssh/id_rsa.pub /mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME
+mkdir -p "/mnt/home/keranod/.dotfiles/.ssh"
+ssh-keygen -t rsa -b 4096 -C "$email" -f "/mnt/home/keranod/.dotfiles/.ssh/id_rsa" -N ""
+cp /mnt/home/keranod/.dotfiles/.ssh/id_rsa.pub /mnt/home/keranod/.dotfiles/hosts/$HOSTNAME
 
 # Git commit ssh keys
-cd /mnt/home/$USERNAME/.dotfiles
+cd /mnt/home/keranod/.dotfiles
 git add .
-git -c user.name="$USERNAME" -c user.email="$EMAIL" commit -m "Git ssh key commit"
+git -c user.name="Keranod" -c user.email="$email" commit -m "Git ssh key commit"
 
 # echo "Unmounting bootable ISO..."
 # umount --lazy /iso || umount --force /iso
 
 # setup home-manager for user
-nixos-enter --command "chown -R $USERNAME /home/$USERNAME/.dotfiles && passwd --expire root && passwd --expire $USERNAME"
+nixos-enter --command "chown -R keranod /home/keranod/.dotfiles && passwd --expire root && passwd --expire keranod"
 
 echo "Rebooting in 60 seconds..."
 sleep 60
