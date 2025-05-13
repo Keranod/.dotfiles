@@ -6,6 +6,7 @@
 let
   postgresVersion = "17"; # Define PostgreSQL version once
   postgresPackage = pkgs."postgresql_${postgresVersion}";
+  anydesk = pkgs.anydesk;
 in
 {
   imports = [
@@ -116,7 +117,18 @@ in
     '';
   };
 
-  services.anydesk.enable = true;
+  services.anydesk = {
+    description = "AnyDesk remote desktop service";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      # run the headless daemon
+      ExecStart = "${anydesk}/bin/anydesk --service";
+      Type      = "simple";
+      Restart   = "always";
+    };
+  };
 
   # Always mount second hard drive
   # sudo lsblk -o name,mountpoint,label,size,uuid -> get disk details
