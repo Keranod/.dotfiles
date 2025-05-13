@@ -117,6 +117,7 @@ in
     '';
   };
 
+  # Stop the service to change password and settings
   systemd.services.anydesk = {
     description = "AnyDesk remote desktop service";
     after = [ "network-online.target" ];
