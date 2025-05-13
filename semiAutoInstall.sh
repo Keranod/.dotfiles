@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # --- Positional args with “fail if missing” ---
-DISK="${1:?Error: you must specify a disk (eg. /dev/sda)}"
-HOSTNAME="${2:?Error: you must specify a hostname}"
-USERNAME="${3:?Error: you must specify a username}"                      
-EMAIL="${4:?Error: you must specify an email}"
-PROXY="${5:-}"                                
+DISK="${1:?Error: you must specify a disk (eg. /dev/sda)}"; DISK="${DISK,,}"
+HOSTNAME="${2:?Error: you must specify a hostname}"; HOSTNAME="${HOSTNAME,,}"
+USERNAME="${3:?Error: you must specify a username}"; USERNAME="${USERNAME,,}"
+EMAIL="${4:?Error: you must specify an email}"; EMAIL="${EMAIL,,}"
+PROXY="${5:-}"; PROXY="${PROXY,,}"
 
 echo "Disk:     $DISK"
 echo "Host:     $HOSTNAME"
