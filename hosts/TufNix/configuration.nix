@@ -117,7 +117,7 @@ in
     '';
   };
 
-  services.anydesk = {
+  systemd.services.anydesk = {
     description = "AnyDesk remote desktop service";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
