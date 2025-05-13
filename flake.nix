@@ -63,8 +63,9 @@
           # List/Array of modules
           modules = [
             ./hosts/TufNix/configuration.nix
-            ./modules/users.nix
-            ./modules/commonConfig.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
+            ./modules/config/virtualBox.nix
           ];
         };
         MainServer = lib.nixosSystem {
@@ -73,8 +74,8 @@
           # List/Array of modules
           modules = [
             ./hosts/MainServer/configuration.nix
-            ./modules/users.nix
-            ./modules/commonConfig.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
           ];
         };
         VMNixOSWork = lib.nixosSystem {
@@ -84,8 +85,8 @@
           # List/Array of modules
           modules = [
             ./hosts/VMNixOSWork/configuration.nix
-            ./modules/users.nix
-            ./modules/commonConfig.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
           ];
         };
         NetworkBox = lib.nixosSystem {
@@ -94,8 +95,8 @@
           # List/Array of modules
           modules = [
             ./hosts/NetworkBox/configuration.nix
-            ./modules/users.nix
-            ./modules/commonConfig.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
           ];
         };
       };
@@ -104,17 +105,17 @@
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
-            ./modules/gnome.nix
-            ./modules/commonHome.nix
-            ./modules/vscode.nix
-            ./modules/godot.nix
+            ./modules/homeManager/gnome.nix
+            ./modules/homeManager/commonHome.nix
+            ./modules/homeManager/vscode.nix
+            ./modules/homeManager/godot.nix
             ./hosts/TufNix/home.nix
           ];
         };
         "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./modules/commonHome.nix
+            ./modules/homeManager/commonHome.nix
             ./hosts/MainServer/home.nix
           ];
         };
@@ -122,16 +123,16 @@
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
-            ./modules/gnome.nix
-            ./modules/commonHome.nix
-            ./modules/vscode.nix
+            ./modules/homeManager/gnome.nix
+            ./modules/homeManager/commonHome.nix
+            ./modules/homeManager/vscode.nix
             ./hosts/VMNixOSWork/home.nix
           ];
         };
         "keranod@NetworkBox" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
-            ./modules/commonHome.nix
+            ./modules/homeManager/commonHome.nix
             ./hosts/NetworkBox/home.nix
           ];
         };
