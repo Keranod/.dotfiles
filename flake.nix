@@ -99,12 +99,12 @@
             ./modules/config/commonConfig.nix
           ];
         };
-        FranzBox = lib.nixosSystem {
+        FranzNix = lib.nixosSystem {
           # Architecture
           inherit system;
           # List/Array of modules
           modules = [
-            ./hosts/FranzBox/configuration.nix
+            ./hosts/FranzNix/configuration.nix
             ./modules/config/franzUsers.nix
           ];
         };
