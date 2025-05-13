@@ -106,6 +106,7 @@
           modules = [
             ./hosts/FranzNix/configuration.nix
             ./modules/config/franzUsers.nix
+            ./modules/config/virtualBox.nix
           ];
         };
       };
