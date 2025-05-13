@@ -81,7 +81,7 @@ in
     git
     nodePackages_latest.nodejs
     home-manager
-    gnome.gnome-tweaks
+    gnome-tweaks
     gnome-online-accounts
     anydesk
   ];
@@ -114,11 +114,10 @@ in
 
   # Not working/not sorted yet
   # Always mount second hard drive
-  # lsblk -> get /dev/<diskname>
-  # sudo blkid /dev/<diskname> -> get uuid of the disk
-  # fileSystems."/mnt/data" = {
-  #   device = "/dev/disk/by-uuid/b298f8d8-1745-4581-ad9e-a58023d83f61";
-  #   fsType = "ext4";
-  #   options = [ "defaults" "nofail" ];
-  # };
+  # sudo lsblk -o name,mountpoint,label,size,uuid -> get disk details
+  fileSystems."/mnt/data" = {
+    device = "/dev/disk/by-uuid/d7222132-56ed-4f35-889e-417f9d7c3f3b";
+    fsType = "ext4";
+    options = [ "defaults" "nofail" "x-systemd.automount" "x-systemd.device-timeout=10s" ];
+  };
 }
