@@ -53,18 +53,39 @@ sudo systemctl restart nix-daemon
 
 # One line installer:
 
-- In `BIOS` disable `Secure Boot` otherwise cannot write to `EFI` variables
+- For `Legacy` in `configuration.nix`
+
+```nix
+  # Disable EFI bootloader and use GRUB for Legacy BIOS
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda"; # or the appropriate disk, replace /dev/sda with your disk name
+
+  # Set boot partition label for GRUB to use
+  boot.loader.grub.useOSProber = true;
+```
+
+- For `EFI` in `configuration.nix`
+
+```nix
+  # Default settings for EFI
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  fileSystems."/boot" = {
+    fsType = "vfat";
+  };
+```
+
 - When rebuilding rename/remove `hardware-configuration.nix` and `id_rsa.pub`
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
-- `PROXY` - if behind proxy add after `curl` `-x <proxy_url>:<port>`
 - CASE SENSITIVE COMMAND
-- `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh -x <proxy_url>:<port> | sudo bash -s /dev/<disk name> <hostname> <optional proxy:port>`
+- `curl -sSL https://github.com/keranod/.dotfiles/raw/main/semiAutoInstall.sh -x <proxy_url>:<port> | sudo bash -s /dev/<disk name> <hostname> <username> <email> <optional proxy:port>`
 - after install run on each user that has home-manager specific config on that user profile `home-manager switch --flake ~/.dotfiles`
 - `PROXY` - after install and home manager done, change git origin for `~/.dotfiles` to use `https` instead `ssh` by first doing `git remote -v` and doing `git remote set-url origin https://github.com/keranod/.dotfiles`
 - remember one way or another `git add .` on new install in `~/.dotfiles` and `git push` to github (add pub rsa to github `cat ~/.dotfiles/.ssh/id_rsa.pub` or using vscode ext)
 - reneable `Secure Boot`
 - `SSH` allowed by default after installing `home-manager` to `TufNix`
 - Errors:
+  - In `BIOS` disable `Secure Boot` otherwise cannot write to `EFI` variables
   - `Failed to write LoaderSystemToken efi variable input/output error` -> Set `boot.loader.efi.canTouchEfiVariables = false;`

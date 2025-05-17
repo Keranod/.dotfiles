@@ -99,6 +99,16 @@
             ./modules/config/commonConfig.nix
           ];
         };
+        FranzNix = lib.nixosSystem {
+          # Architecture
+          inherit system;
+          # List/Array of modules
+          modules = [
+            ./hosts/FranzNix/configuration.nix
+            ./modules/config/franzUsers.nix
+            ./modules/config/virtualBox.nix
+          ];
+        };
       };
       homeConfigurations = {
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
@@ -134,6 +144,13 @@
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/NetworkBox/home.nix
+          ];
+        };
+        "franz@FranzNix" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/homeManager/vscode.nix
+            ./hosts/FranzNix/home.nix
           ];
         };
       };
