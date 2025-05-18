@@ -88,6 +88,11 @@ in
     home-manager
     gnome-tweaks
     gnome-online-accounts
+    # GNOME‐Network‐Displays requires an XDG portal + a backend:
+    xdg-desktop-portal
+    xdg-desktop-portal-gtk
+    gvfs
+
     gnome-network-displays
     anydesk
   ];
