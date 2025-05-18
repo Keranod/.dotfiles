@@ -98,6 +98,7 @@ in
   networking.firewall.allowedTCPPorts = [
     5173
     45000
+    3131
   ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
