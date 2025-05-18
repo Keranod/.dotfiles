@@ -88,25 +88,17 @@ in
     home-manager
     gnome-tweaks
     gnome-online-accounts
-    #xdg-desktop-portal
-    #xdg-desktop-portal-gtk
-    #gvfs
-    # G_MESSAGES_DEBUG=all gnome-network-displays^C
-    gnome-network-displays
     anydesk
   ];
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
-  networking.firewall.enable = false;
-
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [
-  #   5173
-  #   45000
-  # ];
-
+  networking.firewall.allowedTCPPorts = [
+    5173
+    45000
+  ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -151,17 +143,4 @@ in
       "x-systemd.device-timeout=10s"
     ];
   };
-
-  # Enable Avahi (mDNS) so the LG TV can talk back
-  services.avahi = {
-    enable = true;
-    nssmdns = true; # so "hostname.local" names resolve
-  };
-
-  # xdg.portal = {
-  #   enable = true;
-  #   extraPortals = [
-  #     pkgs.xdg-desktop-portal-gtk
-  #   ];
-  # };
 }

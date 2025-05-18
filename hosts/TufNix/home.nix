@@ -10,6 +10,7 @@ in
     google-chrome
     vlc
     prismlauncher
+    deskreen
   ];
   # User services
   systemd.user.services.pgadmin4 = {
