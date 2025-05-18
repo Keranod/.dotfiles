@@ -35,7 +35,7 @@ in
   services.xserver.enable = true;
 
   # GNOME
-  services.xserver ={
+  services.xserver = {
     displayManager.gdm = {
       enable = true;
       wayland = false;
@@ -88,6 +88,7 @@ in
     home-manager
     gnome-tweaks
     gnome-online-accounts
+    gnome-network-displays
     anydesk
   ];
 
@@ -126,8 +127,8 @@ in
     serviceConfig = {
       # run the headless daemon
       ExecStart = "${anydesk}/bin/anydesk --service";
-      Type      = "simple";
-      Restart   = "always";
+      Type = "simple";
+      Restart = "always";
     };
   };
 
@@ -136,6 +137,11 @@ in
   fileSystems."/mnt/data" = {
     device = "/dev/disk/by-uuid/d7222132-56ed-4f35-889e-417f9d7c3f3b";
     fsType = "ext4";
-    options = [ "defaults" "nofail" "x-systemd.automount" "x-systemd.device-timeout=10s" ];
+    options = [
+      "defaults"
+      "nofail"
+      "x-systemd.automount"
+      "x-systemd.device-timeout=10s"
+    ];
   };
 }
