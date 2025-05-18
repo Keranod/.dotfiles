@@ -88,9 +88,9 @@ in
     home-manager
     gnome-tweaks
     gnome-online-accounts
-    xdg-desktop-portal
-    xdg-desktop-portal-gtk
-    gvfs
+    #xdg-desktop-portal
+    #xdg-desktop-portal-gtk
+    #gvfs
     gnome-network-displays
     anydesk
   ];
@@ -148,10 +148,10 @@ in
     ];
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-    ];
-  };
+  # xdg.portal = {
+  #   enable = true;
+  #   extraPortals = [
+  #     pkgs.xdg-desktop-portal-gtk
+  #   ];
+  # };
 }
