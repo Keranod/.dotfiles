@@ -88,11 +88,9 @@ in
     home-manager
     gnome-tweaks
     gnome-online-accounts
-    # GNOME‐Network‐Displays requires an XDG portal + a backend:
     xdg-desktop-portal
     xdg-desktop-portal-gtk
     gvfs
-
     gnome-network-displays
     anydesk
   ];
@@ -147,6 +145,13 @@ in
       "nofail"
       "x-systemd.automount"
       "x-systemd.device-timeout=10s"
+    ];
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
     ];
   };
 }
