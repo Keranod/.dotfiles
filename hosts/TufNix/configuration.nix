@@ -91,6 +91,7 @@ in
     #xdg-desktop-portal
     #xdg-desktop-portal-gtk
     #gvfs
+    # G_MESSAGES_DEBUG=all gnome-network-displays^C
     gnome-network-displays
     anydesk
   ];
@@ -146,6 +147,12 @@ in
       "x-systemd.automount"
       "x-systemd.device-timeout=10s"
     ];
+  };
+
+  # Enable Avahi (mDNS) so the LG TV can talk back
+  services.avahi = {
+    enable = true;
+    nssmdns = true; # so "hostname.local" names resolve
   };
 
   # xdg.portal = {
