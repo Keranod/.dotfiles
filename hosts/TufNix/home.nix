@@ -11,6 +11,7 @@ in
     vlc
     prismlauncher
     deskreen
+    blender
   ];
   # User services
   systemd.user.services.pgadmin4 = {
