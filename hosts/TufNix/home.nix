@@ -12,6 +12,7 @@ in
     prismlauncher
     deskreen
     blender
+    qbittorrent
   ];
   # User services
   systemd.user.services.pgadmin4 = {
