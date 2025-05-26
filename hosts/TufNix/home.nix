@@ -13,6 +13,7 @@ in
     deskreen
     blender
     qbittorrent
+    handbrake
   ];
   # User services
   systemd.user.services.pgadmin4 = {
