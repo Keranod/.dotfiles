@@ -15,6 +15,7 @@ in
     qbittorrent
     handbrake
   ];
+
   # User services
   systemd.user.services.pgadmin4 = {
     Unit = {
