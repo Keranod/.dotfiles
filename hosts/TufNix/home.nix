@@ -14,6 +14,7 @@ in
     blender
     qbittorrent
     handbrake
+    wechat-uos
   ];
 
   # User services
