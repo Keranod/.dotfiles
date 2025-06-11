@@ -37,7 +37,7 @@
   console.keyMap = "pl";
 
   # https://mynixos.com/
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 
   nix.settings.experimental-features = [
     "nix-command"
@@ -110,7 +110,7 @@
   programs.nix-ld.enable = true;
 
   # List packages installed in system profile.
-  # To search, go https://search.nixos.org/packages?channel=24.11&
+  # To search, go https://search.nixos.org/packages?channel=25.05&
   environment.systemPackages = with pkgs; [
     vim
     git

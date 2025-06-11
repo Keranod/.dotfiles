@@ -18,7 +18,7 @@ in
   home.stateVersion = "24.05"; # Please read the comment before changing.
 
   # List packages installed in user profile.
-  # To search, go https://search.nixos.org/packages?channel=24.11&
+  # To search, go https://search.nixos.org/packages?channel=25.05&
   # home.packages = with pkgs; [
   #
   # ];
