@@ -20,7 +20,7 @@
 
 # Commands
 
-- `nix flake update` - it if works do not fix it
+- `nix flake update` -> cd to .dotfiles and run from there
 - `nix-shell -p <packagename>` -> enable package for this shell only
 - `sudo nixos-rebuild test` -> test build
 - `sudo nixos-rebuild switch` -> rebuild distro and switch to it
