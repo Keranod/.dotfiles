@@ -1,7 +1,7 @@
 { pkgs, pkgsUnstable_, ... }:
 
 let
-  wrappedGodot = pkgs.buildFHSUserEnv {
+  wrappedGodot = pkgs.buildFHSEnv {
     name = "godot-fhs";
     targetPkgs =
       pkgs: with pkgsUnstable_; [
@@ -15,11 +15,11 @@ let
       #!/usr/bin/env bash
 
       # Run Godot with mono
-      exec ${pkgsUnstable_.godot-mono}/bin/godot --editor "\$@"
+      exec ${pkgsUnstable_.godot-mono}/bin/godot-mono --editor "\$@"
     '';
   };
 
-  wrappedGodotVM = pkgs.buildFHSUserEnv {
+  wrappedGodotVM = pkgs.buildFHSEnv {
     name = "godot-fhsvm";
     targetPkgs =
       pkgs: with pkgsUnstable_; [
@@ -33,7 +33,7 @@ let
       #!/usr/bin/env bash
 
       # Run Godot with mono
-      exec ${pkgsUnstable_.godot-mono}/bin/godot --editor --rendering-driver opengl3 "\$@"
+      exec ${pkgsUnstable_.godot-mono}/bin/godot-mono --editor --rendering-driver opengl3 "\$@"
     '';
   };
 
