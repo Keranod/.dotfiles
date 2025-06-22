@@ -15,6 +15,7 @@ in
     qbittorrent
     handbrake
     wechat-uos
+    unar
   ];
 
   # User services
