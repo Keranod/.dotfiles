@@ -18,7 +18,7 @@
 
   time.timeZone = "Europe/Warsaw";
 
-   # Select internationalisation properties.
+  # Select internationalisation properties.
   i18n.defaultLocale = "pl_PL.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -65,7 +65,7 @@
   services.xserver.enable = true;
 
   # GNOME
-  services.xserver ={
+  services.xserver = {
     displayManager.gdm = {
       enable = true;
       wayland = false;
@@ -97,13 +97,13 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    pulseaudio.enable = false;
   };
 
   # For vscode extensions

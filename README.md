@@ -20,12 +20,11 @@
 
 # Commands
 
-- `nix flake update` -> cd to .dotfiles and run from there
+- `nix flake update` -> cd to .dotfiles and run from there, updates flake.lock file with wihtin directory containing it, updates just flake.lock not whole system
 - `nix-shell -p <packagename>` -> enable package for this shell only
 - `sudo nixos-rebuild test` -> test build
 - `sudo nixos-rebuild switch` -> rebuild distro and switch to it
 - `sudo nixos-rebuild switch --flake <path to flake>#<flakename>` -> rebuil and switch to build using flake file and flakename
-- `nix flake update` -> updates flake.lock file with wihtin directory containing it, updates just flake.lock not whole system
 - `echo "<password>" | sudo tee <filename>` -> save password in plain text for pgadmin
 - `sudo chmod 600 <filename>` -> make password only readable for root
 - `nix-shell -p picutils && lspci` -> get pcis of devices
@@ -34,12 +33,16 @@
 - `df -h` -> check disk free space
 - `top` or `htop` -> get system load
 - `du -sh /nix/store` -> check how much space is used by nix store
-- `sudo nix-collect-garbage -d` -> remove unused packages
+- `sudo nix-collect-garbage -d` -> remove unused packages, run after removing generations for nix and home-manager
+- `sudo nix-env --list-generations --profile /nix/var/nix/profiles/system` -> show all system generations
+- `sudo nix-env --delete-generations <gen_number> --profile /nix/var/nix/profiles/system` -> delete specific generation
 - `journalctl -u strapi.service --since today` -> get lastest logs of strapi.service since today
 - `ps aux | grep sshd` -> get all ssh sessions, first number after user is PID
 - `nix flake metadata` -> get matadata about inputs, need to run in directory with flake
 - `home-manager switch --flake ~/.dotfiles` -> username and machine pulled from current machine and user who is running, no need to specify as long as flake is using "username@hostname"
 - Temporary proxy for current shell/session
+- `home-manager generations` -> get home-manager generations
+- `home-manager expire-generations "-1 day"` -> remove all generations older than
 
 ```nix
 # Need both for shell and daemon to pickup proxy
