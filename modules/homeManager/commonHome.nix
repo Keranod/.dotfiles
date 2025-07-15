@@ -64,7 +64,7 @@ in
     enable = true;
     extraConfig = ''
       Host github.com
-        IdentityFile /home/keranod/.dotfiles/.ssh/id_rsa
+        IdentityFile /home/keranod/.dotfiles/.ssh/id_ed25519
         IdentitiesOnly yes
     '';
   };
@@ -99,7 +99,7 @@ in
           local ip="$1"
           
           echo "Connecting to $ip..."
-          ssh -i ~/.dotfiles/.ssh/id_rsa "keranod@$ip"
+          ssh -i ~/.dotfiles/.ssh/id_ed25519 "keranod@$ip"
       }
     '';
   };
