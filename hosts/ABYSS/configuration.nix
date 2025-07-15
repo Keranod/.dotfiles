@@ -45,7 +45,7 @@
     };
 
     firewall = {
-      enable = false;
+      enable = true;
       allowedUDPPorts = [ 51820 ]; # Default WireGuard port
     };
 
@@ -69,6 +69,7 @@
     home-manager
     unzip
     htop
+    wireguard-tools
   ];
 
   # Enable the OpenSSH service

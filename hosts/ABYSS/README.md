@@ -13,6 +13,7 @@
 
 ```bash
 umask 077
+sudo mkdir /etc/wireguard
 # generated server vpn keys once
 wg genkey | tee /etc/wireguard/server.key | wg pubkey > /etc/wireguard/server.pub
 # Client keys (name them per person/device)
