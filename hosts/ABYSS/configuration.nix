@@ -52,8 +52,6 @@
 
     nftables = {
       enable = true;
-      # don’t error if interfaces aren’t present at build‑time
-      checkInterfaces = false;
 
       ruleset = ''
         # NAT table for VPN → Internet
@@ -74,10 +72,7 @@
           }
 
           chain forward {
-            type filter hook forward priority 0; policy drop;
-            ct state established,related accept
-            iif "wg0" oif "enp1s0" accept
-            iif "enp1s0" oif "wg0" ct state established,related accept
+            type filter hook forward priority 0; policy accept;
           }
         }
       '';
