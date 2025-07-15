@@ -7,17 +7,53 @@
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda"; # or the appropriate disk, replace /dev/sda with your disk name
+  boot = {
+    # IP forwarding & NAT so clients can access internet
+    kernel.sysctl = {
+      "net.ipv4.ip_forward" = true;
+      "net.ipv6.conf.all.forwarding" = true;
+    };
 
-  # Set boot partition label for GRUB to use
-  boot.loader.grub.useOSProber = true;
+    loader.grub = {
+      enable = true;
+      device = "/dev/sda"; # or the appropriate disk, replace /dev/sda with your disk name
+
+      # Set boot partition label for GRUB to use
+      useOSProber = true;
+    };
+  };
 
   # Networking
   networking = {
     hostName = "ABYSS";
     networkmanager.enable = true;
-    firewall.enable = false;
+
+    wireguard = {
+      enable = true;
+      # wg0 = {
+      #   ips = [ "10.100.0.1/24" ];
+      #   listenPort = 51820;
+      #   privateKeyFile = "/etc/wireguard/server.key";
+
+      #   peers = [
+      #     {
+      #       publicKey = "CLIENT_PUBLIC_KEY_HERE";
+      #       allowedIPs = [ "10.100.0.2/32" ];
+      #     }
+      #   ];
+      # };
+    };
+
+    firewall = {
+      enable = false;
+      allowedUDPPorts = [ 51820 ]; # Default WireGuard port
+    };
+
+    nat = {
+      enable = true;
+      internalInterfaces = [ "wg0" ];
+      externalInterface = "enp1s0"; # 🠖 Replace with your real NIC, use `ip a` to check
+    };
   };
 
   # Configure network proxy if necessary
