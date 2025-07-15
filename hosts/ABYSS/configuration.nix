@@ -52,6 +52,9 @@
 
     nftables = {
       enable = true;
+      # don’t error if interfaces aren’t present at build‑time
+      checkInterfaces = false;
+
       ruleset = ''
         # NAT table for VPN → Internet
         table ip nat {
