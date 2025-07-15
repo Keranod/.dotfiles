@@ -81,6 +81,7 @@
     htop
     wireguard-tools
     tcpdump
+    dig
   ];
 
   # Enable the OpenSSH service
@@ -99,8 +100,6 @@
   services.adguardhome = {
     enable = true;
     openFirewall = true; # opens port 3000 (UI) and 53 (DNS)
-    port = 3000; # ← this replaces `settings.bind_port`
-
     mutableSettings = false;
 
     settings = {
