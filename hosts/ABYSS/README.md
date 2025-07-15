@@ -23,3 +23,15 @@ wg genkey | tee /etc/wireguard/clients/client.key | wg pubkey > /etc/wireguard/c
 ```
 
 - uncomment wireguard config otherwise will not work without above files
+- push to GitHub and pull on the server
+- on the server add clients by doing below
+
+```bash
+sudo su -
+vi /home/keranod/.dotfiles/hosts/ABYSS/configuration.nix
+:r /etc/wireguard/clients/myAndroid.pub
+```
+
+- move the pub key arnoud to fit in peers
+- save and push to github
+- rebuild nix

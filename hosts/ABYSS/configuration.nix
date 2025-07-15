@@ -30,17 +30,19 @@
 
     wireguard = {
       enable = true;
-      wg0 = {
-        ips = [ "10.100.0.1/24" ];
-        listenPort = 51820;
-        privateKeyFile = "/etc/wireguard/server.key";
+      interfaces = {
+        wg0 = {
+          ips = [ "10.100.0.1/24" ];
+          listenPort = 51820;
+          privateKeyFile = "/etc/wireguard/server.key";
 
-        peers = [
-          {
-            publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
-            allowedIPs = [ "10.100.0.2/32" ];
-          }
-        ];
+          peers = [
+            {
+              publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
+              allowedIPs = [ "10.100.0.2/32" ];
+            }
+          ];
+        };
       };
     };
 
