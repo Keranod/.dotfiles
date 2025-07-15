@@ -37,7 +37,7 @@
 
         peers = [
           {
-            publicKey = "/etc/wireguard/server.key";
+            publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
             allowedIPs = [ "10.100.0.2/32" ];
           }
         ];
