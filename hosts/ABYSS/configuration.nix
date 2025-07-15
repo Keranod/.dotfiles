@@ -12,6 +12,8 @@
     kernel.sysctl = {
       "net.ipv4.ip_forward" = true;
       "net.ipv6.conf.all.forwarding" = true;
+      "net.ipv4.conf.all.route_localnet" = 1;
+      "net.ipv4.conf.default.route_localnet" = 1;
     };
 
     loader.grub = {
@@ -49,17 +51,18 @@
     firewall = {
       enable = true;
       allowedUDPPorts = [ 51820 ];
-      extraCommands = ''
-        nft add table ip nat
-        nft add chain ip nat postrouting { type nat hook postrouting priority 100 \; policy accept \; }
-        nft add rule ip nat postrouting ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
-      '';
     };
 
-    nat = {
+    nftables = {
       enable = true;
-      internalInterfaces = [ "wg0" ];
-      externalInterface = "enp1s0"; # 🠖 Replace with your real NIC, use `ip a` to check
+      ruleset = ''
+        table ip nat {
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
+          }
+        }
+      '';
     };
   };
 
