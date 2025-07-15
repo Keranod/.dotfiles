@@ -49,6 +49,11 @@
     firewall = {
       enable = true;
       allowedUDPPorts = [ 51820 ];
+      extraCommands = ''
+        nft add table ip nat
+        nft add chain ip nat postrouting { type nat hook postrouting priority 100 \; policy accept \; }
+        nft add rule ip nat postrouting ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
+      '';
     };
 
     nat = {
