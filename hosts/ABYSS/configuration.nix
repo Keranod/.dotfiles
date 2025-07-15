@@ -54,7 +54,6 @@
       enable = true;
 
       ruleset = ''
-        # NAT table for VPN → Internet
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
@@ -66,9 +65,20 @@
           chain input {
             type filter hook input priority 0; policy drop;
             ct state established,related accept
-            iif "lo" accept
-            udp dport 51820 accept    # <— allow new WireGuard handshakes
-            tcp dport 22 accept       # <— SSH, etc
+            iifname "lo" accept
+
+            # WireGuard handshake
+            udp dport 51820 accept
+
+            # SSH
+            tcp dport 22 accept
+
+            # AdGuard UI — only on VPN interface!
+            iifname "wg0" tcp dport 3000 accept
+
+            # DNS (server itself or VPN clients)
+            iifname "wg0" udp dport 53 accept
+            iifname "wg0" tcp dport 53 accept
           }
 
           chain forward {
