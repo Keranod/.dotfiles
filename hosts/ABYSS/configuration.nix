@@ -48,12 +48,7 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [];
       allowedUDPPorts = [ 51820 ];
-      extraCommands = ''
-        iptables -A FORWARD -i wg0 -j ACCEPT
-        iptables -A FORWARD -o wg0 -j ACCEPT
-      '';
     };
 
     nat = {

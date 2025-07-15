@@ -188,7 +188,7 @@ in
         AdvSendAdvert on;
         prefix fd00:9::/64 {
           AdvOnLink      on;
-          AdvAutonomous  on;   # clients auto‑SLAAC a ULA
+          AdvAutonomous  on;   # clients auto-SLAAC a ULA
         };
 
         # tell clients to use your ULA DNS
