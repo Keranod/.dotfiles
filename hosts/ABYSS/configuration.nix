@@ -86,4 +86,24 @@
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
     };
   };
+
+  services.adguardhome = {
+    enable = true;
+    openFirewall = true; # opens ports 53 (DNS) and 3000 (UI)
+    mutableSettings = true; # allows editing settings via UI
+    settings = {
+      bind_port = 3000; # Web UI port
+      bind_hosts = [
+        "127.0.0.1"
+        "10.100.0.1"
+      ]; # accessible from VPN only
+      dns = {
+        port = 53;
+        bind_hosts = [
+          "127.0.0.1"
+          "10.100.0.1"
+        ];
+      };
+    };
+  };
 }
