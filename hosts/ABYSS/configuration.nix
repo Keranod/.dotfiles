@@ -53,8 +53,12 @@
     nftables = {
       enable = true;
       ruleset = ''
+        # NAT table for VPN → Internet
         table ip nat {
-          chain postrouting { … }  # your existing NAT
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
+          }
         }
 
         table ip filter {
