@@ -30,18 +30,18 @@
 
     wireguard = {
       enable = true;
-      # wg0 = {
-      #   ips = [ "10.100.0.1/24" ];
-      #   listenPort = 51820;
-      #   privateKeyFile = "/etc/wireguard/server.key";
+      wg0 = {
+        ips = [ "10.100.0.1/24" ];
+        listenPort = 51820;
+        privateKeyFile = "/etc/wireguard/server.key";
 
-      #   peers = [
-      #     {
-      #       publicKey = "CLIENT_PUBLIC_KEY_HERE";
-      #       allowedIPs = [ "10.100.0.2/32" ];
-      #     }
-      #   ];
-      # };
+        peers = [
+          {
+            publicKey = "/etc/wireguard/server.key";
+            allowedIPs = [ "10.100.0.2/32" ];
+          }
+        ];
+      };
     };
 
     firewall = {

@@ -12,12 +12,14 @@
 - enable wireguard and the run below after
 
 ```bash
+sudo su -
 umask 077
-sudo mkdir /etc/wireguard
+mkdir /etc/wireguard
+mkdir /etc/wireguard/clients
 # generated server vpn keys once
 wg genkey | tee /etc/wireguard/server.key | wg pubkey > /etc/wireguard/server.pub
 # Client keys (name them per person/device)
-wg genkey | tee client.key | wg pubkey > client.pub
+wg genkey | tee /etc/wireguard/clients/client.key | wg pubkey > /etc/wireguard/clients/client.pub
 ```
 
 - uncomment wireguard config otherwise will not work without above files
