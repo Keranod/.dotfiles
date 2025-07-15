@@ -72,6 +72,7 @@
     unzip
     htop
     wireguard-tools
+    tcpdump
   ];
 
   # Enable the OpenSSH service
