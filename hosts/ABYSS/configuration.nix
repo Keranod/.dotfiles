@@ -92,7 +92,7 @@
     openFirewall = true; # opens port 3000 (UI) and 53 (DNS)
     port = 3000; # ← this replaces `settings.bind_port`
 
-    mutableSettings = true;
+    mutableSettings = false;
 
     settings = {
       dns = {
@@ -101,6 +101,28 @@
           "10.100.0.1"
         ]; # VPN + localhost access
         port = 53;
+        upstream_dns = [
+          "https://dns.adguard-dns.com/dns-query"
+          "94.140.14.14"
+          "94.140.15.15"
+        ];
+        # Bootstrap DNS: used only to resolve the upstream hostnames
+        bootstrap_dns = [
+          "9.9.9.10"
+          "149.112.112.10"
+        ];
+      };
+
+      # DHCP
+      dhcp = {
+        enabled = false;
+      };
+
+      # Blocklists / filtering (defaults)
+      filtering = {
+        protection_enabled = true;
+        filtering_enabled = true;
+        parental = false;
       };
     };
   };
