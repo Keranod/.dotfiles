@@ -48,18 +48,29 @@
       };
     };
 
-    firewall = {
-      enable = true;
-      allowedUDPPorts = [ 51820 ];
-    };
+    firewall.enable = false;
 
     nftables = {
       enable = true;
       ruleset = ''
         table ip nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-            ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
+          chain postrouting { … }  # your existing NAT
+        }
+
+        table ip filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+            ct state established,related accept
+            iif "lo" accept
+            udp dport 51820 accept    # <— allow new WireGuard handshakes
+            tcp dport 22 accept       # <— SSH, etc
+          }
+
+          chain forward {
+            type filter hook forward priority 0; policy drop;
+            ct state established,related accept
+            iif "wg0" oif "enp1s0" accept
+            iif "enp1s0" oif "wg0" ct state established,related accept
           }
         }
       '';
