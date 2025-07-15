@@ -78,6 +78,16 @@
             ./modules/config/commonConfig.nix
           ];
         };
+        ABYSS = lib.nixosSystem {
+          # Architecture
+          inherit system;
+          # List/Array of modules
+          modules = [
+            ./hosts/ABYSS/configuration.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
+          ];
+        };
         VMNixOSWork = lib.nixosSystem {
           # Architecture
           inherit system;
@@ -127,6 +137,13 @@
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/MainServer/home.nix
+          ];
+        };
+        "keranod@ABYSS" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/homeManager/commonHome.nix
+            ./hosts/ABYSS/home.nix
           ];
         };
         "keranod@VMNixOSWork" = home-manager.lib.homeManagerConfiguration {
