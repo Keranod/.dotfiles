@@ -51,9 +51,7 @@
             }
             # TufNix
             {
-              publicKey = "
-              
-              ";
+              publicKey = "Pegp2QEADJjV/zDPCXxA4OKObSCSBOFm0dRJvEPRjzg=";
               allowedIPs = [ "10.100.0.4/32" ];
             }
           ];
