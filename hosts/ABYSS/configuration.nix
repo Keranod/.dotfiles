@@ -2,9 +2,6 @@
 
 let
   domain        = "keranod.dev";
-  # read the password at eval time from your local secrets dir
-  secretFile     =  ./trojango.pass;
-  trojanPassword = builtins.readFile secretFile;
 in
 {
   imports = [
@@ -209,7 +206,7 @@ in
     dataDir      = "/var/lib/trojan-go";
     localAddress = "0.0.0.0";
     localPort    = 443;
-    passwordList = [ trojanPassword ];
+    passwordFile = "/etc/nix/secrets/trojango.pass";
     certFile     = "/var/www/letsencrypt/${domain}/fullchain.pem";
     keyFile      = "/var/www/letsencrypt/${domain}/privkey.pem";
     remoteAddress = "127.0.0.1";
