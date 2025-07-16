@@ -2,7 +2,8 @@
 
 let
   domain        = "keranod.dev";
-  acmeDir     = "/var/lib/acme/${domain}";
+  acmeRoot = "/var/lib/acme";
+  acmeDir     = "${acmeRoot}/${domain}";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     listen: :443
     tls:
@@ -206,13 +207,18 @@ in
 
   systemd.services.hysteria-server = {
     description = "Hysteria 2 Server";
-    after = [ "network.target" "acme-finished-yourdomain.com.service" ];
+    after = [ "network.target" "acme-finished-${domain}.service" ];
     wantedBy = [ "multi-user.target" ];
+
     serviceConfig = {
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
       Restart = "always";
+
+      # Secure sandboxing
       DynamicUser = true;
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
+      SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
+      ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
     };
   };
 }
