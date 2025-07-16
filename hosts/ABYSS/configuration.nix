@@ -6,7 +6,7 @@ let
   acmeDir     = "${acmeRoot}/${domain}";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     listen: :443
-    protocol: tcp
+    disableUDP: true
     tls:
       cert: ${acmeDir}/fullchain.pem
       key: ${acmeDir}/key.pem
