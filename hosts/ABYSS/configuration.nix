@@ -3,25 +3,8 @@
 let
   domain        = "keranod.dev";
   acmeDir     = "/var/lib/acme/${domain}";
-  secretFile  = "/etc/nix/secrets/trojan.pass";  # you created this already
-  # Read the password at build time (since it's private and outside git).
+  secretFile  = "/etc/nix/secrets/trojan.pass";
   trojanPassword = builtins.readFile secretFile;
-  # Assemble the JSON config inline:
-  trojanConfig = builtins.toString (
-    {
-      run_type    = "server";
-      local_addr  = "0.0.0.0";
-      local_port  = 443;
-      remote_addr = "127.0.0.1";
-      remote_port = 51820;
-      password    = [ trojanPassword ];
-      ssl = {
-        cert = "${acmeDir}/fullchain.pem";
-        key  = "${acmeDir}/privkey.pem";
-        alpn = [ "h2" "http/1.1" ];
-      };
-    }
-  );
 in
 {
   imports = [
@@ -221,19 +204,31 @@ in
     };
   };
 
-  environment.etc."trojan-go/config.json".text = trojanConfig;
+  environment.etc."trojan-go/config.json".text = ''
+    {
+      "run_type": "server",
+      "local_addr": "0.0.0.0",
+      "local_port": 443,
+      "remote_addr": "127.0.0.1",
+      "remote_port": 51820,
+      "password": [ "${trojanPassword}" ],
+      "ssl": {
+        "cert": "${acmeDir}/fullchain.pem",
+        "key": "${acmeDir}/privkey.pem",
+        "alpn": ["h2","http/1.1"]
+      }
+    }
+  '';
 
   systemd.services."trojan-go" = {
     description = "Trojan-Go HTTPS-only transport";
     after       = [ "network-online.target" ];
     wantedBy    = [ "multi-user.target" ];
-
     serviceConfig = {
       ExecStart           = "${pkgs.trojan-go}/bin/trojan-go -config /etc/trojan-go/config.json";
       Restart             = "on-failure";
       User                = "nobody";
       AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
-      # Ensure network is up before starting
       ProtectSystem       = "strict";
       ProtectHome         = true;
       NoNewPrivileges     = true;
