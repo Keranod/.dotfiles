@@ -11,11 +11,12 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: 5kYxPZ+hr4DwXL3OZ8mH0P1LQREdPBp9QutKHv3p1BA=
+      password: "5kYxPZ+hr4DwXL3OZmH0P1LQREdPBp9QutKHv3p1BA="
     masquerade:
       type: proxy
-      url: https://keranod.dev/
-      rewriteHost: true
+      proxy:
+        url: "https://${domain}/"
+        rewriteHost: true
   '';
 in
 {
