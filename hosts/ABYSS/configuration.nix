@@ -3,7 +3,7 @@
 let
   domain        = "keranod.dev";
   # read the password at eval time from your local secrets dir
-  secretFile     =  ./secrets/trojango.pass;
+  secretFile     =  ./trojango.pass;
   trojanPassword = builtins.readFile secretFile;
 in
 {
