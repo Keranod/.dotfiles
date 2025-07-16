@@ -137,7 +137,7 @@ in
     wireguard-tools
     tcpdump
     dig
-    hystera
+    hysteria
   ];
 
   # Enable the OpenSSH service
