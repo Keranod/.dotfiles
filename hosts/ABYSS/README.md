@@ -35,3 +35,7 @@ vi /home/keranod/.dotfiles/hosts/ABYSS/configuration.nix
 - move the pub key arnoud to fit in peers
 - save and push to github
 - rebuild nix
+
+# HysteriaV2
+
+- `sudo mkdir /var/www`
