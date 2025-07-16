@@ -4,19 +4,19 @@ let
   domain        = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir     = "${acmeRoot}/${domain}";
-  hysteriaConfig = (pkgs.writeText "hysteria2-config.yaml" ''
-    listen: :443
-    tls:
-      cert: ${acmeDir}/fullchain.pem
-      key: ${acmeDir}/key.pem
-    auth:
-      type: password
-      password: 5kYxPZ+hr4DwXL3OZ8mH0P1LQREdPBp9QutKHv3p1BA=
-    masquerade:
-      type: proxy
-      url: https://${domain}/
-      rewriteHost: true
-  '');
+  hysteriaConfig = builtins.trace "Config YAML: " (pkgs.writeText "hysteria2-config.yaml" ''
+  listen: :443
+  tls:
+    cert: ${acmeDir}/fullchain.pem
+    key: ${acmeDir}/key.pem
+  auth:
+    type: password
+    password: 5kYxPZ+hr4DwXL3OZ8mH0P1LQREdPBp9QutKHv3p1BA=
+  masquerade:
+    type: proxy
+    url: https://${domain}/
+    rewriteHost: true
+'');
 in
 {
   imports = [
