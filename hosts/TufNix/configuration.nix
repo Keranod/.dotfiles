@@ -106,9 +106,9 @@ in
     45000
     3131
   ];
-  networking.firewall.allowedUDPPorts = [
-    51820
-  ];
+  #   networking.firewall.allowedUDPPorts = [
+  #     51820
+  #   ];
   # networking.wireguard.enable = true;
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
