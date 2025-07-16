@@ -39,13 +39,22 @@
           privateKeyFile = "/etc/wireguard/server.key";
 
           peers = [
+            # myAndoird
             {
               publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
               allowedIPs = [ "10.100.0.2/32" ];
             }
+            # babyIPhone
             {
               publicKey = "9aLtuWpRtk5qaQeEVSgQcu1Fgtej4gUauor19nVKnBA=";
               allowedIPs = [ "10.100.0.3/32" ];
+            }
+            # TufNix
+            {
+              publicKey = "
+              
+              ";
+              allowedIPs = [ "10.100.0.4/32" ];
             }
           ];
         };
