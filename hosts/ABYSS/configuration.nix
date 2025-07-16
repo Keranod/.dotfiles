@@ -5,7 +5,8 @@ let
   acmeRoot = "/var/lib/acme";
   acmeDir     = "${acmeRoot}/${domain}";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
-    listen: "0.0.0.0:443"
+    listen: :443
+    protocol: tcp
     tls:
       cert: ${acmeDir}/fullchain.pem
       key: ${acmeDir}/key.pem
