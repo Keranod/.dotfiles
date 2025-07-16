@@ -231,5 +231,6 @@ in
       Restart = "on-failure";
       User = "nobody";
       AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+    };
   };
 }
