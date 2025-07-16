@@ -2,6 +2,25 @@
 
 let
   domain        = "keranod.dev";
+  acmeDir     = "/var/lib/acme/${domain}";
+  secretFile  = "/etc/nix/secrets/trojan.pass";  # you created this already
+  configJSON = pkgs.writeText "trojan-go-config.json" ''
+    {
+      "run_type": "server",
+      "local_addr": "0.0.0.0",
+      "local_port": 443,
+      "remote_addr": "127.0.0.1",
+      "remote_port": 51820,
+      "password": ["$(cat ${secretFile})"],
+      "ssl": {
+        "cert": "${acmeDir}/fullchain.pem",
+        "key":  "${acmeDir}/privkey.pem",
+        "prefer_server_cipher": true,
+        "alpn": ["h2","http/1.1"],
+        "cipher_tls13":"TLS_AES_128_GCM_SHA256"
+      }
+    }
+  '';
 in
 {
   imports = [
@@ -201,16 +220,16 @@ in
     };
   };
 
-  services.trojan-go = {
-    enable       = true;
-    dataDir      = "/var/lib/trojan-go";
-    localAddress = "0.0.0.0";
-    localPort    = 443;
-    passwordFile = "/etc/nix/secrets/trojango.pass";
-    certFile     = "/var/www/letsencrypt/${domain}/fullchain.pem";
-    keyFile      = "/var/www/letsencrypt/${domain}/privkey.pem";
-    remoteAddress = "127.0.0.1";
-    remotePort    = 51820;
-    sslVersions  = [ "TLSv1.2" "TLSv1.3" ];
+  environment.etc."trojan-go/config.json".text = configJSON;
+
+  systemd.services."trojan-go" = {
+    description = "Trojan-Go HTTPS‑only TLS transport";
+    after = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.trojan-go}/bin/trojan-go -config /etc/trojan-go/config.json";
+      Restart = "on-failure";
+      User = "nobody";
+      AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
   };
 }
