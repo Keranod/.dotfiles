@@ -3,8 +3,19 @@
 let
   domain        = "keranod.dev";
   acmeDir     = "/var/lib/acme/${domain}";
-  secretFile  = "/etc/nix/secrets/trojan.pass";
-  trojanPassword = builtins.readFile secretFile;
+  hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
+    listen: :443
+    tls:
+      cert: ${acmeDir}/fullchain.pem
+      key: ${acmeDir}/key.pem
+    auth:
+      type: password
+      password: 5kYxPZ+hr4DwXL3OZ8mH0P1LQREdPBp9QutKHv3p1BA=
+    masquerade:
+      type: proxy
+      url: https://${domain}/
+      rewriteHost: true
+  '';
 in
 {
   imports = [
@@ -86,8 +97,10 @@ in
 
             # WireGuard handshake
             udp dport 51820 accept
-            # Trojan-Go on HTTPS port
-            tcp dport 443 accept      
+            # Let's Encrypt HTTP-01 challenge
+            tcp dport 80 accept    
+            # Hysteria traffic         
+            tcp dport 443 accept               
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
@@ -124,7 +137,7 @@ in
     wireguard-tools
     tcpdump
     dig
-    trojan-go
+    hystera
   ];
 
   # Enable the OpenSSH service
@@ -178,60 +191,28 @@ in
     };
   };
 
-  services.nginx = {
-    enable = true;
-    virtualHosts = {
-      # dummy vhost just to serve the /.well-known/acme-challenge
-      "${domain}" = {
-        root = "/var/www/letsencrypt";
-        # no proxy or indexing, just let NixOS serve the challenge files
-      };
-    };
-  };
-
   security.acme = {
     acceptTerms = true;
-    defaults = {
-      email   = "konrad.konkel@wp.pl";
-      webroot = "/var/www/letsencrypt";
-    };
-    certs = {
-      # this name must exactly match your domain
-      "${domain}" = {
-        # uses defaults.webroot by default, override if needed
-        webroot = "/var/www/letsencrypt";
-      };
+    defaults.email = "konrad.konkel@wp.pl";
+    certs."${domain}".webroot = "/var/www";
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts."${domain}" = {
+      root = "/var/www";
     };
   };
 
-  environment.etc."trojan-go/config.json".text = ''
-    {
-      "run_type": "server",
-      "local_addr": "0.0.0.0",
-      "local_port": 443,
-      "remote_addr": "127.0.0.1",
-      "remote_port": 51820,
-      "password": [ "${trojanPassword}" ],
-      "ssl": {
-        "cert": "${acmeDir}/fullchain.pem",
-        "key": "${acmeDir}/privkey.pem",
-        "alpn": ["h2","http/1.1"]
-      }
-    }
-  '';
-
-  systemd.services."trojan-go" = {
-    description = "Trojan-Go HTTPS-only transport";
-    after       = [ "network-online.target" ];
-    wantedBy    = [ "multi-user.target" ];
+  systemd.services.hysteria-server = {
+    description = "Hysteria 2 Server";
+    after = [ "network.target" "acme-finished-yourdomain.com.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      ExecStart           = "${pkgs.trojan-go}/bin/trojan-go -config /etc/trojan-go/config.json";
-      Restart             = "on-failure";
-      User                = "nobody";
-      AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
-      ProtectSystem       = "strict";
-      ProtectHome         = true;
-      NoNewPrivileges     = true;
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
+      Restart = "always";
+      DynamicUser = true;
+      AmbientCapabilities = "CAP_NET_BIND_SERVICE";
     };
   };
 }
