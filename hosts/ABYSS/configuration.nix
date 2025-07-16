@@ -204,6 +204,7 @@ in
     enable = true;
     virtualHosts."${domain}" = {
       root = "/var/www";
+      listen = [ 8443 ];
     };
   };
 
