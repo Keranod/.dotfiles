@@ -1,5 +1,11 @@
 { pkgs, lib, ... }:
 
+let
+  domain        = "keranod.dev";
+  # read the password at eval time from your local secrets dir
+  secretFile     =  /home/keranod/.dotfiles/.secrets;
+  trojanPassword = builtins.readFile secretFile;
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -80,9 +86,11 @@
 
             # WireGuard handshake
             udp dport 51820 accept
+            # Trojan-Go on HTTPS port
+            tcp dport 443 accept      
 
-            # SSH
-            tcp dport 22 accept
+            # SSH - No global "accept" for port 22
+            iifname "wg0" tcp dport 22 accept
 
             # AdGuard UI — only on VPN interface!
             iifname "wg0" tcp dport 3000 accept
@@ -116,6 +124,7 @@
     wireguard-tools
     tcpdump
     dig
+    trojan-go
   ];
 
   # Enable the OpenSSH service
@@ -167,5 +176,44 @@
         parental = false;
       };
     };
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      # dummy vhost just to serve the /.well-known/acme-challenge
+      "${domain}" = {
+        root = "/var/www/letsencrypt";
+        # no proxy or indexing, just let NixOS serve the challenge files
+      };
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      email   = "konrad.konkel@wp.pl";
+      webroot = "/var/www/letsencrypt";
+    };
+    certificates = {
+      # this name must exactly match your domain
+      "${domain}" = {
+        # uses defaults.webroot by default, override if needed
+        webroot = "/var/www/letsencrypt";
+      };
+    };
+  };
+
+  services.trojan-go = {
+    enable       = true;
+    dataDir      = "/var/lib/trojan-go";
+    localAddress = "0.0.0.0";
+    localPort    = 443;
+    passwordList = [ trojanPassword ];
+    certFile     = "/var/www/letsencrypt/${domain}/fullchain.pem";
+    keyFile      = "/var/www/letsencrypt/${domain}/privkey.pem";
+    remoteAddress = "127.0.0.1";
+    remotePort    = 51820;
+    sslVersions  = [ "TLSv1.2" "TLSv1.3" ];
   };
 }
