@@ -215,7 +215,7 @@ in
       Restart = "always";
 
       # Secure sandboxing
-      DynamicUser = true;
+      # DynamicUser = true;
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
       SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
       ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further

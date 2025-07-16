@@ -38,5 +38,7 @@ vi /home/keranod/.dotfiles/hosts/ABYSS/configuration.nix
 
 # HysteriaV2
 
-- `sudo mkdir /var/www`
-- `sudo 777 /var/www`
+```bash
+sudo mkdir /var/www
+sudo 777 /var/www
+```
