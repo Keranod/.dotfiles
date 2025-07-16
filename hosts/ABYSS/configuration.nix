@@ -200,13 +200,13 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  services.nginx = {
-    enable = true; 
-    virtualHosts."${domain}" = {
-      root = "/var/www";
-      listen = [ 8443 ];
-    };
-  };
+  # services.nginx = {
+  #   enable = true; 
+  #   virtualHosts."${domain}" = {
+  #     root = "/var/www";
+  #     listen = [ 8443 ];
+  #   };
+  # };
 
   systemd.services.hysteria-server = {
     description = "Hysteria 2 Server";
