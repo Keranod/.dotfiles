@@ -195,7 +195,7 @@ in
       email   = "konrad.konkel@wp.pl";
       webroot = "/var/www/letsencrypt";
     };
-    certificates = {
+    certs = {
       # this name must exactly match your domain
       "${domain}" = {
         # uses defaults.webroot by default, override if needed
