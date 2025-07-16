@@ -4,23 +4,24 @@ let
   domain        = "keranod.dev";
   acmeDir     = "/var/lib/acme/${domain}";
   secretFile  = "/etc/nix/secrets/trojan.pass";  # you created this already
-  configJSON = pkgs.writeText "trojan-go-config.json" ''
+  # Read the password at build time (since it's private and outside git).
+  trojanPassword = builtins.readFile secretFile;
+  # Assemble the JSON config inline:
+  trojanConfig = builtins.toString (
     {
-      "run_type": "server",
-      "local_addr": "0.0.0.0",
-      "local_port": 443,
-      "remote_addr": "127.0.0.1",
-      "remote_port": 51820,
-      "password": ["$(cat ${secretFile})"],
-      "ssl": {
-        "cert": "${acmeDir}/fullchain.pem",
-        "key":  "${acmeDir}/privkey.pem",
-        "prefer_server_cipher": true,
-        "alpn": ["h2","http/1.1"],
-        "cipher_tls13":"TLS_AES_128_GCM_SHA256"
-      }
+      run_type    = "server";
+      local_addr  = "0.0.0.0";
+      local_port  = 443;
+      remote_addr = "127.0.0.1";
+      remote_port = 51820;
+      password    = [ trojanPassword ];
+      ssl = {
+        cert = "${acmeDir}/fullchain.pem";
+        key  = "${acmeDir}/privkey.pem";
+        alpn = [ "h2" "http/1.1" ];
+      };
     }
-  '';
+  );
 in
 {
   imports = [
@@ -223,14 +224,19 @@ in
   environment.etc."trojan-go/config.json".text = configJSON;
 
   systemd.services."trojan-go" = {
-    description = "Trojan-Go HTTPS‑only TLS transport";
-    after = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
+    description = "Trojan-Go HTTPS-only transport";
+    after       = [ "network-online.target" ];
+    wantedBy    = [ "multi-user.target" ];
+
     serviceConfig = {
-      ExecStart = "${pkgs.trojan-go}/bin/trojan-go -config /etc/trojan-go/config.json";
-      Restart = "on-failure";
-      User = "nobody";
+      ExecStart           = "${pkgs.trojan-go}/bin/trojan-go -config /etc/trojan-go/config.json";
+      Restart             = "on-failure";
+      User                = "nobody";
       AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+      # Ensure network is up before starting
+      ProtectSystem       = "strict";
+      ProtectHome         = true;
+      NoNewPrivileges     = true;
     };
   };
 }
