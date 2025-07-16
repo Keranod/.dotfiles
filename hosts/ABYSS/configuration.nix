@@ -201,10 +201,10 @@ in
   };
 
   services.nginx = {
-    enable = true;
-    listenPorts = [ 80 8443 ]; 
+    enable = true; 
     virtualHosts."${domain}" = {
       root = "/var/www";
+      listen = [ 8443 ];
     };
   };
 
