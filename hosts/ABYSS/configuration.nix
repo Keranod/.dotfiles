@@ -221,7 +221,7 @@ in
     };
   };
 
-  environment.etc."trojan-go/config.json".text = configJSON;
+  environment.etc."trojan-go/config.json".text = trojanConfig;
 
   systemd.services."trojan-go" = {
     description = "Trojan-Go HTTPS-only transport";
