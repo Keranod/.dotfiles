@@ -103,8 +103,7 @@ in
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept    
             # Hysteria traffic         
-            tcp dport 443 accept  
-            udp dport 443 accept             
+            tcp dport 443 accept            
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
@@ -209,21 +208,21 @@ in
   #   };
   # };
 
-  systemd.services.hysteria-server = {
-    description = "Hysteria 2 Server";
-    after = [ "network.target" "acme-finished-${domain}.service" ];
-    wantedBy = [ "multi-user.target" ];
+  # systemd.services.hysteria-server = {
+  #   description = "Hysteria 2 Server";
+  #   after = [ "network.target" "acme-finished-${domain}.service" ];
+  #   wantedBy = [ "multi-user.target" ];
 
-    serviceConfig = {
-      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
-      Restart = "always";
+  #   serviceConfig = {
+  #     ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
+  #     Restart = "always";
 
-      # Secure sandboxing
-      # DynamicUser = true;
-      User = "root";
-      AmbientCapabilities = "CAP_NET_BIND_SERVICE";
-      SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
-      ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
-    };
-  };
+  #     # Secure sandboxing
+  #     # DynamicUser = true;
+  #     User = "root";
+  #     AmbientCapabilities = "CAP_NET_BIND_SERVICE";
+  #     SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
+  #     ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
+  #   };
+  # };
 }
