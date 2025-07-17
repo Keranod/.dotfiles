@@ -1,0 +1,6 @@
+- VPN working on laptop
+- Laptop wakeonlan
+- Everything kill switched to VPN
+- Encrypt all devices
+- Enhance security
+  - 2FA?
