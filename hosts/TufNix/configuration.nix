@@ -21,6 +21,10 @@ in
   fileSystems."/boot" = {
     fsType = "vfat";
   };
+  boot.blacklistedKernelModules = [
+    "kvm"
+    "kvm_intel"
+  ];
 
   # Networking
   networking.hostName = "TufNix";
