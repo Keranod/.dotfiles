@@ -67,6 +67,8 @@ in
     ]
   );
 
+  users.extraGroups.vboxusers.members = [ "keranod" ];
+
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
