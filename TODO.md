@@ -2,5 +2,6 @@
 - Laptop wakeonlan
 - Everything kill switched to VPN
 - Encrypt all devices
+ - encryption on the fly, only ssh connection can see unencrypted files, processes?
 - Enhance security
   - 2FA?
