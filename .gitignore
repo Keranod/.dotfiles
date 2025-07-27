@@ -1,5 +1,6 @@
 .env
 **/.ssh/
+**/.VPN/
 db
 **/.vpn/
 **.ovpn
