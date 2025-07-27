@@ -1,7 +1,8 @@
 - VPN working on laptop
+  - Check firewall comment for laptop to make it more secure
 - Laptop wakeonlan
 - Everything kill switched to VPN
 - Encrypt all devices
- - encryption on the fly, only ssh connection can see unencrypted files, processes?
+  - encryption on the fly, only ssh connection can see unencrypted files, processes?
 - Enhance security
   - 2FA?

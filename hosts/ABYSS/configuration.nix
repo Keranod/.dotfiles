@@ -1,11 +1,10 @@
 { pkgs, lib, ... }:
 
 let
-  domain        = "keranod.dev";
+  domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
-  acmeDir     = "${acmeRoot}/${domain}";
+  acmeDir = "${acmeRoot}/${domain}";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
-    listen: :443
     disableUDP: true
     tls:
       cert: ${acmeDir}/fullchain.pem
@@ -15,8 +14,9 @@ let
       password: "5kYxPZ+hr4DwXL3OZmH0P1LQREdPBp9QutKHv3p1BA="
     masquerade:
       type: proxy
+      forceHTTPS: true
       proxy:
-        url: "https://${domain}/"
+        url: "https://www.wechat.com/"
         rewriteHost: true
   '';
 in
@@ -200,29 +200,24 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  # services.nginx = {
-  #   enable = true; 
-  #   virtualHosts."${domain}" = {
-  #     root = "/var/www";
-  #     listen = [ 8443 ];
-  #   };
-  # };
+  systemd.services.hysteria-server = {
+    description = "Hysteria 2 Server";
+    after = [
+      "network.target"
+      "acme-finished-${domain}.service"
+    ];
+    wantedBy = [ "multi-user.target" ];
 
-  # systemd.services.hysteria-server = {
-  #   description = "Hysteria 2 Server";
-  #   after = [ "network.target" "acme-finished-${domain}.service" ];
-  #   wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
+      Restart = "always";
 
-  #   serviceConfig = {
-  #     ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
-  #     Restart = "always";
-
-  #     # Secure sandboxing
-  #     # DynamicUser = true;
-  #     User = "root";
-  #     AmbientCapabilities = "CAP_NET_BIND_SERVICE";
-  #     SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
-  #     ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
-  #   };
-  # };
+      User = "root";
+      AmbientCapabilities = "CAP_NET_BIND_SERVICE";
+      SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
+      ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+  };
 }
