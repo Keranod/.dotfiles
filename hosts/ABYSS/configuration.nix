@@ -103,7 +103,8 @@ in
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept    
             # Hysteria traffic         
-            tcp dport 443 accept            
+            tcp dport 443 accept
+            udp dport 443 accept     
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
