@@ -212,13 +212,11 @@ in
           protocol = "TCP";
         }
       ];
-    };
 
-    # 4) Bridge the SoftEther hub into your wg0 interface
-    #    so all VPN traffic (SoftEther or WireGuard) shares the same L3 network.
-    bridges."wg-bridge" = {
-      hub = "wg-hub";
-      interface = "wg0";
+      bridges."wg-bridge" = {
+        hub = "wg-hub";
+        interface = "wg0";
+      };
     };
   };
 }
