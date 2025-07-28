@@ -4,6 +4,7 @@ let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
+  vpnDir = "/var/lib/softether";
 in
 {
   imports = [
