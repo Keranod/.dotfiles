@@ -86,7 +86,9 @@ in
             # WireGuard handshake
             udp dport 51820 accept
             # Let's Encrypt HTTP-01 challenge
-            tcp dport 80 accept      
+            tcp dport 80 accept
+            # SoftEther
+            tcp dport 443 accept      
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
@@ -123,7 +125,7 @@ in
     wireguard-tools
     tcpdump
     dig
-    hysteria
+    softether-vpnserver
   ];
 
   # Enable the OpenSSH service
@@ -181,5 +183,68 @@ in
     acceptTerms = true;
     defaults.email = "konrad.konkel@wp.pl";
     certs."${domain}".webroot = "/var/www";
+  };
+
+systemd.services.softether-vpnserver = {
+    description = "SoftEther VPN Server";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type      = "forking";
+      ExecStart = "${pkgs.softether-vpnserver}/bin/vpnserver start";
+      ExecStop  = "${pkgs.softether-vpnserver}/bin/vpnserver stop";
+    };
+  };
+
+  # 4) Ensure vpnDir exists with correct perms
+  system.activationScripts.softether-dir = {
+    text = ''
+      mkdir -p ${vpnDir}/server
+      chown root:root ${vpnDir}/server
+      chmod 700 ${vpnDir}/server
+    '';
+  };
+
+  # 5) One‑shot bootstrap of hub/user/SecureNAT/listener
+  system.activationScripts.softether-config = {
+    deps = [ pkgs.softether-vpnserver ];
+    text = ''
+      if [ ! -f ${vpnDir}/server/server.pem ]; then
+        printf "adminpass\nhubpass\nuserpass\n" | \
+          ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /CMD ServerPasswordSet
+
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /CMD \
+          HubCreate wg-hub /PASSWORD:hubpass
+
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /HUB:wg-hub /CMD \
+          UserCreate wg-user /GROUP:none /REALNAME:none /NOTE:none
+
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /HUB:wg-hub /CMD \
+          UserPasswordSet wg-user /PASSWORD:userpass
+
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /HUB:wg-hub /CMD \
+          SecureNatEnable
+
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /HUB:wg-hub /CMD \
+          ListenerCreate 443 /PROTO:TCP
+      fi
+    '';
+  };
+
+  # 6) Bridge SoftEther hub → your WireGuard interface
+  systemd.services.softether-bridge = {
+    description = "Bridge WireGuard wg0 into SoftEther hub";
+    after   = [ "softether-vpnserver.service" ];
+    wants   = [ "softether-vpnserver.service" ];
+    serviceConfig = {
+      Type      = "oneshot";
+      ExecStart = ''
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /CMD Hub wg-hub
+        ${pkgs.softether-vpnserver}/bin/vpncmd ${vpnDir}/server /SERVER /HUB:wg-hub /CMD \
+          BridgeCreate wg-bridge /DEVICE:wg0
+      '';
+      RemainAfterExit = true;
+    };
+    install.wantedBy = [ "multi-user.target" ];
   };
 }
