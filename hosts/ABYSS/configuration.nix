@@ -191,7 +191,6 @@ in
 
     vpnserver = {
       enable = true;
-      dataDir = vpnDir;
 
       # Create a hub named “wg-hub”
       hubs."wg-hub" = {
