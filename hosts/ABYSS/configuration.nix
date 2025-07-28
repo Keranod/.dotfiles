@@ -233,10 +233,10 @@ systemd.services.softether-vpnserver = {
   };
 
   # 6) Bridge SoftEther hub → your WireGuard interface
-  systemd.services.softether-bridge = {
+  systemd.services.softetherBridge = {
     description = "Bridge WireGuard wg0 into SoftEther hub";
-    after   = [ "softether-vpnserver.service" ];
-    wants   = [ "softether-vpnserver.service" ];
+    after       = [ "softether-vpnserver.service" ];
+    wants       = [ "softether-vpnserver.service" ];
     serviceConfig = {
       Type      = "oneshot";
       ExecStart = ''
@@ -246,6 +246,8 @@ systemd.services.softether-vpnserver = {
       '';
       RemainAfterExit = true;
     };
-    install.wantedBy = [ "multi-user.target" ];
+    install = {
+      wantedBy = [ "multi-user.target" ];
+    };
   };
 }
