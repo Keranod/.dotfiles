@@ -38,7 +38,8 @@ vi /home/keranod/.dotfiles/hosts/ABYSS/configuration.nix
 
 # HysteriaV2
 
+- first get ACME cert for domain
+
 ```bash
-sudo mkdir /var/www
-sudo 777 /var/www
+
 ```

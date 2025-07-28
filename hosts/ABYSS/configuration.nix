@@ -12,12 +12,12 @@ let
     auth:
       type: password
       password: "5kYxPZ+hr4DwXL3OZmH0P1LQREdPBp9QutKHv3p1BA="
-    masquerade:
-      type: proxy
-      forceHTTPS: true
-      proxy:
-        url: "https://www.wechat.com/"
-        rewriteHost: true
+    #masquerade:
+    #  type: proxy
+    #  forceHTTPS: true
+    #  proxy:
+    #    url: "https://www.wechat.com/"
+    #    rewriteHost: true
   '';
 in
 {
