@@ -212,11 +212,6 @@ in
           protocol = "TCP";
         }
       ];
-
-      bridges."wg-bridge" = {
-        hub = "wg-hub";
-        interface = "wg0";
-      };
     };
   };
 }
