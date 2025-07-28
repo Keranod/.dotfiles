@@ -246,8 +246,6 @@ systemd.services.softether-vpnserver = {
       '';
       RemainAfterExit = true;
     };
-    install = {
       wantedBy = [ "multi-user.target" ];
-    };
   };
 }
