@@ -88,7 +88,7 @@ in
             udp dport 51820 accept
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
-            # SoftEther
+            # OCSERV
             tcp dport 443 accept      
 
             # SSH - No global "accept" for port 22
@@ -126,7 +126,6 @@ in
     wireguard-tools
     tcpdump
     dig
-    softether
   ];
 
   # Enable the OpenSSH service
@@ -186,31 +185,34 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  services.softether = {
+  services.ocserv = {
     enable = true;
+    package = pkgs.ocserv;
+    config = ''
+      auth = "plain[passwd=/etc/ocserv/ocpasswd]"
+      tcp-port = 443
+      udp-port = 0
+      server-cert = ${acmeDir}/fullchain.pem
+      server-key  = ${acmeDir}/privkey.pem
 
-    vpnserver = {
-      enable = true;
+      # IP pool for VPN clients
+      ipv4-network = 10.100.0.0
+      ipv4-netmask = 255.255.255.0
 
-      # Create a hub named “wg-hub”
-      hubs."wg-hub" = {
-        password = "hubpass"; # hub admin password
-        secureNat = true; # built‑in NAT & DHCP
-      };
+      # force all traffic through tunnel
+      route = 0.0.0.0/0
+      no-route = 10.100.0.0/24  # your WireGuard subnet, so they can still peer
 
-      # Create a user “wg-user” on that hub
-      users."wg-user" = {
-        hub = "wg-hub";
-        password = "userpass";
-      };
+      # performance & security tweaks
+      keepalive = 300
+      dpd       = 90
+      max-clients = 16
+    '';
+  };
 
-      # Listen on TCP 443
-      listeners = [
-        {
-          port = 443;
-          protocol = "TCP";
-        }
-      ];
-    };
+  users.extraUsers.vpnuser = {
+    isNormalUser = true;
+    extraGroups = [ "ocserv" ];
+    password = "yourStrongPasswordHere";
   };
 }
