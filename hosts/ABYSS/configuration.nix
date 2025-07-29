@@ -188,6 +188,9 @@ in
   services.ocserv = {
     enable    = true;
     config = ''
+      # specify the TUN device (auto picks first available)
+      device           = auto
+
       # management socket (you need this for ocpasswd if you ever use it)
       socket-file      = /var/run/ocserv.sock
 
