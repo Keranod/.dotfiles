@@ -205,11 +205,10 @@ in
       server-cert      = ${acmeDir}/fullchain.pem
       server-key       = ${acmeDir}/privkey.pem
 
-      ipv4-network = "10.100.0.0"
-      ipv4-netmask = "255.255.255.0"
+      ipv4-network     = 10.200.0.0
+      ipv4-netmask     = 255.255.255.0
 
-      route        = "0.0.0.0/0"
-      no-route     = "10.100.0.0/24"
+      route            = 0.0.0.0 0.0.0.0
 
       # tuning
       keepalive        = 300
