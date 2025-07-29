@@ -187,7 +187,6 @@ in
 
   services.ocserv = {
     enable    = true;
-    configFile = "/etc/ocserv/ocserv.conf";
     config = ''
       # management socket (you need this for ocpasswd if you ever use it)
       socket-file      = /var/run/ocserv.sock
