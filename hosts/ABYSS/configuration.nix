@@ -205,13 +205,11 @@ in
       server-cert      = ${acmeDir}/fullchain.pem
       server-key       = ${acmeDir}/privkey.pem
 
-      # IP pool (same 10.100.0.0/24 as your wg0)
-      ipv4-network     = 10.100.0.0
-      ipv4-netmask     = 255.255.255.0
+      ipv4-network = "10.100.0.0"
+      ipv4-netmask = "255.255.255.0"
 
-      # force all traffic through tunnel except the VPN LAN itself
-      route            = 0.0.0.0/0
-      no-route         = 10.100.0.0/24
+      route        = "0.0.0.0/0"
+      no-route     = "10.100.0.0/24"
 
       # tuning
       keepalive        = 300
