@@ -187,7 +187,6 @@ in
 
   services.ocserv = {
     enable = true;
-    package = pkgs.ocserv;
     config = ''
       auth = "plain[passwd=/etc/ocserv/ocpasswd]"
       tcp-port = 443
