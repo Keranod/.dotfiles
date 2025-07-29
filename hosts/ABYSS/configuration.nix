@@ -203,7 +203,7 @@ in
 
       # certs from your ACME setup
       server-cert      = ${acmeDir}/fullchain.pem
-      server-key       = ${acmeDir}/privkey.pem
+      server-key       = ${acmeDir}/key.pem
 
       ipv4-network     = 10.200.0.0
       ipv4-netmask     = 255.255.255.0
