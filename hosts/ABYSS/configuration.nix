@@ -193,10 +193,6 @@ in
 
       # plain-text auth: no crypt errors, simplest path
       auth             = "plain[passwd=/etc/ocserv/ocpasswd]"
-      passwd-hash      = plain
-
-      # pretend we're answering HTTPS for your domain
-      vhost            = ${domain}
 
       # only TCP 443, no UDP
       tcp-port         = 443
