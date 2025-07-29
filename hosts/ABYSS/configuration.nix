@@ -189,6 +189,7 @@ in
     enable = true;
     config = ''
       auth = "plain[passwd=/etc/ocserv/ocpasswd]"
+      passwd-hash = plain
       tcp-port = 443
       udp-port = 0
       server-cert = ${acmeDir}/fullchain.pem
