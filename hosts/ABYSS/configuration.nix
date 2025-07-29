@@ -186,33 +186,39 @@ in
   };
 
   services.ocserv = {
-    enable = true;
+    enable    = true;
+    configFile = "/etc/ocserv/ocserv.conf";
     config = ''
-      auth = "plain[passwd=/etc/ocserv/ocpasswd]"
-      passwd-hash = plain
-      tcp-port = 443
-      udp-port = 0
-      server-cert = ${acmeDir}/fullchain.pem
-      server-key  = ${acmeDir}/privkey.pem
+      # management socket (you need this for ocpasswd if you ever use it)
+      socket-file      = /var/run/ocserv.sock
 
-      # IP pool for VPN clients
-      ipv4-network = 10.100.0.0
-      ipv4-netmask = 255.255.255.0
+      # plain-text auth: no crypt errors, simplest path
+      auth             = "plain[passwd=/etc/ocserv/ocpasswd]"
+      passwd-hash      = plain
 
-      # force all traffic through tunnel
-      route = 0.0.0.0/0
-      no-route = 10.100.0.0/24  # your WireGuard subnet, so they can still peer
+      # pretend we're answering HTTPS for your domain
+      vhost            = ${domain}
 
-      # performance & security tweaks
-      keepalive = 300
-      dpd       = 90
-      max-clients = 16
+      # only TCP 443, no UDP
+      tcp-port         = 443
+      udp-port         = 0
+
+      # certs from your ACME setup
+      server-cert      = ${acmeDir}/fullchain.pem
+      server-key       = ${acmeDir}/privkey.pem
+
+      # IP pool (same 10.100.0.0/24 as your wg0)
+      ipv4-network     = 10.100.0.0
+      ipv4-netmask     = 255.255.255.0
+
+      # force all traffic through tunnel except the VPN LAN itself
+      route            = 0.0.0.0/0
+      no-route         = 10.100.0.0/24
+
+      # tuning
+      keepalive        = 300
+      dpd              = 90
+      max-clients      = 16
     '';
-  };
-
-  users.extraUsers.vpnuser = {
-    isNormalUser = true;
-    extraGroups = [ "ocserv" ];
-    password = "yourStrongPasswordHere";
   };
 }
