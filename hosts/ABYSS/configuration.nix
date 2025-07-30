@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, sops, ... }:
 
 let
   domain = "keranod.dev";
