@@ -4,6 +4,8 @@ let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
+  secrectsDir = "/etc/secrets"
+  hysteriaPassword = builtins.readFile "${secrectsDir}/hysteriav2";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true
     tls:
@@ -11,7 +13,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "5kYxPZ+hr4DwXL3OZmH0P1LQREdPBp9QutKHv3p1BA="
+      password: "${hysteriaPassword}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
