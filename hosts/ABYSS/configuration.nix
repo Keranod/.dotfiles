@@ -26,7 +26,6 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    sops-nix_
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
@@ -147,7 +146,8 @@ in
     hysteria
   ];
 
-  sops-nix_.sops = {
+  sops = {
+    package = sops-nix_.sops;
     defaultSopsFile = ../secrets/abyss-secrets.yaml;
     gnupg.enable = true; # or age.enable = true;
     secrets.hysteria-password = {
