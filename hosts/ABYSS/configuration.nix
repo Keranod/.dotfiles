@@ -213,6 +213,7 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
+      RuntimeDirectory = "hysteria";
       ExecStartPre = ''
         "${pkgs.coreutils}/bin/cat" > /run/hysteria/config.yaml <<EOF
       tls:
