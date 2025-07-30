@@ -57,6 +57,7 @@
 
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
+      sops-nix_ = import sops-nix { inherit system; };
     in
     {
       # Can specify multiple configurations
