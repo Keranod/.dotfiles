@@ -1,10 +1,10 @@
-{ pkgs, sops, ... }:
+{ pkgs, ... }:
 
 let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
-  
+
   # hysteriaPassword = sops.secrets."hysteria-password".data;
 
   # hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
@@ -212,29 +212,37 @@ in
     ];
     wantedBy = [ "multi-user.target" ];
 
+    # ensure /run/hysteria exists
+    runtimeDirectory = "hysteria";
+
     serviceConfig = {
-      RuntimeDirectory = "hysteria";
-      ExecStartPre = ''
-        ${pkgs.bash}/bin/bash -c '
-          PASSWORD="$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)"
-          cat > /run/hysteria/config.yaml <<EOF
-      tls:
-        cert: ${acmeDir}/fullchain.pem
-        key: ${acmeDir}/key.pem
-      auth:
-        type: password
-        password: $PASSWORD
-      EOF
-        '
-      '';
-
-      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
-      Restart = "always";
-
+      Type = "simple";
       User = "root";
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
       StandardOutput = "journal";
       StandardError = "journal";
+
+      # write the config file at runtime
+      ExecStartPre = [
+        # use bash to build a here‑doc
+        "${pkgs.bash}/bin/bash"
+        "-c"
+        ''
+                  PASSWORD="$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)"
+                  cat > /run/hysteria/config.yaml <<EOF
+          tls:
+              cert: ${acmeDir}/fullchain.pem
+              key:  ${acmeDir}/key.pem
+          auth:
+              type:     password
+              password: "$PASSWORD"
+          EOF
+        ''
+      ];
+
+      # now start the server
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
+      Restart = "always";
     };
   };
 }
