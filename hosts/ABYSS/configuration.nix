@@ -148,9 +148,11 @@ in
 
   sops = {
     defaultSopsFile = /root/.sops/secrets/abyss-secrets.yaml;
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-    sops.age.generateKey = true;
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/lib/sops-nix/key.txt";
+      generateKey = true;
+    };
     secrets.hysteria-password = {
       owner = "root";
       path = "/run/secrets/hysteria-password";
