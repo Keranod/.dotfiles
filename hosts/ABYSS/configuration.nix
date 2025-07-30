@@ -26,7 +26,7 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    inputs.sops-nix.nixosModules.sops
+    sops-nix_
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
