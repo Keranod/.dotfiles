@@ -1,11 +1,11 @@
-{ pkgs, sops-nix_, ... }:
+{ pkgs, ... }:
 
 let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
   
-  hysteriaPassword = sops-nix_.secrets."hysteria-password".data;
+  hysteriaPassword = sops.secrets."hysteria-password".data;
 
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true

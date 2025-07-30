@@ -57,7 +57,6 @@
 
       bindPkgs_ = import bindPkgs { inherit system; };
       sambaPkgs_ = import sambaPkgs { inherit system; };
-      sops-nix_ = import sops-nix { inherit system; };
     in
     {
       # Can specify multiple configurations
@@ -87,7 +86,6 @@
         ABYSS = lib.nixosSystem {
           # Architecture
           inherit system;
-          specialArgs = { inherit sops-nix_; };
           # List/Array of modules
           modules = [
             ./hosts/ABYSS/configuration.nix
