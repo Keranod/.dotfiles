@@ -39,7 +39,5 @@ vi /home/keranod/.dotfiles/hosts/ABYSS/configuration.nix
 # HysteriaV2
 
 - first get ACME cert for domain
-
-```bash
-
-```
+- `sudo mkdir /etc/secrets`
+- `sudo vi /etc/secrets/hysteriav2` -> put the password in there
