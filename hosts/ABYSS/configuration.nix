@@ -215,8 +215,9 @@ in
     serviceConfig = {
       RuntimeDirectory = "hysteria";
       ExecStartPre = ''
-        PASSWORD=$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)
-        ${pkgs.coreutils}/bin/cat > /run/hysteria/config.yaml <<EOF
+        ${pkgs.bash}/bin/bash -c '
+          PASSWORD=$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)
+          cat > /run/hysteria/config.yaml <<EOF
       tls:
         cert: ${acmeDir}/fullchain.pem
         key: ${acmeDir}/key.pem
@@ -224,6 +225,7 @@ in
         type: password
         password: $PASSWORD
       EOF
+        '
       '';
 
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
@@ -231,8 +233,6 @@ in
 
       User = "root";
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
-      SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
-      ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
       StandardOutput = "journal";
       StandardError = "journal";
     };
