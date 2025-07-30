@@ -1,3 +1,4 @@
+- custom command to git pull and nix rebuild
 - VPN working on laptop
   - Check firewall comment for laptop to make it more secure
 - Laptop wakeonlan
