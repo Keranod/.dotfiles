@@ -20,10 +20,6 @@
     sambaPkgs = {
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   # Importing self ans nixpkgs
@@ -34,7 +30,6 @@
       home-manager,
       bindPkgs,
       sambaPkgs,
-      sops-nix,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
@@ -91,11 +86,7 @@
             ./hosts/ABYSS/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
-            sops-nix.nixosModules.sops
           ];
-          specialArgs = {
-            sops = sops-nix;  # pass sops here so the config receives it
-          };
         };
         VMNixOSWork = lib.nixosSystem {
           # Architecture

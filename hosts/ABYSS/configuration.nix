@@ -147,22 +147,6 @@ in
     hysteria
   ];
 
-  # Storing secrets
-  sops = {
-    defaultSopsFile = /root/.sops/secrets/abyss-secrets.yaml;
-    age = {
-      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-      keyFile = "/var/lib/sops-nix/key.txt";
-      generateKey = true;
-    };
-    secrets = {
-      "hysteria-password" = {
-        owner = "root";
-        path = "/run/secrets/hysteria-password";
-      };
-    };
-  };
-
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
