@@ -221,6 +221,12 @@ in
       auth:
         type:     password
         password: "$PASSWORD"
+      masquerade:
+        type: proxy
+        forceHTTPS: true
+        proxy:
+            url: "https://www.wechat.com"
+            rewriteHost: true
       EOF
     '';
 
