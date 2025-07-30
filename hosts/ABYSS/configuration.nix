@@ -1,4 +1,4 @@
-{ pkgs, lib, sops-nix_, ... }:
+{ pkgs, lib, ... }:
 
 let
   domain = "keranod.dev";
@@ -146,7 +146,7 @@ in
     hysteria
   ];
 
-  sops-nix_.sops = {
+  sops = {
     defaultSopsFile = ../secrets/abyss-secrets.yaml;
     gnupg.enable = true; # or age.enable = true;
     secrets.hysteria-password = {

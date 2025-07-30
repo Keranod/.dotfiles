@@ -87,11 +87,13 @@
         ABYSS = lib.nixosSystem {
           # Architecture
           inherit system;
+          specialArgs = { inherit sops-nix_; };
           # List/Array of modules
           modules = [
             ./hosts/ABYSS/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
+            sops-nix_.nixosModules.sops
           ];
         };
         VMNixOSWork = lib.nixosSystem {
