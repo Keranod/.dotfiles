@@ -215,15 +215,17 @@ in
     serviceConfig = {
       RuntimeDirectory = "hysteria";
       ExecStartPre = ''
-        "${pkgs.coreutils}/bin/cat" > /run/hysteria/config.yaml <<EOF
+        PASSWORD=$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)
+        ${pkgs.coreutils}/bin/cat > /run/hysteria/config.yaml <<EOF
       tls:
         cert: ${acmeDir}/fullchain.pem
         key: ${acmeDir}/key.pem
       auth:
         type: password
-        password: $(cat /etc/secrets/hysteriav2)
+        password: $PASSWORD
       EOF
       '';
+
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
       Restart = "always";
 
