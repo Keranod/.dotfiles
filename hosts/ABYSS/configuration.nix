@@ -214,7 +214,6 @@ in
 
     serviceConfig = {
       ExecStartPre = ''
-        mkdir -p /run/hysteria
         echo "
       tls:
         cert: ${acmeDir}/fullchain.pem
