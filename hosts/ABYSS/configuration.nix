@@ -231,9 +231,13 @@ in
     serviceConfig = {
       ExecStartPre = ''
         mkdir -p /run/hysteria
-        echo "auth:
-  type: password
-  password: ${builtins.toString (sops.secrets."hysteria-password".data)}" > /run/hysteria/config.yaml
+        echo "
+      tls:
+        cert: ${acmeDir}/fullchain.pem
+        key: ${acmeDir}/key.pem  
+      auth:
+        type: password
+        password: $(cat /etc/secrets/hysteriav2)" > /run/hysteria/config.yaml
       '';
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
       Restart = "always";
