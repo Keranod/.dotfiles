@@ -1,4 +1,4 @@
-{ pkgs, lib, inputs, ... }:
+{ pkgs, lib, sops-nix_, ... }:
 
 let
   domain = "keranod.dev";
@@ -26,7 +26,6 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    inputs.sops-nix.nixosModules.sops
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
@@ -147,7 +146,7 @@ in
     hysteria
   ];
 
-  sops = {
+  sops-nix_.sops = {
     defaultSopsFile = ../secrets/abyss-secrets.yaml;
     gnupg.enable = true; # or age.enable = true;
     secrets.hysteria-password = {
