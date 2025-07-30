@@ -148,7 +148,6 @@ in
 
   sops = {
     defaultSopsFile = ../secrets/abyss-secrets.yaml;
-    gnupg.enable = true; # or age.enable = true;
     secrets.hysteria-password = {
       owner = "root";
       path = "/run/secrets/hysteria-password";
