@@ -214,7 +214,7 @@ in
     preStart = ''
             PASSWORD="$(cat /etc/secrets/hysteriav2)"
             cat > /run/hysteria/config.yaml <<EOF
-      disableUDP: true
+      #disableUDP: true
       tls:
         cert: ${acmeDir}/fullchain.pem
         key:  ${acmeDir}/key.pem
