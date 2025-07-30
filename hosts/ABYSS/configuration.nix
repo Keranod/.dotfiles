@@ -1,4 +1,4 @@
-{ pkgs, lib, sops-nix_, ... }:
+{ pkgs, lib, inputs, ... }:
 
 let
   domain = "keranod.dev";
@@ -26,7 +26,7 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    sops-nix_
+    inputs.sops-nix.nixosModules.sops
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
