@@ -93,6 +93,9 @@
             ./modules/config/commonConfig.nix
             sops-nix.nixosModules.sops
           ];
+          specialArgs = {
+            sops = sops-nix;  # pass sops here so the config receives it
+          };
         };
         VMNixOSWork = lib.nixosSystem {
           # Architecture
