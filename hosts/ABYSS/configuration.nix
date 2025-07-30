@@ -5,23 +5,23 @@ let
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
   
-  hysteriaPassword = sops.secrets."hysteria-password".data;
+  # hysteriaPassword = sops.secrets."hysteria-password".data;
 
-  hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
-    #disableUDP: true
-    tls:
-      cert: ${acmeDir}/fullchain.pem
-      key: ${acmeDir}/key.pem
-    auth:
-      type: password
-      password: "${hysteriaPassword}"
-    #masquerade:
-    #  type: proxy
-    #  forceHTTPS: true
-    #  proxy:
-    #    url: "https://www.wechat.com/"
-    #    rewriteHost: true
-  '';
+  # hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
+  #   #disableUDP: true
+  #   tls:
+  #     cert: ${acmeDir}/fullchain.pem
+  #     key: ${acmeDir}/key.pem
+  #   auth:
+  #     type: password
+  #     password: "${hysteriaPassword}"
+  #   #masquerade:
+  #   #  type: proxy
+  #   #  forceHTTPS: true
+  #   #  proxy:
+  #   #    url: "https://www.wechat.com/"
+  #   #    rewriteHost: true
+  # '';
 in
 {
   imports = [
@@ -155,9 +155,11 @@ in
       keyFile = "/var/lib/sops-nix/key.txt";
       generateKey = true;
     };
-    secrets.hysteria-password = {
-      owner = "root";
-      path = "/run/secrets/hysteria-password";
+    secrets = {
+      "hysteria-password" = {
+        owner = "root";
+        path = "/run/secrets/hysteria-password";
+      };
     };
   };
 
@@ -227,6 +229,12 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
+      ExecStartPre = ''
+        mkdir -p /run/hysteria
+        echo "auth:
+  type: password
+  password: ${builtins.toString (sops.secrets."hysteria-password".data)}" > /run/hysteria/config.yaml
+      '';
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
       Restart = "always";
 
