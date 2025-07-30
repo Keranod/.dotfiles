@@ -4,7 +4,21 @@ let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
-  vpnDir = "/var/lib/softether";
+  hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
+    #disableUDP: true
+    tls:
+      cert: ${acmeDir}/fullchain.pem
+      key: ${acmeDir}/key.pem
+    auth:
+      type: password
+      password: "5kYxPZ+hr4DwXL3OZmH0P1LQREdPBp9QutKHv3p1BA="
+    #masquerade:
+    #  type: proxy
+    #  forceHTTPS: true
+    #  proxy:
+    #    url: "https://www.wechat.com/"
+    #    rewriteHost: true
+  '';
 in
 {
   imports = [
@@ -88,8 +102,9 @@ in
             udp dport 51820 accept
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
-            # OCSERV
-            tcp dport 443 accept      
+            # Hysteria
+            tcp dport 443 accept
+            udp dport 443 accept 
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
@@ -126,6 +141,7 @@ in
     wireguard-tools
     tcpdump
     dig
+    hysteria
   ];
 
   # Enable the OpenSSH service
@@ -185,35 +201,24 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  services.ocserv = {
-    enable    = true;
-    config = ''
-      # specify the TUN device (auto picks first available)
-      device           = auto
+  systemd.services.hysteria-server = {
+    description = "Hysteria 2 Server";
+    after = [
+      "network.target"
+      "acme-finished-${domain}.service"
+    ];
+    wantedBy = [ "multi-user.target" ];
 
-      # management socket (you need this for ocpasswd if you ever use it)
-      socket-file      = /var/run/ocserv.sock
+    serviceConfig = {
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
+      Restart = "always";
 
-      # plain-text auth: no crypt errors, simplest path
-      auth             = "plain[passwd=/etc/ocserv/ocpasswd]"
-
-      # only TCP 443, no UDP
-      tcp-port         = 443
-      udp-port         = 0
-
-      # certs from your ACME setup
-      server-cert      = ${acmeDir}/fullchain.pem
-      server-key       = ${acmeDir}/key.pem
-
-      ipv4-network     = 10.200.0.0
-      ipv4-netmask     = 255.255.255.0
-
-      route            = 0.0.0.0/0.0.0.0
-
-      # tuning
-      keepalive        = 300
-      dpd              = 90
-      max-clients      = 16
-    '';
+      User = "root";
+      AmbientCapabilities = "CAP_NET_BIND_SERVICE";
+      SupplementaryGroups = [ "acme" ]; # <-- grant read access to certs
+      ReadOnlyPaths = [ "${acmeRoot}" ]; # optionally restrict further
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
   };
 }
