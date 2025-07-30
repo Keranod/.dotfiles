@@ -107,7 +107,6 @@ in
             tcp dport 80 accept
             # Hysteria
             tcp dport 443 accept
-            udp dport 443 accept 
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
