@@ -5,7 +5,7 @@ let
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
   secrectsDir = "/etc/secrets";
-  hysteriaPassword = builtins.readFile "${secrectsDir}/hysteriav2";
+  hysteriaPassword = builtins.readFile "/run/secrets/hysteria-password";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true
     tls:
@@ -13,7 +13,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "${hysteriaPassword}"
+      password: "${HYSTERIA_PASSWORD}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
@@ -26,6 +26,7 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    inputs.sops-nix.nixosModules.sops
   ];
 
   # Disable EFI bootloader and use GRUB for Legacy BIOS
@@ -145,6 +146,15 @@ in
     dig
     hysteria
   ];
+
+  sops = {
+    defaultSopsFile = ../secrets/abyss-secrets.yaml;
+    gnupg.enable = true; # or age.enable = true;
+    secrets.hysteria-password = {
+      owner = "root";
+      path = "/run/secrets/hysteria-password";
+    };
+  };
 
   # Enable the OpenSSH service
   services.openssh = {
