@@ -13,7 +13,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "${HYSTERIA_PASSWORD}"
+      password: "${hysteriaPassword}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
