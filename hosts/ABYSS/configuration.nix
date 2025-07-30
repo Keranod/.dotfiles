@@ -214,13 +214,14 @@ in
 
     serviceConfig = {
       ExecStartPre = ''
-        echo "
+        cat > /run/hysteria/config.yaml <<EOF
       tls:
         cert: ${acmeDir}/fullchain.pem
-        key: ${acmeDir}/key.pem  
+        key: ${acmeDir}/key.pem
       auth:
         type: password
-        password: $(cat /etc/secrets/hysteriav2)" > /run/hysteria/config.yaml
+        password: $(cat /etc/secrets/hysteriav2)
+      EOF
       '';
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
       Restart = "always";
