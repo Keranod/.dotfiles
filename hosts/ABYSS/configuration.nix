@@ -4,7 +4,7 @@ let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
-  secrectsDir = "/etc/secrets"
+  secrectsDir = "/etc/secrets";
   hysteriaPassword = builtins.readFile "${secrectsDir}/hysteriav2";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true
