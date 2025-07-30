@@ -223,18 +223,17 @@ in
 
       # write the config file at runtime
       ExecStartPre = [
-        # use bash to build a here‑doc
         "${pkgs.bash}/bin/bash"
         "-c"
         ''
                   PASSWORD="$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)"
                   cat > /run/hysteria/config.yaml <<EOF
           tls:
-              cert: ${acmeDir}/fullchain.pem
-              key:  ${acmeDir}/key.pem
+            cert: ${acmeDir}/fullchain.pem
+            key:  ${acmeDir}/key.pem
           auth:
-              type:     password
-              zpassword: "$PASSWORD"
+            type:     password
+            password: "$PASSWORD"
           EOF
         ''
       ];
