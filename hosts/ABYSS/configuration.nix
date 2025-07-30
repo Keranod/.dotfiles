@@ -212,6 +212,18 @@ in
     ];
     wantedBy = [ "multi-user.target" ];
 
+    preStart = ''
+            PASSWORD="$(cat /etc/secrets/hysteriav2)"
+            cat > /run/hysteria/config.yaml <<EOF
+      tls:
+        cert: ${acmeDir}/fullchain.pem
+        key:  ${acmeDir}/key.pem
+      auth:
+        type:     password
+        password: "$PASSWORD"
+      EOF
+    '';
+
     serviceConfig = {
       Type = "simple";
       User = "root";
@@ -221,24 +233,6 @@ in
       # ensure /run/hysteria exists
       RuntimeDirectory = "hysteria";
 
-      # write the config file at runtime
-      ExecStartPre = [
-        "${pkgs.bash}/bin/bash"
-        "-c"
-        ''
-                  PASSWORD="$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)"
-                  cat > /run/hysteria/config.yaml <<EOF
-          tls:
-            cert: ${acmeDir}/fullchain.pem
-            key:  ${acmeDir}/key.pem
-          auth:
-            type:     password
-            password: "$PASSWORD"
-          EOF
-        ''
-      ];
-
-      # now start the server
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
       Restart = "always";
     };
