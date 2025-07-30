@@ -235,7 +235,7 @@ in
   type: password
   password: ${builtins.toString (sops.secrets."hysteria-password".data)}" > /run/hysteria/config.yaml
       '';
-      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
       Restart = "always";
 
       User = "root";
