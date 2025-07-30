@@ -212,15 +212,14 @@ in
     ];
     wantedBy = [ "multi-user.target" ];
 
-    # ensure /run/hysteria exists
-    runtimeDirectory = "hysteria";
-
     serviceConfig = {
       Type = "simple";
       User = "root";
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
       StandardOutput = "journal";
       StandardError = "journal";
+      # ensure /run/hysteria exists
+      RuntimeDirectory = "hysteria";
 
       # write the config file at runtime
       ExecStartPre = [
@@ -235,7 +234,7 @@ in
               key:  ${acmeDir}/key.pem
           auth:
               type:     password
-              password: "$PASSWORD"
+              zpassword: "$PASSWORD"
           EOF
         ''
       ];
