@@ -12,7 +12,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "${HYSTERIA_PASSWORD}"
+      password: "${PASSWORD}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
@@ -225,7 +225,7 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      Environment = "HYSTERIA_PASSWORD_FILE=/run/secrets/hysteria-password";
+      ExecStartPre = "${pkgs.bash}/bin/bash -c 'PASSWORD=$(cat /root/secrets/hysteriav2) && envsubst < /etc/hysteria/template.yaml > /run/hysteria/config.yaml'";
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
       Restart = "always";
 
