@@ -5,7 +5,6 @@ let
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
   secrectsDir = "/etc/secrets";
-  hysteriaPassword = builtins.readFile "/run/secrets/hysteria-password";
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true
     tls:
@@ -13,7 +12,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "${hysteriaPassword}"
+      password: "${HYSTERIA_PASSWORD}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
@@ -146,6 +145,7 @@ in
     hysteria
   ];
 
+  # Storing secrets
   sops = {
     defaultSopsFile = /root/.sops/secrets/abyss-secrets.yaml;
     age = {
@@ -225,6 +225,7 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
+      Environment = "HYSTERIA_PASSWORD_FILE=/run/secrets/hysteria-password";
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
       Restart = "always";
 
