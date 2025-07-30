@@ -215,6 +215,7 @@ in
     preStart = ''
             PASSWORD="$(cat /etc/secrets/hysteriav2)"
             cat > /run/hysteria/config.yaml <<EOF
+      disableUDP: true
       tls:
         cert: ${acmeDir}/fullchain.pem
         key:  ${acmeDir}/key.pem
@@ -230,7 +231,6 @@ in
       AmbientCapabilities = "CAP_NET_BIND_SERVICE";
       StandardOutput = "journal";
       StandardError = "journal";
-      # ensure /run/hysteria exists
       RuntimeDirectory = "hysteria";
 
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
