@@ -92,7 +92,6 @@
             ./hosts/ABYSS/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
-            sops-nix.nixosModules.sops
           ];
         };
         VMNixOSWork = lib.nixosSystem {
