@@ -216,7 +216,7 @@ in
       RuntimeDirectory = "hysteria";
       ExecStartPre = ''
         ${pkgs.bash}/bin/bash -c '
-          PASSWORD=$(${pkgs.coreutils}/bin/cat /etc/secrets/hysteriav2)
+          PASSWORD=$(cat /etc/secrets/hysteriav2)
           cat > /run/hysteria/config.yaml <<EOF
       tls:
         cert: ${acmeDir}/fullchain.pem
