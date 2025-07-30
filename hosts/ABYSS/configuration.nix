@@ -1,10 +1,12 @@
-{ pkgs, sops-nix_, ... }:
+{ pkgs, ... }:
 
 let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
-  secrectsDir = "/etc/secrets";
+  
+  hysteriaPassword = sops-nix_.secrets."hysteria-password".data;
+
   hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
     #disableUDP: true
     tls:
@@ -12,7 +14,7 @@ let
       key: ${acmeDir}/key.pem
     auth:
       type: password
-      password: "${"$"}{PASSWORD}"
+      password: "${hysteriaPassword}"
     #masquerade:
     #  type: proxy
     #  forceHTTPS: true
@@ -145,6 +147,20 @@ in
     hysteria
   ];
 
+  # Storing secrets
+  sops = {
+    defaultSopsFile = /root/.sops/secrets/abyss-secrets.yaml;
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/lib/sops-nix/key.txt";
+      generateKey = true;
+    };
+    secrets.hysteria-password = {
+      owner = "root";
+      path = "/run/secrets/hysteria-password";
+    };
+  };
+
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
@@ -211,7 +227,6 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      ExecStartPre = "${pkgs.bash}/bin/bash -c 'PASSWORD=$(cat /root/secrets/hysteriav2) && envsubst < /etc/hysteria/template.yaml > /run/hysteria/config.yaml'";
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config ${hysteriaConfig}";
       Restart = "always";
 
