@@ -214,7 +214,7 @@ in
 
     serviceConfig = {
       ExecStartPre = ''
-        /bin/cat > /run/hysteria/config.yaml <<EOF
+        "${pkgs.coreutils}/bin/cat" > /run/hysteria/config.yaml <<EOF
       tls:
         cert: ${acmeDir}/fullchain.pem
         key: ${acmeDir}/key.pem
