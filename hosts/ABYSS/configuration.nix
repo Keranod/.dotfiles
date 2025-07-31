@@ -106,6 +106,7 @@ in
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
             # Hysteria
+            udp dport 80 accept
             tcp dport 443 accept
             udp dport 443 accept
 
@@ -216,6 +217,7 @@ in
             PASSWORD="$(cat /etc/secrets/hysteriav2)"
             cat > /run/hysteria/config.yaml <<EOF
       #disableUDP: true
+      listen: ":80"
       tls:
         cert: ${acmeDir}/fullchain.pem
         key:  ${acmeDir}/key.pem
