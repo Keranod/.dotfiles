@@ -204,6 +204,10 @@ in
       auth:
         type:     password
         password: "$PASSWORD"
+      obfs:
+        type: salamander
+        salamander:
+          password: "$PASSWORD"
       masquerade:
         type: proxy
         forceHTTPS: true
