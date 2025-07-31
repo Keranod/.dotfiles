@@ -105,8 +105,7 @@ in
             udp dport 51820 accept
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
-            # Hysteria
-            udp dport 80 accept
+            # Sing-Box
             tcp dport 443 accept
             udp dport 443 accept
 
@@ -145,7 +144,7 @@ in
     wireguard-tools
     tcpdump
     dig
-    hysteria
+    #hysteria
   ];
 
   # Enable the OpenSSH service
@@ -205,44 +204,69 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  systemd.services.hysteria-server = {
-    description = "Hysteria 2 Server";
-    after = [
-      "network.target"
-      "acme-finished-${domain}.service"
-    ];
-    wantedBy = [ "multi-user.target" ];
-
-    preStart = ''
-            PASSWORD="$(cat /etc/secrets/hysteriav2)"
-            cat > /run/hysteria/config.yaml <<EOF
-      #disableUDP: true
-      listen: ":80"
-      tls:
-        cert: ${acmeDir}/fullchain.pem
-        key:  ${acmeDir}/key.pem
-      auth:
-        type:     password
-        password: "$PASSWORD"
-      masquerade:
-        type: proxy
-        forceHTTPS: true
-        proxy:
-            url: "https://www.wechat.com"
-            rewriteHost: true
-      EOF
-    '';
-
-    serviceConfig = {
-      Type = "simple";
-      User = "root";
-      AmbientCapabilities = "CAP_NET_BIND_SERVICE";
-      StandardOutput = "journal";
-      StandardError = "journal";
-      RuntimeDirectory = "hysteria";
-
-      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
-      Restart = "always";
+  services.sing-box = {
+    enable = true;
+    settings = {
+      inbounds = [
+        {
+          tag = "naive-in";
+          type = "naive";
+          listen = "0.0.0.0";
+          listen_port = 443;
+          tls = {
+            enabled = true;
+            certificate_path = "${acmeDir}/fullchain.pem";
+            key_path = "${acmeDir}/key.pem";
+          };
+          users = [
+            { username = "user"; password = "SuperSercetPassword"; }
+          ];
+        }
+      ];
+      outbounds = [
+        { type = "direct"; }
+      ];
     };
   };
+
+  # systemd.services.hysteria-server = {
+  #   description = "Hysteria 2 Server";
+  #   after = [
+  #     "network.target"
+  #     "acme-finished-${domain}.service"
+  #   ];
+  #   wantedBy = [ "multi-user.target" ];
+
+  #   preStart = ''
+  #           PASSWORD="$(cat /etc/secrets/hysteriav2)"
+  #           cat > /run/hysteria/config.yaml <<EOF
+  #     #disableUDP: true
+  #     listen: ":80"
+  #     tls:
+  #       cert: ${acmeDir}/fullchain.pem
+  #       key:  ${acmeDir}/key.pem
+  #     auth:
+  #       type:     password
+  #       password: "$PASSWORD"
+  #     masquerade:
+  #       type: proxy
+  #       forceHTTPS: true
+  #       proxy:
+  #           url: "https://www.wechat.com"
+  #           rewriteHost: true
+  #     EOF
+  #   '';
+
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     User = "root";
+  #     AmbientCapabilities = "CAP_NET_BIND_SERVICE";
+  #     StandardOutput = "journal";
+  #     StandardError = "journal";
+  #     RuntimeDirectory = "hysteria";
+
+  #     ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
+  #     Restart = "always";
+  #   };
+  # };
 }
