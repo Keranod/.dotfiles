@@ -4,24 +4,6 @@ let
   domain = "keranod.dev";
   acmeRoot = "/var/lib/acme";
   acmeDir = "${acmeRoot}/${domain}";
-
-  # hysteriaPassword = sops.secrets."hysteria-password".data;
-
-  # hysteriaConfig = pkgs.writeText "hysteria2-config.yaml" ''
-  #   #disableUDP: true
-  #   tls:
-  #     cert: ${acmeDir}/fullchain.pem
-  #     key: ${acmeDir}/key.pem
-  #   auth:
-  #     type: password
-  #     password: "${hysteriaPassword}"
-  #   #masquerade:
-  #   #  type: proxy
-  #   #  forceHTTPS: true
-  #   #  proxy:
-  #   #    url: "https://www.wechat.com/"
-  #   #    rewriteHost: true
-  # '';
 in
 {
   imports = [
@@ -105,7 +87,7 @@ in
             udp dport 51820 accept
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
-            # Sing-Box
+            # 
             tcp dport 443 accept
             udp dport 443 accept
 
@@ -203,82 +185,4 @@ in
     defaults.email = "konrad.konkel@wp.pl";
     certs."${domain}".webroot = "/var/www";
   };
-
-  services.v2ray = {
-    enable = true;
-    config = {
-      log = { loglevel = "warning"; };
-      inbounds = [
-        {
-          port = 443;
-          protocol = "vless";
-          settings = {
-            clients = [
-              { id = "82fdd2a6-f9e8-44ef-99a2-36d5c0d21726"; level = 0; flow = "xtls-rprx-direct"; }
-            ];
-          };
-          streamSettings = {
-            network = "tcp";
-            security  = "xtls";
-            xtlsSettings = {
-              certificates = [
-                {
-                  certificateFile = "${acmeDir}/fullchain.pem";
-                  keyFile         = "${acmeDir}/key.pem";
-                }
-              ];
-            };
-          };
-        }
-      ];
-      outbounds = [
-        { protocol = "freedom"; settings = {}; }
-      ];
-    };
-    serviceConfig = {
-    StandardOutput = "journal+console";
-    StandardError  = "journal+console";
-  };
-  };
-
-  # systemd.services.hysteria-server = {
-  #   description = "Hysteria 2 Server";
-  #   after = [
-  #     "network.target"
-  #     "acme-finished-${domain}.service"
-  #   ];
-  #   wantedBy = [ "multi-user.target" ];
-
-  #   preStart = ''
-  #           PASSWORD="$(cat /etc/secrets/hysteriav2)"
-  #           cat > /run/hysteria/config.yaml <<EOF
-  #     #disableUDP: true
-  #     listen: ":80"
-  #     tls:
-  #       cert: ${acmeDir}/fullchain.pem
-  #       key:  ${acmeDir}/key.pem
-  #     auth:
-  #       type:     password
-  #       password: "$PASSWORD"
-  #     masquerade:
-  #       type: proxy
-  #       forceHTTPS: true
-  #       proxy:
-  #           url: "https://www.wechat.com"
-  #           rewriteHost: true
-  #     EOF
-  #   '';
-
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     User = "root";
-  #     AmbientCapabilities = "CAP_NET_BIND_SERVICE";
-  #     StandardOutput = "journal";
-  #     StandardError = "journal";
-  #     RuntimeDirectory = "hysteria";
-
-  #     ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /run/hysteria/config.yaml";
-  #     Restart = "always";
-  #   };
-  # };
 }
