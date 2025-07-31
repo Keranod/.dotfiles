@@ -204,27 +204,35 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  services.sing-box = {
-    enable = false;
-    settings = {
+  services.v2ray = {
+    enable = true;
+    config = {
+      log = { loglevel = "warning"; };
       inbounds = [
         {
-          tag = "naive-in";
-          type = "naive";
-          listen = "0.0.0.0";
-          listen_port = 443;
-          tls = {
-            enabled = true;
-            certificate_path = "${acmeDir}/fullchain.pem";
-            key_path = "${acmeDir}/key.pem";
+          port = 443;
+          protocol = "vless";
+          settings = {
+            clients = [
+              { id = "82fdd2a6-f9e8-44ef-99a2-36d5c0d21726"; level = 0; flow = "xtls-rprx-direct"; }
+            ];
           };
-          users = [
-            { username = "user"; password = "SuperSercetPassword"; }
-          ];
+          streamSettings = {
+            network = "tcp";
+            security  = "xtls";
+            xtlsSettings = {
+              certificates = [
+                {
+                  certificateFile = "${acmeDir}/fullchain.pem";
+                  keyFile         = "${acmeDir}/key.pem";
+                }
+              ];
+            };
+          };
         }
       ];
       outbounds = [
-        { type = "direct"; }
+        { protocol = "freedom"; settings = {}; }
       ];
     };
   };
