@@ -235,6 +235,10 @@ in
         { protocol = "freedom"; settings = {}; }
       ];
     };
+    serviceConfig = {
+    StandardOutput = "journal+console";
+    StandardError  = "journal+console";
+  };
   };
 
   # systemd.services.hysteria-server = {
