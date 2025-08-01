@@ -167,6 +167,10 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
+        # Add this rewrite rule
+        rewrite = {
+          "vaultwarden.internal" = "10.100.0.1";
+        };
       };
 
       # DHCP
@@ -189,12 +193,29 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
+  services.nginx = {
+    enable = true;
+
+    virtualHosts."vaultwarden.internal" = {
+      listen = [ { addr = "0.0.0.0"; port = 80; } ];
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+        proxySetHeader = {
+          Host = "vaultwarden.internal";
+          X-Real-IP = "$remote_addr";
+          X-Forwarded-For = "$proxy_add_x_forwarded_for";
+          X-Forwarded-Proto = "http";
+        };
+      };
+    };
+  };
+
   services.vaultwarden = {
     enable = true;
     config = {
       rocketPort = 8222; # or whatever port you want
       rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
-      domain = "https://keranod.dev:8222"; # for local/VPN access only
+      domain = "https://127.0.0.1:8222"; # for local/VPN access only
       signupsAllowed = false;
     };
   };
