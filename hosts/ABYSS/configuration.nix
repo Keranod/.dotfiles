@@ -194,7 +194,7 @@ in
     config = {
       rocketPort = 8222; # or whatever port you want
       rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
-      domain = "https://10.100.0.1:8222"; # for local/VPN access only
+      domain = "https://keranod.dev:8222"; # for local/VPN access only
       signupsAllowed = false;
     };
   };
