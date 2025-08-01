@@ -191,7 +191,6 @@ in
 
   services.vaultwarden = {
     enable = true;
-    webVault.enable = true;
     config = {
       rocketPort = 8222; # or whatever port you want
       rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
