@@ -100,9 +100,6 @@ in
             # DNS (server itself or VPN clients)
             iifname "wg0" udp dport 53 accept
             iifname "wg0" tcp dport 53 accept
-
-            # Vaultwarden — only on VPN interface!
-            iifname "wg0" tcp dport 8222 accept
           }
 
           chain forward {
@@ -193,30 +190,25 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
-  services.nginx = {
-    enable = true;
-
-    virtualHosts."vaultwarden.internal" = {
-      listen = [ { addr = "0.0.0.0"; port = 80; } ];
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8222";
-        proxySetHeader = {
-          Host = "vaultwarden.internal";
-          X-Real-IP = "$remote_addr";
-          X-Forwarded-For = "$proxy_add_x_forwarded_for";
-          X-Forwarded-Proto = "http";
-        };
-      };
-    };
-  };
 
   services.vaultwarden = {
     enable = true;
     config = {
       rocketPort = 8222; # or whatever port you want
       rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
-      domain = "https://127.0.0.1:8222"; # for local/VPN access only
+      domain = "https://vaultwarden.internal:8222"; # for local/VPN access only
       signupsAllowed = false;
+    };
+  };
+
+  services.caddy = {
+    enable = true;
+    virtualHosts."vaultwarden.internal" = {
+      listen = [ { addr = "0.0.0.0"; port = 80; } ]; # Listen on all interfaces port 80
+      extraConfig = ''
+        auto_https off
+        reverse_proxy 127.0.0.1:8222
+      '';
     };
   };
 
