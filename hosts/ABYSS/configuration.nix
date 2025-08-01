@@ -204,18 +204,32 @@ in
   services.nginx = {
     enable = true;
 
+    recommendedProxySettings = true;
+    recommendedGzipSettings   = true;
+    recommendedOptimisation    = true;
+
+    # catch all public-IP traffic
+    virtualHosts."_" = {
+      default = true;
+      extraConfig = ''
+        return 444;  # drop everything not matching a real vhost
+      '';
+    };
+
+    # Vaultwarden reverse proxy, HTTP, VPN-only
     virtualHosts."vaultwarden.internal" = {
-      listen = [ { addr = "0.0.0.0"; port = 80; } ];
+      # no HTTPS/ACME here, we only serve over your VPN
+      forceSSL    = false;
+      enableACME  = false;
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:8222";
-
-        proxySetHeader = {
-          Host = "vaultwarden.internal";
-          "X-Real-IP" = "$remote_addr";
-          "X-Forwarded-For" = "$proxy_add_x_forwarded_for";
-          "X-Forwarded-Proto" = "http";
-        };
+        extraConfig = ''
+          proxy_pass         http://127.0.0.1:8222;
+          proxy_set_header   Host                 $host;
+          proxy_set_header   X-Real-IP            $remote_addr;
+          proxy_set_header   X-Forwarded-For      $proxy_add_x_forwarded_for;
+          proxy_set_header   X-Forwarded-Proto    $scheme;
+        '';
       };
     };
   };
