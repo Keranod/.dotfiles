@@ -164,8 +164,7 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
-        # Add this rewrite rule
-        rewrite = {
+        hosts = {
           "vaultwarden.internal" = "10.100.0.1";
         };
       };
