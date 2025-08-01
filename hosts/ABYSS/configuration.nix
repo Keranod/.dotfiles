@@ -164,9 +164,12 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
-        hosts = {
-          "vaultwarden.internal" = "10.100.0.1";
-        };
+        rewrites = [
+          {
+            domain = "vaultwarden.internal";
+            answer = "10.100.0.1";
+          }
+        ];
       };
 
       # DHCP
