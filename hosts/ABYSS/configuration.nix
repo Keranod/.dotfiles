@@ -186,6 +186,16 @@ in
     certs."${domain}".webroot = "/var/www";
   };
 
+  services.vaultwarden = {
+    enable = true;
+    config = {
+      rocketPort = 8222; # or whatever port you want
+      rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
+      domain = "http://10.100.0.1:8222"; # for local/VPN access only
+      signupsAllowed = false;
+    };
+  };
+
   systemd.services.hysteria-server = {
     description = "Hysteria 2 Server";
     after = [
