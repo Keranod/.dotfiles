@@ -164,12 +164,6 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
-        rewrites = [
-          {
-            domain = "vaultwarden.internal";
-            answer = "10.100.0.1";
-          }
-        ];
       };
 
       # DHCP
@@ -198,41 +192,29 @@ in
     config = {
       rocketAddress = "127.0.0.1";
       rocketPort = 8222; # or whatever port you want
-      domain = "http://vaultwarden.internal:8222"; # for local/VPN access only
+      domain = "http://10.100.0.1:8222"; # for local/VPN access only
       signupsAllowed = false;
     };
   };
 
   services.nginx = {
-    enable = true;
-
+    enable                 = true;
     recommendedProxySettings = true;
     recommendedGzipSettings   = true;
     recommendedOptimisation    = true;
 
-    # catch all public-IP traffic
+    # CATCH-ALL on port 80 → Vaultwarden
     virtualHosts."_" = {
       default = true;
       extraConfig = ''
-        return 444;  # drop everything not matching a real vhost
-      '';
-    };
-
-    # Vaultwarden reverse proxy, HTTP, VPN-only
-    virtualHosts."vaultwarden.internal" = {
-      # no HTTPS/ACME here, we only serve over your VPN
-      forceSSL    = false;
-      enableACME  = false;
-
-      locations."/" = {
-        extraConfig = ''
+        location / {
           proxy_pass         http://127.0.0.1:8222;
-          proxy_set_header   Host                 $host;
-          proxy_set_header   X-Real-IP            $remote_addr;
-          proxy_set_header   X-Forwarded-For      $proxy_add_x_forwarded_for;
-          proxy_set_header   X-Forwarded-Proto    $scheme;
-        '';
-      };
+          proxy_set_header   Host              $host;
+          proxy_set_header   X-Real-IP         $remote_addr;
+          proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header   X-Forwarded-Proto $scheme;
+        }
+      '';
     };
   };
 
