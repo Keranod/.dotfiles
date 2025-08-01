@@ -100,6 +100,9 @@ in
             # DNS (server itself or VPN clients)
             iifname "wg0" udp dport 53 accept
             iifname "wg0" tcp dport 53 accept
+
+            # Vaultwarden — only on VPN interface!
+            iifname "wg0" tcp dport 8222 accept
           }
 
           chain forward {
