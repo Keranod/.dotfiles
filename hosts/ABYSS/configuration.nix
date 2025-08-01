@@ -194,21 +194,30 @@ in
   services.vaultwarden = {
     enable = true;
     config = {
+      rocketAddress = "127.0.0.1";
       rocketPort = 8222; # or whatever port you want
       rocketAddress = "10.100.0.1"; # ← set this to your VPN interface IP
-      domain = "https://vaultwarden.internal:8222"; # for local/VPN access only
+      domain = "http://vaultwarden.internal:8222"; # for local/VPN access only
       signupsAllowed = false;
     };
   };
 
-  services.caddy = {
+  services.nginx = {
     enable = true;
+
     virtualHosts."vaultwarden.internal" = {
-      listen = [ { addr = "0.0.0.0"; port = 80; } ]; # Listen on all interfaces port 80
-      extraConfig = ''
-        auto_https off
-        reverse_proxy 127.0.0.1:8222
-      '';
+      listen = [ { addr = "0.0.0.0"; port = 80; } ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+
+        proxySetHeader = {
+          Host = "vaultwarden.internal";
+          "X-Real-IP" = "$remote_addr";
+          "X-Forwarded-For" = "$proxy_add_x_forwarded_for";
+          "X-Forwarded-Proto" = "http";
+        };
+      };
     };
   };
 
