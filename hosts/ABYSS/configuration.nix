@@ -217,28 +217,36 @@ in
     };
   };
 
-  services.nginx.virtualHosts."vault.keranod.dev" = {
-    enableACME = true;
-    forceSSL = true;
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
 
-    # lock UI to VPN IP
-    listen = [
-      {
-        addr = "10.100.0.1";
-        port = 443;
-        ssl = true;
-      }
-    ];
+    virtualHosts."${vaultDomain}" = {
+      enableACME = true; # uses the DNS-01 cert above
+      addSSL = true; # auto-creates your HTTPS vhost
 
-    serverName = "${vaultDomain}";
-    locations."/" = {
-      proxyPass = "https://127.0.0.1:8222";
-      extraConfig = ''
-        proxy_set_header Host            $host;
-        proxy_set_header X-Real-IP       $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      '';
+      # bind your real UI only to the VPN interface:
+      listen = [
+        {
+          addr = "10.100.0.1";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      serverName = vaultDomain;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+        extraConfig = ''
+          proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
     };
   };
 
