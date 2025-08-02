@@ -198,29 +198,21 @@ in
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
   security.acme = {
     acceptTerms = true;
-    defaults.email = "konrad.konkel@wp.pl";
+    defaults = {
+      email = "konrad.konkel@wp.pl";
+      dnsProvider = "Hetzner";
+      credentialFiles = {
+        "HETZNER_API_KEY" = "/etc/secrets/hetznerDNSApi";
+      };
+      reloadServices = [ "nginx" ];
+    };
 
     certs = {
       # your root domain, in case you need it:
-      "${domain}" = {
-        dnsChallenge = {
-          provider = "hetzner";
-          env = {
-            # LEGO looks for HETZNER_API_TOKEN
-            HETZNER_API_TOKEN = builtins.readFile "/etc/secrets/hetznerDNSApi";
-          };
-        };
-      };
+      "${domain}" = { };
 
       # the Vaultwarden subdomain
-      "${vaultDomain}" = {
-        dnsChallenge = {
-          provider = "hetzner";
-          env = {
-            HETZNER_API_TOKEN = builtins.readFile "/etc/secrets/hetznerDNSApi";
-          };
-        };
-      };
+      "${vaultDomain}" = { };
     };
   };
 
