@@ -199,6 +199,7 @@ in
       domain = "https://${vaultDomain}"; # for local/VPN access only
       signupsAllowed = false;
     };
+    environmentFile = "/etc/secrets/vaultwarden";
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
