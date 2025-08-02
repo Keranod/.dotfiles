@@ -168,10 +168,11 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
-        hosts = [
+        rewrites = [
+          # equivalent of *.vault.keranod.dev → 10.100.0.1
           {
-            host = "${vaultDomain}";
-            ip = "10.100.0.1";
+            domain = "*.vault.keranod.dev";
+            answer = "10.100.0.1";
           }
         ];
       };
