@@ -213,11 +213,19 @@ in
     recommendedOptimisation = true;
 
     virtualHosts."${vaultDomain}" = {
-      enableACME = true; # turn on automatic LE for this host
-      addSSL = true; # create the port80 ACME vhost + 443 vhost
-      forceSSL = true; # redirect http→https for browsers
+      enableACME = true; # auto-issue/renew via Let's Encrypt
+      addSSL = true; # create the HTTP challenge vhost + HTTPS vhost
 
-      # NixOS will listen on 0.0.0.0:80 and 10.100.0.1:443 automatically
+      # bind HTTPS only on your VPN interface
+      listen = [
+        {
+          addr = "10.100.0.1";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      serverName = vaultDomain;
 
       locations."/" = {
         proxyPass = "http://127.0.0.1:8222";
