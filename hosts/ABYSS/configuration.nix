@@ -185,17 +185,6 @@ in
     };
   };
 
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = "konrad.konkel@wp.pl";
-
-    # certs = {
-    #   "${domain}" = {
-    #     webroot = "/var/www";
-    #   };
-    # };
-  };
-
   services.vaultwarden = {
     enable = true;
     config = {
@@ -206,6 +195,36 @@ in
     };
   };
 
+  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "konrad.konkel@wp.pl";
+
+    certs = {
+      # your root domain, in case you need it:
+      "${domain}" = {
+        dnsChallenge = {
+          provider = "hetzner";
+          env = {
+            # LEGO looks for HETZNER_API_TOKEN
+            HETZNER_API_TOKEN = builtins.readFile "/etc/secrets/hetznerDNSApi";
+          };
+        };
+      };
+
+      # the Vaultwarden subdomain
+      "${vaultDomain}" = {
+        dnsChallenge = {
+          provider = "hetzner";
+          env = {
+            HETZNER_API_TOKEN = builtins.readFile "/etc/secrets/hetznerDNSApi";
+          };
+        };
+      };
+    };
+  };
+
+  # 2) Nginx: HTTPS only on WireGuard, ACME via DNS-01
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -213,10 +232,10 @@ in
     recommendedOptimisation = true;
 
     virtualHosts."${vaultDomain}" = {
-      enableACME = true; # auto-issue/renew via Let's Encrypt
-      addSSL = true; # create the HTTP challenge vhost + HTTPS vhost
+      enableACME = true; # uses the DNS-01 cert above
+      addSSL = true; # auto-creates your HTTPS vhost
 
-      # bind HTTPS only on your VPN interface
+      # bind your real UI only to the VPN interface:
       listen = [
         {
           addr = "10.100.0.1";
@@ -230,9 +249,9 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:8222";
         extraConfig = ''
-          proxy_set_header Host              $host;
-          proxy_set_header X-Real-IP         $remote_addr;
-          proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
