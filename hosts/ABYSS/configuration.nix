@@ -200,7 +200,7 @@ in
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
-      dnsProvider = "Hetzner";
+      dnsProvider = "hetzner";
       credentialFiles = {
         # Need to suffix variable name with _FILE
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
