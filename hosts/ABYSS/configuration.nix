@@ -215,8 +215,18 @@ in
     virtualHosts."${vaultDomain}" = {
       forceSSL = true;
       enableACME = true;
+      locations."/.well-known/acme-challenge/" = {
+        root = "/var/www";
+      };
+      locations."/" = {
+        return = 403; # Block all other HTTP traffic
+      };
       # bind *only* to the wg0 IP
       listen = [
+        {
+          addr = "0.0.0.0";
+          port = 80;
+        } # Open for ACME
         {
           addr = "10.100.0.1";
           port = 443;
