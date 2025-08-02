@@ -204,7 +204,7 @@ in
         # Need to suffix variable name with _FILE
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
       };
-      postRun = [ "systemctl restart nginx" ];
+      postRun = "systemctl restart nginx";
     };
 
     certs = {
