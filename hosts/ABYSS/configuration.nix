@@ -2,8 +2,10 @@
 
 let
   domain = "keranod.dev";
+  vaultDomain = "vault.keranod.dev";
   acmeRoot = "/var/lib/acme";
-  acmeDir = "${acmeRoot}/${domain}";
+  acmeDomainDir = "${acmeRoot}/${domain}";
+  acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
 in
 {
   imports = [
@@ -88,8 +90,8 @@ in
             # Let's Encrypt HTTP-01 challenge
             tcp dport 80 accept
             # Hysteria
-            tcp dport 443 accept
-            udp dport 443 accept
+            # tcp dport 443 accept
+            # udp dport 443 accept
 
             # SSH - No global "accept" for port 22
             iifname "wg0" tcp dport 22 accept
@@ -100,6 +102,9 @@ in
             # DNS (server itself or VPN clients)
             iifname "wg0" udp dport 53 accept
             iifname "wg0" tcp dport 53 accept
+
+            # Vaultwarden 
+            iifname "wg0" tcp dport 443 accept
           }
 
           chain forward {
@@ -183,29 +188,44 @@ in
   security.acme = {
     acceptTerms = true;
     defaults.email = "konrad.konkel@wp.pl";
-    certs."${domain}".webroot = "/var/www";
-  };
 
+    certs = {
+      "${domain}" = {
+        webroot = "/var/www";
+      };
+    };
+  };
 
   services.vaultwarden = {
     enable = true;
     config = {
       rocketAddress = "127.0.0.1";
       rocketPort = 8222; # or whatever port you want
-      domain = "https://10.100.0.1:8222"; # for local/VPN access only
+      domain = "https://${vaultDomain}"; # for local/VPN access only
       signupsAllowed = false;
     };
   };
 
   services.nginx = {
-    enable                 = true;
+    enable = true;
     recommendedProxySettings = true;
-    recommendedGzipSettings   = true;
-    recommendedOptimisation    = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
 
-    # CATCH-ALL on port 80 → Vaultwarden
-    virtualHosts."_" = {
-      default = true;
+    virtualHosts."${vaultDomain}" = {
+      forceSSL = true;
+      enableACME = true;
+      # bind *only* to the wg0 IP
+      listen = [
+        {
+          addr = "10.100.0.1";
+          port = 443;
+          ssl = true;
+        }
+      ];
+      serverName = "${vaultDomain}";
+
+      # proxy into Vaultwarden
       extraConfig = ''
         location / {
           proxy_pass         https://127.0.0.1:8222;
@@ -231,8 +251,8 @@ in
             cat > /run/hysteria/config.yaml <<EOF
       #disableUDP: true
       tls:
-        cert: ${acmeDir}/fullchain.pem
-        key:  ${acmeDir}/key.pem
+        cert: ${acmeDomainDir}/fullchain.pem
+        key:  ${acmeDomainDir}/key.pem
       auth:
         type:     password
         password: "$PASSWORD"

@@ -1,4 +1,4 @@
-{ pkgs, pkgsUnstable_, ... }:
+{ pkgs, ... }:
 
 let
   username = "keranod";
