@@ -185,16 +185,16 @@ in
     };
   };
 
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = "konrad.konkel@wp.pl";
+  # security.acme = {
+  #   acceptTerms = true;
+  #   defaults.email = "konrad.konkel@wp.pl";
 
-    certs = {
-      "${domain}" = {
-        webroot = "/var/www";
-      };
-    };
-  };
+  #   certs = {
+  #     "${domain}" = {
+  #       webroot = "/var/www";
+  #     };
+  #   };
+  # };
 
   services.vaultwarden = {
     enable = true;
