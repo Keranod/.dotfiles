@@ -87,8 +87,7 @@ in
 
             # WireGuard handshake
             udp dport 51820 accept
-            # Let's Encrypt HTTP-01 challenge
-            tcp dport 80 accept
+
             # Hysteria
             # tcp dport 443 accept
             # udp dport 443 accept
@@ -205,7 +204,7 @@ in
         # Need to suffix variable name with _FILE
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
       };
-      reloadServices = [ "nginx" ];
+      postRun = [ "systemctl restart nginx" ];
     };
 
     certs = {
