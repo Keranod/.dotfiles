@@ -213,38 +213,21 @@ in
     recommendedOptimisation = true;
 
     virtualHosts."${vaultDomain}" = {
-      forceSSL = true;
-      enableACME = true;
-      locations."/.well-known/acme-challenge/" = {
-        root = "/var/www";
-      };
-      locations."/" = {
-        return = 403; # Block all other HTTP traffic
-      };
-      # bind *only* to the wg0 IP
-      listen = [
-        {
-          addr = "0.0.0.0";
-          port = 80;
-        } # Open for ACME
-        {
-          addr = "10.100.0.1";
-          port = 443;
-          ssl = true;
-        }
-      ];
-      serverName = "${vaultDomain}";
+      enableACME = true; # turn on automatic LE for this host
+      addSSL = true; # create the port80 ACME vhost + 443 vhost
+      forceSSL = true; # redirect http→https for browsers
 
-      # proxy into Vaultwarden
-      extraConfig = ''
-        location / {
-          proxy_pass         https://127.0.0.1:8222;
-          proxy_set_header   Host              $host;
-          proxy_set_header   X-Real-IP         $remote_addr;
-          proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-          proxy_set_header   X-Forwarded-Proto $scheme;
-        }
-      '';
+      # NixOS will listen on 0.0.0.0:80 and 10.100.0.1:443 automatically
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+        extraConfig = ''
+          proxy_set_header Host              $host;
+          proxy_set_header X-Real-IP         $remote_addr;
+          proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
     };
   };
 
