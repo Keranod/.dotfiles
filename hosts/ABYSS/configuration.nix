@@ -202,7 +202,8 @@ in
       email = "konrad.konkel@wp.pl";
       dnsProvider = "Hetzner";
       credentialFiles = {
-        "HETZNER_API_KEY" = "/etc/secrets/hetznerDNSApi";
+        # Need to suffix with _FILE
+        "HETZNER_API_KEY" = "/etc/secrets/hetznerDNSApi_FILE";
       };
       reloadServices = [ "nginx" ];
     };
