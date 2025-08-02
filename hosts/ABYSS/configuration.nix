@@ -168,13 +168,6 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
-        rewrites = [
-          # equivalent of *.vault.keranod.dev → 10.100.0.1
-          {
-            domain = "*.vault.keranod.dev";
-            answer = "10.100.0.1";
-          }
-        ];
       };
 
       # DHCP
@@ -187,6 +180,14 @@ in
         protection_enabled = true;
         filtering_enabled = true;
         parental = false;
+
+        rewrites = [
+          # equivalent of vault.keranod.dev → 10.100.0.1
+          {
+            domain = "vault.keranod.dev";
+            answer = "10.100.0.1";
+          }
+        ];
       };
     };
   };
