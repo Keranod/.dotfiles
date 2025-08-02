@@ -200,6 +200,7 @@ in
     defaults = {
       email = "konrad.konkel@wp.pl";
       dnsProvider = "hetzner";
+      dnsResolver = "1.1.1.1:53";
       credentialFiles = {
         # Need to suffix variable name with _FILE
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
@@ -216,37 +217,28 @@ in
     };
   };
 
-  # 2) Nginx: HTTPS only on WireGuard, ACME via DNS-01
-  services.nginx = {
-    enable = true;
-    recommendedProxySettings = true;
-    recommendedGzipSettings = true;
-    recommendedOptimisation = true;
+  services.nginx.virtualHosts."vault.keranod.dev" = {
+    enableACME = true;
+    forceSSL = true;
 
-    virtualHosts."${vaultDomain}" = {
-      enableACME = true; # uses the DNS-01 cert above
-      addSSL = true; # auto-creates your HTTPS vhost
+    # lock UI to VPN IP
+    listen = [
+      {
+        addr = "10.100.0.1";
+        port = 443;
+        ssl = true;
+      }
+    ];
 
-      # bind your real UI only to the VPN interface:
-      listen = [
-        {
-          addr = "10.100.0.1";
-          port = 443;
-          ssl = true;
-        }
-      ];
-
-      serverName = vaultDomain;
-
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8222";
-        extraConfig = ''
-          proxy_set_header Host            $host;
-          proxy_set_header X-Real-IP       $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
+    serverName = "${vaultDomain}";
+    locations."/" = {
+      proxyPass = "https://127.0.0.1:8222";
+      extraConfig = ''
+        proxy_set_header Host            $host;
+        proxy_set_header X-Real-IP       $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      '';
     };
   };
 
