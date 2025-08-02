@@ -160,7 +160,6 @@ in
         port = 53;
         upstream_dns = [
           "https://dns.adguard-dns.com/dns-query"
-          "tls://dns.adguard-dns.com"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
