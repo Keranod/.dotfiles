@@ -168,6 +168,12 @@ in
           "9.9.9.10"
           "149.112.112.10"
         ];
+        hosts = [
+          {
+            host = "${vaultDomain}";
+            ip = "10.100.0.1";
+          }
+        ];
       };
 
       # DHCP
@@ -235,8 +241,6 @@ in
           ssl = true;
         }
       ];
-
-      serverName = vaultDomain;
 
       locations."/" = {
         proxyPass = "http://127.0.0.1:8222";
