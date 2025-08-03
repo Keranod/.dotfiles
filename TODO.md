@@ -1,3 +1,4 @@
+- autogenerate wireguard keys on creation?
 - fail2ban on abyss
 - custom command to git pull and nix rebuild
 - VPN working on laptop

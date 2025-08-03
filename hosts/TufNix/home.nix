@@ -16,6 +16,7 @@ in
     handbrake
     wechat-uos
     unar
+    tor-browser-bundle-bin
   ];
 
   # User services
