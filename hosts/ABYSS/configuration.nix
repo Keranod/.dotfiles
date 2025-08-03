@@ -121,15 +121,9 @@ in
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=25.05&
   environment.systemPackages = with pkgs; [
-    vim
-    git
     nodePackages_latest.nodejs
     home-manager
-    unzip
-    htop
     wireguard-tools
-    tcpdump
-    dig
     hysteria
   ];
 

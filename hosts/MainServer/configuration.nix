@@ -28,13 +28,9 @@ in
   # List packages installed in system profile.
   # To search, go https://search.nixos.org/packages?channel=25.05&
   environment.systemPackages = with pkgs; [
-    vim
-    git
     nodejs_22
     home-manager
     goaccess
-    unzip
-    htop
   ];
 
   networking.firewall = {

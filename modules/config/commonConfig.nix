@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   time.timeZone = "Europe/London";
@@ -36,4 +36,13 @@
     layout = "gb";
     variant = "";
   };
+
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+    tcpdump
+    htop
+    unzip
+    dig
+  ];
 }

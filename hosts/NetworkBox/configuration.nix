@@ -144,13 +144,8 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    vim
-    git
     nodePackages_latest.nodejs
     home-manager
-    htop
-    tcpdump
-    dig
   ];
 
   # Enable the OpenSSH service
