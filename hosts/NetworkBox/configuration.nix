@@ -9,18 +9,6 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
-
-  phoneMAC = "E0:CC:F8:FA:FB:42";
-  phoneFwmark = "300";
-  phoneTable = phoneFwmark;
-  phonePriority = "1001";
-  phoneInterface = "wg1";
-
-  mlodejMAC = "58:41:46:ED:9C:3B";
-  mlodejFwmark = "400";
-  mlodejTable = phoneFwmark;
-  mlodejPriority = "1002";
-  mlodejInterface = "wg2";
 in
 {
   imports = [
@@ -80,40 +68,13 @@ in
       }
     ];
 
-    # VPN - use wireguard config, if different interface change/create connection/device , create folder and config files in /etc/wireguard/<interface>.conf
-    # https://airvpn.org/generator/
-    # [Interface]
-    # [...] <- other config
-    # Table = <tableNumber>
-
-    # DO NOT COMMIT CONFIG FILES
-    # sudo wg-quick down wg0 -> stop connection
-    # sudo wg-quick up wg0 -> start connection
-
-    wg-quick.interfaces = {
-      "${tvInterface}" = {
-        configFile = "/etc/wireguard/${tvInterface}.conf";
-        autostart = false;
-      };
-      "${phoneInterface}" = {
-        configFile = "/etc/wireguard/${phoneInterface}.conf";
-        autostart = false;
-      };
-      "${mlodejInterface}" = {
-        configFile = "/etc/wireguard/${mlodejInterface}.conf";
-        autostart = false;
-      };
-    };
-
     nftables = {
       enable = true;
       ruleset = ''
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
-            ether saddr ${tvMAC} counter mark set ${tvFwmark}
-            ether saddr ${phoneMAC} counter mark set ${phoneFwmark}
-            ether saddr ${mlodejMAC} counter mark set ${mlodejFwmark}
+            # ether saddr ${tvMAC} counter mark set ${tvFwmark}
           }
         }
 
@@ -124,9 +85,7 @@ in
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
-            meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
-            meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
-            meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
+            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
 
@@ -134,9 +93,7 @@ in
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
-            meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
-            meta mark ${phoneFwmark} oifname "${phoneInterface}" masquerade
-            meta mark ${mlodejFwmark} oifname "${mlodejInterface}" masquerade
+            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
       '';
