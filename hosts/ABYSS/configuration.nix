@@ -85,13 +85,13 @@ in
             ct state established,related accept
 
             # allow the home↔VPS tunnel itself
-            iif "enp1s0" udp dport 51820 accept
+            iifname "enp1s0" udp dport 51820 accept
 
             # allow traffic arriving over wg0 (so ping, replies, etc. aren't dropped)
-            iif "wg0" accept
+            iifname "wg0" accept
 
             # allow incoming device→home forwarding
-            iif "enp1s0" udp dport 51821 accept
+            iifname "enp1s0" udp dport 51821 accept
           }
           chain forward {
             type filter hook forward priority 0; policy accept;
