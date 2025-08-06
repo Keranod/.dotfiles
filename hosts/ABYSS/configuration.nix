@@ -82,9 +82,9 @@ in
             ct state established,related accept;
             iifname "lo" accept;
             # Allow the home-server tunnel handshake
-            udp dport 51820 accept iifname "enp1s0";
+            iifname "enp1s0" udp dport 51820 accept;
             # Allow incoming device traffic for forwarding
-            udp dport 51821 accept iifname "enp1s0";
+            iifname "enp1s0" udp dport 51821 accept;
           }
           chain forward {
             type filter hook forward priority 0; policy accept;
