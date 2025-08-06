@@ -71,7 +71,7 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        wg0 = {
+        "wg-lab" = {
           ips = [ "10.100.0.1/24" ];   # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           
