@@ -41,7 +41,7 @@ in
       enable = true;
       interfaces = {
         wg0 = {
-          ips = [ "10.100.0.100/24" ];
+          ips = [ "10.100.0.100/32" ];
           listenPort = 51820;
           privateKeyFile = "/etc/wireguard/server.key";
 
@@ -79,12 +79,19 @@ in
         table ip filter {
           chain input {
             type filter hook input priority 0; policy drop;
-            ct state established,related accept;
-            iifname "lo" accept;
-            # Allow the home-server tunnel handshake
-            iifname "enp1s0" udp dport 51820 accept;
-            # Allow incoming device traffic for forwarding
-            iifname "enp1s0" udp dport 51821 accept;
+
+            # allow loopback & established
+            iif "lo" accept
+            ct state established,related accept
+
+            # allow the home↔VPS tunnel itself
+            iif "enp1s0" udp dport 51820 accept
+
+            # allow traffic arriving over wg0 (so ping, replies, etc. aren't dropped)
+            iif "wg0" accept
+
+            # allow incoming device→home forwarding
+            iif "enp1s0" udp dport 51821 accept
           }
           chain forward {
             type filter hook forward priority 0; policy accept;
