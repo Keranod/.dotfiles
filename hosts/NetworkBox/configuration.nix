@@ -71,17 +71,24 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        "wg-vps" = {
-          ips = [ "10.100.0.1/32" ];   # home end of the tunnel
+        wg0 = {
+          ips = [ "10.100.0.1/24" ];   # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           
           peers = [
+            # VPS Connection
             {
               publicKey  = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
               # tell it to reach VPS on its public IP:51820
               endpoint   = "46.62.157.130:51820";
               allowedIPs = [ "10.100.0.100/32" ];  # VPS tunnel IP
               persistentKeepalive = 25;
+            }
+
+            # myAndroid
+            {
+              publicKey  = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
+              allowedIPs = [ "10.100.0.2/32" ];
             }
           ];
         };
