@@ -177,27 +177,27 @@ in
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
-  security.acme = {
-    acceptTerms = true;
-    defaults = {
-      email = "konrad.konkel@wp.pl";
-      dnsProvider = "hetzner";
-      dnsResolver = "1.1.1.1:53";
-      credentialFiles = {
-        # Need to suffix variable name with _FILE
-        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
-      };
-      postRun = "systemctl restart nginx";
-    };
+  # security.acme = {
+  #   acceptTerms = true;
+  #   defaults = {
+  #     email = "konrad.konkel@wp.pl";
+  #     dnsProvider = "hetzner";
+  #     dnsResolver = "1.1.1.1:53";
+  #     credentialFiles = {
+  #       # Need to suffix variable name with _FILE
+  #       "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+  #     };
+  #     postRun = "systemctl restart nginx";
+  #   };
 
-    certs = {
-      # your root domain, in case you need it:
-      "${domain}" = { };
+  #   certs = {
+  #     # your root domain, in case you need it:
+  #     "${domain}" = { };
 
-      # the Vaultwarden subdomain
-      "${vaultDomain}" = { };
-    };
-  };
+  #     # the Vaultwarden subdomain
+  #     "${vaultDomain}" = { };
+  #   };
+  # };
 
   services.nginx = {
     enable = false;
