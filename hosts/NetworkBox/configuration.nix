@@ -73,6 +73,7 @@ in
       interfaces = {
         "wg-lab" = {
           ips = [ "10.100.0.1/24" ];   # home end of the tunnel
+          listenPort = 51820;
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           
           peers = [
