@@ -48,7 +48,7 @@ in
           peers = [
             # NetworkBox
             {
-              publicKey = "Fy86q6t2xOMn7mZkClegXQQ3IsVuxj6CE6aBjKu54nc=";
+              publicKey = "rGShQxK1qfo6GCmgVBoan3KKxq0Z+ZkF1/WxLKvM030=";
               allowedIPs = [ "10.100.0.1/32" ];
             }
           ];
