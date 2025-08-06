@@ -178,7 +178,6 @@ in
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
   security.acme = {
-    enable = false;
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
