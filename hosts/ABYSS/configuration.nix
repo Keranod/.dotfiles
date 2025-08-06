@@ -18,9 +18,9 @@ in
     # IP forwarding & NAT so clients can access internet
     kernel.sysctl = {
       "net.ipv4.ip_forward" = true;
-      "net.ipv6.conf.all.forwarding" = true;
-      "net.ipv4.conf.all.route_localnet" = 1;
-      "net.ipv4.conf.default.route_localnet" = 1;
+      # "net.ipv6.conf.all.forwarding" = true;
+      # "net.ipv4.conf.all.route_localnet" = 1;
+      # "net.ipv4.conf.default.route_localnet" = 1;
     };
 
     loader.grub = {
@@ -35,31 +35,21 @@ in
   # Networking
   networking = {
     hostName = "ABYSS";
-    networkmanager.enable = true;
+    networkmanager.enable = false;
 
     wireguard = {
       enable = true;
       interfaces = {
         wg0 = {
-          ips = [ "10.100.0.1/24" ];
+          ips = [ "10.100.0.100/24" ];
           listenPort = 51820;
           privateKeyFile = "/etc/wireguard/server.key";
 
           peers = [
-            # myAndoird
+            # NetworkBox
             {
-              publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
-              allowedIPs = [ "10.100.0.2/32" ];
-            }
-            # babyIPhone
-            {
-              publicKey = "9aLtuWpRtk5qaQeEVSgQcu1Fgtej4gUauor19nVKnBA=";
-              allowedIPs = [ "10.100.0.3/32" ];
-            }
-            # TufNix
-            {
-              publicKey = "Pegp2QEADJjV/zDPCXxA4OKObSCSBOFm0dRJvEPRjzg=";
-              allowedIPs = [ "10.100.0.4/32" ];
+              publicKey = "Fy86q6t2xOMn7mZkClegXQQ3IsVuxj6CE6aBjKu54nc=";
+              allowedIPs = [ "10.100.0.1/32" ];
             }
           ];
         };
@@ -70,42 +60,32 @@ in
 
     nftables = {
       enable = true;
-
       ruleset = ''
+        # NAT table for DNAT/SNAT
         table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority 0;
+            # Forward device traffic on 51821 → home server via wg0
+            udp dport 51821 dnat to 10.100.0.1:51820
+          }
           chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-            ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade
+            type nat hook postrouting priority 100;
+            # Masquerade replies back to devices on enp1s0
+            oifname "enp1s0" masquerade
           }
         }
 
+        # Filter table to lock down inputs
         table ip filter {
           chain input {
             type filter hook input priority 0; policy drop;
-            ct state established,related accept
-            iifname "lo" accept
-
-            # WireGuard handshake
-            udp dport 51820 accept
-
-            # Hysteria
-            # tcp dport 443 accept
-            # udp dport 443 accept
-
-            # SSH - No global "accept" for port 22
-            iifname "wg0" tcp dport 22 accept
-
-            # AdGuard UI — only on VPN interface!
-            iifname "wg0" tcp dport 3000 accept
-
-            # DNS (server itself or VPN clients)
-            iifname "wg0" udp dport 53 accept
-            iifname "wg0" tcp dport 53 accept
-
-            # Vaultwarden 
-            iifname "wg0" tcp dport 443 accept
+            ct state established,related accept;
+            iifname "lo" accept;
+            # Allow the home-server tunnel handshake
+            udp dport 51820 accept iifname "enp1s0";
+            # Allow incoming device traffic for forwarding
+            udp dport 51821 accept iifname "enp1s0";
           }
-
           chain forward {
             type filter hook forward priority 0; policy accept;
           }
@@ -141,7 +121,7 @@ in
   };
 
   services.adguardhome = {
-    enable = true;
+    enable = false;
     openFirewall = true; # opens port 3000 (UI) and 53 (DNS)
     mutableSettings = false;
 
@@ -186,7 +166,7 @@ in
   };
 
   services.vaultwarden = {
-    enable = true;
+    enable = false;
     config = {
       rocketAddress = "127.0.0.1";
       rocketPort = 8222; # or whatever port you want
@@ -198,7 +178,7 @@ in
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
   security.acme = {
-    acceptTerms = true;
+    acceptTerms = false;
     defaults = {
       email = "konrad.konkel@wp.pl";
       dnsProvider = "hetzner";
@@ -220,7 +200,7 @@ in
   };
 
   services.nginx = {
-    enable = true;
+    enable = false;
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
@@ -251,6 +231,7 @@ in
   };
 
   systemd.services.hysteria-server = {
+    enable = false;
     description = "Hysteria 2 Server";
     after = [
       "network.target"

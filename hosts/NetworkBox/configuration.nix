@@ -103,6 +103,7 @@ in
   environment.systemPackages = with pkgs; [
     nodePackages_latest.nodejs
     home-manager
+    wireguard-tools
   ];
 
   # Enable the OpenSSH service
