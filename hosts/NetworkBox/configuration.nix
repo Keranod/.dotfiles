@@ -131,20 +131,6 @@ in
             # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
-
-        table ip filter {
-          chain input {
-            type filter hook input priority 0; policy drop;
-            iif "lo" accept
-            ct state established,related accept
-
-            # allow the device tunnel on wg-devices
-            iif "wg-devices" accept
-          }
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-          }
-        }
       '';
     };
   };
