@@ -117,6 +117,30 @@ in
           }
         }
 
+        table ip filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+
+            # always allow loopback and established traffic
+            iif "lo" accept
+            ct state established,related accept
+
+            # allow the incoming WireGuard handshake and data on wg-lab
+            iif "wg-lab" accept
+
+            # SSH in via the VPN:
+            # iif "wg-lab" tcp dport 22 accept
+          }
+
+          chain forward {
+            type filter hook forward priority 0; policy accept;
+          }
+
+          chain output {
+            type filter hook output priority 0; policy accept;
+          }
+        }
+
         table ip6 nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
