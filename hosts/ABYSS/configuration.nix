@@ -65,15 +65,11 @@ in
         table ip nat {
           chain prerouting {
             type nat hook prerouting priority 0;
-            # OLD:
-            # udp dport 51821 dnat to 10.100.0.1:51820
-
-            # NEW: only match on your external NIC + count matches
-            iifname "enp1s0" udp dport 51821 counter dnat to 10.100.0.1:51820
+            # Device traffic → home-devices
+            iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51822
           }
           chain postrouting {
             type nat hook postrouting priority 100;
-            # Masquerade replies back to devices on enp1s0
             oifname "enp1s0" masquerade
           }
         }

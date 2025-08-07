@@ -71,9 +71,8 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        "wg-lab" = {
+        "wg-vps" = {
           ips = [ "10.100.0.1/24" ];   # home end of the tunnel
-          listenPort = 51820;
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           
           peers = [
@@ -86,10 +85,19 @@ in
               persistentKeepalive = 25;
             }
 
+            
+          ];
+        };
+        "wg-devices" = {
+          ips            = [ "10.200.0.1/24" ];
+          listenPort     = 51822;                     # pick a distinct port
+          privateKeyFile = "/etc/wireguard/NetworkBox.key";
+
+          peers = [
             # myAndroid
             {
               publicKey  = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
-              allowedIPs = [ "10.100.0.2/32" ];
+              allowedIPs = [ "10.200.0.2/32" ];
             }
           ];
         };
@@ -114,30 +122,6 @@ in
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
 
             # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
-          }
-        }
-
-        table ip filter {
-          chain input {
-            type filter hook input priority 0; policy drop;
-
-            # always allow loopback and established traffic
-            iif "lo" accept
-            ct state established,related accept
-
-            # allow the incoming WireGuard handshake and data on wg-lab
-            iifname "wg-lab" accept
-
-            # SSH in via the VPN:
-            iifname "wg-lab" tcp dport 22 accept
-          }
-
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-          }
-
-          chain output {
-            type filter hook output priority 0; policy accept;
           }
         }
 
