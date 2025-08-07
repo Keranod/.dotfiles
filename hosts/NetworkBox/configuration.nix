@@ -126,10 +126,10 @@ in
             ct state established,related accept
 
             # allow the incoming WireGuard handshake and data on wg-lab
-            iif "wg-lab" accept
+            iifname "wg-lab" accept
 
             # SSH in via the VPN:
-            # iif "wg-lab" tcp dport 22 accept
+            iifname "wg-lab" tcp dport 22 accept
           }
 
           chain forward {
