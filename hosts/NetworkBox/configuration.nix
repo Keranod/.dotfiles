@@ -72,31 +72,30 @@ in
       enable = true;
       interfaces = {
         "wg-vps" = {
-          ips = [ "10.100.0.1/24" ];   # home end of the tunnel
+          ips = [ "10.100.0.1/24" ]; # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
-          
+
           peers = [
             # VPS Connection
             {
-              publicKey  = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
+              publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
               # tell it to reach VPS on its public IP:51820
-              endpoint   = "46.62.157.130:51820";
-              allowedIPs = [ "10.100.0.100/32" ];  # VPS tunnel IP
+              endpoint = "46.62.157.130:51820";
+              allowedIPs = [ "10.100.0.100/32" ]; # VPS tunnel IP
               persistentKeepalive = 25;
             }
 
-            
           ];
         };
         "wg-devices" = {
-          ips            = [ "10.200.0.1/24" ];
-          listenPort     = 51822;                     # pick a distinct port
+          ips = [ "10.200.0.1/24" ];
+          listenPort = 51822; # pick a distinct port
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
 
           peers = [
             # myAndroid
             {
-              publicKey  = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
+              publicKey = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
               allowedIPs = [ "10.200.0.2/32" ];
             }
           ];
@@ -130,6 +129,20 @@ in
             type nat hook postrouting priority 100; policy accept;
 
             # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
+          }
+        }
+
+        table ip filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+            iif "lo" accept
+            ct state established,related accept
+
+            # allow the device tunnel on wg-devices
+            iif "wg-devices" accept
+          }
+          chain forward {
+            type filter hook forward priority 0; policy accept;
           }
         }
       '';
