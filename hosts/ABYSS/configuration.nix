@@ -65,8 +65,11 @@ in
         table ip nat {
           chain prerouting {
             type nat hook prerouting priority 0;
-            # Forward device traffic on 51821 → home server via wg0
-            udp dport 51821 dnat to 10.100.0.1:51820
+            # OLD:
+            # udp dport 51821 dnat to 10.100.0.1:51820
+
+            # NEW: only match on your external NIC + count matches
+            iifname "enp1s0" udp dport 51821 counter dnat to 10.100.0.1:51820
           }
           chain postrouting {
             type nat hook postrouting priority 100;
