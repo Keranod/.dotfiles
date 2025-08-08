@@ -82,8 +82,8 @@ in
             iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51821
           }
           chain postrouting {
-            type nat hook postrouting priority 100;
-            ip saddr 10.200.0.0/24 ip daddr 10.100.0.2 snat to 10.100.0.1
+            type nat hook postrouting priority 100; policy accept;
+            oifname "enp1s0" masquerade
           }
         }
 
