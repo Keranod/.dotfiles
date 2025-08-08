@@ -89,6 +89,14 @@ in
             }
 
           ];
+
+          ipv4.routes = [
+            {
+              address = "10.200.0.0";
+              prefixLength = 24;
+              via = "10.100.0.100";  # VPS WireGuard IP
+            }
+          ];
         };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
@@ -104,10 +112,6 @@ in
           ];
         };
       };
-    };
-
-    routes = {
-      "10.200.0.0/24" = "via 10.100.0.100 dev wg-vps";
     };
 
     nftables = {
