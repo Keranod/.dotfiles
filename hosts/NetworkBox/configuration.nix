@@ -92,7 +92,7 @@ in
         };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
-          listenPort = 51822; # pick a distinct port
+          listenPort = 51821; # pick a distinct port
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
 
           peers = [
