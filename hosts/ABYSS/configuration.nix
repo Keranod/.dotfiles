@@ -92,8 +92,8 @@ in
             type filter hook input priority 0; policy drop;
             iif "lo" accept
             ct state established,related accept
-            iif "enp1s0" udp dport {51820,51821} accept
-            iif "wg0" accept
+            iifname "enp1s0" udp dport {51820,51821} accept
+            iifname "wg0" accept
           }
           chain forward { type filter hook forward priority 0; policy accept; }
         }
