@@ -87,6 +87,10 @@ in
           ct state established,related accept;
           # Allow the outer WG tunnel to connect
           iifname "enp1s0" udp dport 51820 accept; 
+
+          # Allow all traffic that comes IN from the WireGuard tunnel.
+          # This will allow pings and SSH initiated from your NetworkBox.
+          iifname "wg0" accept;
         }
 
         chain forward {
