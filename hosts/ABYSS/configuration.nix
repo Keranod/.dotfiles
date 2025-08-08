@@ -96,6 +96,7 @@ in
             iif "wg0" accept
           }
           chain forward { type filter hook forward priority 0; policy accept; }
+        }
       '';
     };
   };
