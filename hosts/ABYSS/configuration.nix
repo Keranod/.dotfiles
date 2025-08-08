@@ -49,7 +49,7 @@ in
             # NetworkBox
             {
               publicKey = "rGShQxK1qfo6GCmgVBoan3KKxq0Z+ZkF1/WxLKvM030=";
-              allowedIPs = [ "10.100.0.1/32" ];
+              allowedIPs = [ "10.100.0.1/32" "10.200.0.0/24" ];
             }
           ];
         };
@@ -74,28 +74,15 @@ in
           }
         }
 
-        # Filter table to lock down inputs
         table ip filter {
           chain input {
             type filter hook input priority 0; policy drop;
-
-            # allow loopback & established
             iif "lo" accept
             ct state established,related accept
-
-            # allow the home↔VPS tunnel itself
-            iifname "enp1s0" udp dport 51820 accept
-
-            # allow traffic arriving over wg0 (so ping, replies, etc. aren't dropped)
-            iifname "wg0" accept
-
-            # allow incoming device→home forwarding
-            iifname "enp1s0" udp dport 51821 accept
+            iif "enp1s0" udp dport {51820,51821} accept
+            iif "wg0" accept
           }
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-          }
-        }
+          chain forward { type filter hook forward priority 0; policy accept; }
       '';
     };
   };
