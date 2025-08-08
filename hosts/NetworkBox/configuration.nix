@@ -106,6 +106,13 @@ in
       };
     };
 
+    routes = {
+      "10.200.0.0/24" = {
+        via = "10.100.0.100";
+        dev = "wg0";
+      };
+    };
+
     nftables = {
       enable = true;
       ruleset = ''

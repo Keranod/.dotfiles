@@ -83,7 +83,7 @@ in
           }
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
-            oifname "enp1s0" masquerade
+            ip saddr 10.200.0.0/24 oifname "enp1s0" snat to 10.100.0.100
           }
         }
 
