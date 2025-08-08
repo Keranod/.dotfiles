@@ -64,16 +64,26 @@ in
     nftables = {
       enable = true;
       ruleset = ''
+        table inet filter {
+          chain input {
+            type filter hook input priority 0;
+            ct state established,related accept
+            iif "lo" accept
+            tcp dport 51821 accept
+            udp dport 51821 accept
+          }
+        }
+
         # NAT table for DNAT/SNAT
         table ip nat {
           chain prerouting {
-            type nat hook prerouting priority 0;
+            type nat hook prerouting priority -100;
             # Device traffic → home-devices
-            iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51822
+            iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51822
           }
           chain postrouting {
             type nat hook postrouting priority 100;
-            oifname "enp1s0" masquerade
+            ip saddr 10.200.0.0/24 ip daddr 10.100.0.2 snat to 10.100.0.1
           }
         }
 
