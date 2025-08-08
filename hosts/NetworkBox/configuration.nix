@@ -89,14 +89,6 @@ in
             }
 
           ];
-
-          ipv4.routes = [
-            {
-              address = "10.200.0.0";
-              prefixLength = 24;
-              via = "10.100.0.100";  # VPS WireGuard IP
-            }
-          ];
         };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
@@ -121,6 +113,19 @@ in
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
             # ether saddr ${tvMAC} counter mark set ${tvFwmark}
+          }
+        }
+
+        # This is the new, critical piece for NetworkBox
+        table inet filter {
+          chain forward {
+            type filter hook forward priority 0; policy accept;
+
+            # Allow traffic from your VPN devices to your LAN
+            iifname "wg-devices" oifname "enp0s20u1c2" accept;
+
+            # Allow return traffic from your LAN to your VPN devices
+            iifname "enp0s20u1c2" oifname "wg-devices" accept;
           }
         }
 
