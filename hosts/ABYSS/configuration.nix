@@ -44,7 +44,7 @@ in
           ips = [ "10.100.0.100/32" ];
           listenPort = 51820;
           privateKeyFile = "/etc/wireguard/server.key";
-
+          mtu = 1340;
           peers = [
             # NetworkBox
             {

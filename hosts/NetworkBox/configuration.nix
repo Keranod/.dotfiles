@@ -74,7 +74,7 @@ in
         "wg-vps" = {
           ips = [ "10.100.0.1/24" ]; # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
-
+          mtu = 1340;
           peers = [
             # VPS Connection
             {
@@ -94,7 +94,7 @@ in
           ips = [ "10.200.0.1/24" ];
           listenPort = 51821; # pick a distinct port
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
-
+          mtu = 1340;
           peers = [
             # myAndroid
             {
@@ -226,8 +226,7 @@ in
         port = 53;
         upstream_dns = [
           "https://dns.adguard-dns.com/dns-query"
-          "94.140.14.14"
-          "94.140.15.15"
+          "tls://dns.adguard-dns.com"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
