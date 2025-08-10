@@ -64,46 +64,47 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-      table ip nat {
-        chain prerouting {
-          type nat hook prerouting priority -100;
-          # This is the key rule for the relay:
-          # Any UDP packet arriving on the public interface on port 51821...
-          iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51821;
+        table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority -100;
+            # This is the key rule for the relay:
+            # Any UDP packet arriving on the public interface on port 51821...
+            iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51821;
+            udp dport 51821 meta nftrace set 1;
+          }
+
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            # This rule is for when your connected device (10.200.0.0/24)
+            # wants to access the INTERNET via the VPS. It's still useful!
+            ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
+          }
         }
 
-        chain postrouting {
-          type nat hook postrouting priority 100; policy accept;
-          # This rule is for when your connected device (10.200.0.0/24)
-          # wants to access the INTERNET via the VPS. It's still useful!
-          ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
+        table ip filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+            iif "lo" accept;
+            ct state established,related accept;
+            # Allow the outer WG tunnel to connect
+            iifname "enp1s0" udp dport 51820 accept; 
+
+            # Allow all traffic that comes IN from the WireGuard tunnel.
+            # This will allow pings and SSH initiated from your NetworkBox.
+            iifname "wg0" accept;
+          }
+
+          chain forward {
+            type filter hook forward priority 0; policy drop; # More secure
+            # Allow the relayed traffic from the device to be forwarded
+            # through the tunnel to your NetworkBox.
+            iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
+
+            # Allow the connected device to access the internet via the VPS
+            iifname "wg0" oifname "enp1s0" ct state established,related accept;
+          }
         }
-      }
-
-      table ip filter {
-        chain input {
-          type filter hook input priority 0; policy drop;
-          iif "lo" accept;
-          ct state established,related accept;
-          # Allow the outer WG tunnel to connect
-          iifname "enp1s0" udp dport 51820 accept; 
-
-          # Allow all traffic that comes IN from the WireGuard tunnel.
-          # This will allow pings and SSH initiated from your NetworkBox.
-          iifname "wg0" accept;
-        }
-
-        chain forward {
-          type filter hook forward priority 0; policy drop; # More secure
-          # Allow the relayed traffic from the device to be forwarded
-          # through the tunnel to your NetworkBox.
-          iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
-
-          # Allow the connected device to access the internet via the VPS
-          iifname "wg0" oifname "enp1s0" ct state established,related accept;
-        }
-      }
-    '';
+      '';
     };
   };
 
