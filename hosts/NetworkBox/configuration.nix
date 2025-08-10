@@ -83,6 +83,7 @@ in
               endpoint = "46.62.157.130:51820";
               allowedIPs = [
                 "10.100.0.100/32"
+                "10.200.0.0/24"
               ]; # VPS tunnel IP
               persistentKeepalive = 25;
             }
