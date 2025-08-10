@@ -67,11 +67,13 @@ in
         table ip nat {
           chain prerouting {
             type nat hook prerouting priority -100;
-            # This is the key rule for the relay:
-            # Any UDP packet arriving on the public interface on port 51821...
+
+            # Rule 1: Add a log message AND set the trace flag for the phone's port
+            udp dport 51821 log prefix "AGH_TRACE: " meta nftrace set 1;
+
+            # Rule 2: The original DNAT rule
             iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51821;
-            udp dport 51821 meta nftrace set 1;
-          }
+            }
 
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
