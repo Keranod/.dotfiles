@@ -65,47 +65,53 @@ in
       enable = true;
       ruleset = ''
         table ip nat {
-          chain prerouting {
-            type nat hook prerouting priority -100;
+            chain prerouting {
+                type nat hook prerouting priority -100;
 
-            # Rule 1: Add a log message AND set the trace flag for the phone's port
-            udp dport 51821 log prefix "AGH_TRACE: " meta nftrace set 1;
-
-            # Rule 2: The original DNAT rule
-            iifname "enp1s0" udp dport 51821 dnat to 10.100.0.1:51821;
+                # Correct DNAT rule:
+                # Change destination to the NetworkBox's wg-devices interface
+                iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51821;
             }
 
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-            # This rule is for when your connected device (10.200.0.0/24)
-            # wants to access the INTERNET via the VPS. It's still useful!
-            ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
-          }
-        }
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
 
-        table ip filter {
-          chain input {
-            type filter hook input priority 0; policy drop;
-            iif "lo" accept;
-            ct state established,related accept;
-            # Allow the outer WG tunnel to connect
-            iifname "enp1s0" udp dport 51820 accept; 
+                # This rule is for when your connected device (10.200.0.0/24)
+                # wants to access the INTERNET via the VPS. It's still useful!
+                ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
 
-            # Allow all traffic that comes IN from the WireGuard tunnel.
-            # This will allow pings and SSH initiated from your NetworkBox.
-            iifname "wg0" accept;
-          }
+                # NEW MASQUERADE RULE:
+                # Change the source IP of the packet from your phone to the VPS's
+                # WireGuard IP so it's accepted by the NetworkBox's WireGuard peer.
+                oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
+            }
+            }
 
-          chain forward {
-            type filter hook forward priority 0; policy drop; # More secure
-            # Allow the relayed traffic from the device to be forwarded
-            # through the tunnel to your NetworkBox.
-            iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
+            table ip filter {
+            chain input {
+                type filter hook input priority 0; policy drop;
+                iif "lo" accept;
+                ct state established,related accept;
+                # Allow the outer WG tunnel to connect
+                iifname "enp1s0" udp dport 51820 accept;
+                iifname "enp1s0" udp dport 51821 accept; # allow the forwarded traffic
 
-            # Allow the connected device to access the internet via the VPS
-            iifname "wg0" oifname "enp1s0" ct state established,related accept;
-          }
-        }
+                # Allow all traffic that comes IN from the WireGuard tunnel.
+                iifname "wg0" accept;
+            }
+
+            chain forward {
+                type filter hook forward priority 0; policy drop; # More secure
+                # Allow the relayed traffic from the phone to be forwarded
+                # through the tunnel to your NetworkBox.
+                iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
+                # This rule is also needed for the return traffic
+                iifname "wg0" oifname "enp1s0" ct state established,related accept;
+
+                # Allow the connected device to access the internet via the VPS
+                iifname "wg0" oifname "enp1s0" ct state established,related accept;
+            }
+            }
       '';
     };
   };
