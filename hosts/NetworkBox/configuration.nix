@@ -109,62 +109,23 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        # table inet filter (hardened ruleset)
-        table inet filter {
-          chain input {
-            type filter hook input priority 0; policy drop;
-
-            # 1. Allow internal traffic
-            iif "lo" accept;
-
-            # 2. Allow established and related connections
-            ct state established,related accept;
-
-            # 3. Explicitly allow inbound SSH
-            iifname "enp3s0" tcp dport 22 accept;
-            iifname "wg-vps" tcp dport 22 accept;
-
-            # 4. Explicitly allow WireGuard tunnel connections on all interfaces
-            iifname "enp3s0" udp dport 51820 accept; 
-            iifname "enp3s0" udp dport 51821 accept; 
-
-            # 5. Allow DNS traffic to the AdGuard Home service
-            # iifname "wg-devices" udp dport 53 accept;
-
-            # 6. Allow AdGuard Home UI access
-            # iifname "wg-devices" tcp dport 3000 accept;
+        table inet mangle {
+          chain prerouting {
+            type filter hook prerouting priority raw; policy accept;
+            # ether saddr ${tvMAC} counter mark set ${tvFwmark}
           }
+        }
 
+        # This is the new, critical piece for NetworkBox
+        table inet filter {
           chain forward {
-            type filter hook forward priority 0; policy drop;
-
-            # Allow traffic from the LAN to the internet (WAN)
-            iifname "enp0s20u1c2" oifname "enp3s0" ct state new,established,related accept;
+            type filter hook forward priority 0; policy accept;
 
             # Allow traffic from your VPN devices to your LAN
             iifname "wg-devices" oifname "enp0s20u1c2" accept;
 
             # Allow return traffic from your LAN to your VPN devices
             iifname "enp0s20u1c2" oifname "wg-devices" accept;
-
-            # Allow traffic from the VPS tunnel to the LAN
-            iifname "wg-vps" oifname "enp0s20u1c2" accept;
-
-            # Allow traffic from the LAN to the VPS tunnel
-            iifname "enp0s20u1c2" oifname "wg-vps" accept;
-
-            # Allow traffic from the VPS tunnel to the devices tunnel
-            iifname "wg-vps" oifname "wg-devices" accept;
-
-            # Allow traffic from the devices tunnel to the VPS tunnel
-            iifname "wg-devices" oifname "wg-vps" accept;
-          }
-        }
-
-        table inet mangle {
-          chain prerouting {
-            type filter hook prerouting priority raw; policy accept;
-            # ether saddr ${tvMAC} counter mark set ${tvFwmark}
           }
         }
 
