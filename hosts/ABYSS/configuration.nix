@@ -85,9 +85,9 @@ in
                 # WireGuard IP so it's accepted by the NetworkBox's WireGuard peer.
                 oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
             }
-            }
+        }
 
-            table ip filter {
+        table ip filter {
             chain input {
                 type filter hook input priority 0; policy drop;
                 iif "lo" accept;
@@ -111,7 +111,7 @@ in
                 # Allow the connected device to access the internet via the VPS
                 iifname "wg0" oifname "enp1s0" ct state established,related accept;
             }
-            }
+        }
       '';
     };
   };
