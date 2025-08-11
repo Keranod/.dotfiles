@@ -82,10 +82,7 @@ in
               publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
               # tell it to reach VPS on its public IP:51820
               endpoint = "46.62.157.130:51820";
-              allowedIPs = [
-                "10.100.0.100/32"
-                "10.200.0.0/24"
-              ]; # VPS tunnel IP
+              allowedIPs = [ "0.0.0.0/0" ]; # VPS tunnel IP
               persistentKeepalive = 25;
             }
 
@@ -237,25 +234,18 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          #"127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
           "10.200.0.1"
           "fd00:9::1"
         ];
         port = 53;
-        upstream_dns = [
-          "127.0.0.1:5335"
-        ];
+        upstream_dns = [ "127.0.0.1:5335" ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-
-        ];
+        bootstrap_dns = [];
       };
 
       # DHCP
-      dhcp = {
-        enabled = false;
-      };
+      dhcp = { enabled = false; };
 
       # Blocklists / filtering (defaults)
       filtering = {
