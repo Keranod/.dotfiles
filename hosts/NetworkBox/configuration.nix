@@ -9,7 +9,6 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
-  ip = "${pkgs.iproute2}/bin/ip";
 in
 {
   imports = [
@@ -91,25 +90,6 @@ in
 
           ];
         };
-        # "wg-vps2" = {
-        #   ips = [ "10.150.0.1/24" ]; # home end of the tunnel
-        #   privateKeyFile = "/etc/wireguard/NetworkBox.key";
-        #   mtu = 1340;
-        #   peers = [
-        #     # VPS Connection
-        #     {
-        #       publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-        #       # tell it to reach VPS on its public IP:51822
-        #       endpoint = "46.62.157.130:51822";
-        #       allowedIPs = [
-        #         "10.150.0.100/32"
-        #         "10.200.0.0/24"
-        #       ]; # VPS tunnel IP
-        #       persistentKeepalive = 25;
-        #     }
-
-        #   ];
-        # };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
           listenPort = 51821; # pick a distinct port
@@ -228,24 +208,6 @@ in
     '';
   };
 
-  services.unbound = {
-    enable = true;
-    settings = {
-      server = {
-        interface = [ "127.0.0.1" ];
-        port = 5335;
-        access-control = [ "127.0.0.1 allow" ];
-        harden-glue = true;
-        harden-dnssec-stripped = true;
-        use-caps-for-id = false;
-        prefetch = true;
-        edns-buffer-size = 1232;
-        hide-identity = true;
-        hide-version = true;
-      };
-    };
-  };
-
   # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
@@ -256,15 +218,21 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          "127.0.0.1"
+          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
           "10.200.0.1"
           "fd00:9::1"
         ];
         port = 53;
-        upstream_dns = [ "127.0.0.1:5335" ];
+        upstream_dns = [
+          "https://dns.adguard-dns.com/dns-query"
+          "tls://dns.adguard-dns.com"
+        ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [ ];
+        bootstrap_dns = [
+          "9.9.9.10"
+          "149.112.112.10"
+        ];
       };
 
       # DHCP
