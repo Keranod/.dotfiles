@@ -99,8 +99,8 @@ in
             # VPS Connection
             {
               publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-              # tell it to reach VPS on its public IP:51820
-              endpoint = "46.62.157.130:51820";
+              # tell it to reach VPS on its public IP:51822
+              endpoint = "46.62.157.130:51822";
               allowedIPs = [
                 "10.300.0.100/32"
                 "10.200.0.0/24"
