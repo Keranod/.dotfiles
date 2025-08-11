@@ -50,7 +50,7 @@ in
             {
               publicKey = "rGShQxK1qfo6GCmgVBoan3KKxq0Z+ZkF1/WxLKvM030=";
               allowedIPs = [
-                "10.100.0.1/32"
+                "10.100.0.0/24"
                 "10.200.0.0/24"
               ];
             }
