@@ -105,14 +105,26 @@ in
 
             chain forward {
                 type filter hook forward priority 0; policy drop; # More secure
-                # Allow the relayed traffic from the phone to be forwarded
-                # through the tunnel to your NetworkBox.
+                
+                # Allow the relayed traffic from the phone (coming in on enp1s0) 
+                # to be forwarded to NetworkBox (out via wg0).
+                # Phone is allowed to start connections to NetworkBox (state=new),
+                # and also send packets for already-established/related connections.
                 iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
-                # This rule is also needed for the return traffic
+
+                # Allow return traffic from NetworkBox (wg0) back to the phone (enp1s0).
+                # Only allow established/related here — this prevents NetworkBox from 
+                # initiating connections *to* the phone over this path.
                 iifname "wg0" oifname "enp1s0" ct state established,related accept;
 
-                # Allow the connected device to access the internet via the VPS
-                iifname "wg0" oifname "enp1s0" ct state established,related accept;
+
+                # Allow NetworkBox (wg0) to start and maintain internet connections via VPS (enp1s0).
+                # NetworkBox is allowed to initiate (state=new) and maintain existing connections.
+                iifname "wg0" oifname "enp1s0" ct state new,established,related accept;
+
+                # Allow return traffic from the internet (enp1s0) back to NetworkBox (wg0).
+                # Only established/related allowed — prevents unsolicited inbound from internet.
+                iifname "enp1s0" oifname "wg0" ct state established,related accept;
             }
         }
       '';
