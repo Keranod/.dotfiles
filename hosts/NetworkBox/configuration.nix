@@ -92,7 +92,7 @@ in
           ];
         };
         "wg-vps2" = {
-          ips = [ "10.300.0.1/24" ]; # home end of the tunnel
+          ips = [ "10.150.0.1/24" ]; # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           mtu = 1340;
           peers = [
@@ -102,7 +102,7 @@ in
               # tell it to reach VPS on its public IP:51822
               endpoint = "46.62.157.130:51822";
               allowedIPs = [
-                "10.300.0.100/32"
+                "10.150.0.100/32"
                 "10.200.0.0/24"
               ]; # VPS tunnel IP
               persistentKeepalive = 25;
