@@ -91,25 +91,25 @@ in
 
           ];
         };
-        "wg-vps2" = {
-          ips = [ "10.150.0.1/24" ]; # home end of the tunnel
-          privateKeyFile = "/etc/wireguard/NetworkBox.key";
-          mtu = 1340;
-          peers = [
-            # VPS Connection
-            {
-              publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-              # tell it to reach VPS on its public IP:51822
-              endpoint = "46.62.157.130:51822";
-              allowedIPs = [
-                "10.150.0.100/32"
-                "10.200.0.0/24"
-              ]; # VPS tunnel IP
-              persistentKeepalive = 25;
-            }
+        # "wg-vps2" = {
+        #   ips = [ "10.150.0.1/24" ]; # home end of the tunnel
+        #   privateKeyFile = "/etc/wireguard/NetworkBox.key";
+        #   mtu = 1340;
+        #   peers = [
+        #     # VPS Connection
+        #     {
+        #       publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
+        #       # tell it to reach VPS on its public IP:51822
+        #       endpoint = "46.62.157.130:51822";
+        #       allowedIPs = [
+        #         "10.150.0.100/32"
+        #         "10.200.0.0/24"
+        #       ]; # VPS tunnel IP
+        #       persistentKeepalive = 25;
+        #     }
 
-          ];
-        };
+        #   ];
+        # };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
           listenPort = 51821; # pick a distinct port
@@ -264,11 +264,13 @@ in
         port = 53;
         upstream_dns = [ "127.0.0.1:5335" ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [];
+        bootstrap_dns = [ ];
       };
 
       # DHCP
-      dhcp = { enabled = false; };
+      dhcp = {
+        enabled = false;
+      };
 
       # Blocklists / filtering (defaults)
       filtering = {
