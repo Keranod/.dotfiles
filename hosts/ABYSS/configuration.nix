@@ -84,6 +84,9 @@ in
                 # Change the source IP of the packet from your phone to the VPS's
                 # WireGuard IP so it's accepted by the NetworkBox's WireGuard peer.
                 oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
+
+                # To allow NetworkBox exit via VPS
+                ip saddr 10.100.0.0/24 oifname "enp1s0" masquerade;
             }
         }
 
