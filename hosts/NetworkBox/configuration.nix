@@ -9,6 +9,7 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
+  ip = "${pkgs.iproute2}/bin/ip";
 in
 {
   imports = [
@@ -253,6 +254,21 @@ in
     enable = true;
     extraConfig = ''
       --http-port=3001
+    '';
+  };
+
+  systemd.services.vps-route = {
+    description = "Policy route home-to-VPS via wg-vps";
+    after = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = "yes";
+    };
+    serviceConfig.ExecStart = ''
+      ${ip} route replace default dev wg-vps table 200
+      ${ip} rule add from 10.100.0.1 lookup 200 pref 1000 || true
+      ${ip} route flush cache
     '';
   };
 }
