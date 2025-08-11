@@ -209,6 +209,15 @@ in
     '';
   };
 
+  services.unbound = {
+    enable = true;
+    interfaces = [ "127.0.0.1" ];
+    forwarders = []; # no forwarders, recursive resolver
+    accessControl = [
+      { network = "127.0.0.0/8"; action = "allow"; }
+    ];
+  };
+
   # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
@@ -219,20 +228,18 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
+          #"127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
           "10.200.0.1"
           "fd00:9::1"
         ];
         port = 53;
         upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "tls://dns.adguard-dns.com"
+          "127.0.0.1:53"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
+
         ];
       };
 
@@ -254,21 +261,6 @@ in
     enable = true;
     extraConfig = ''
       --http-port=3001
-    '';
-  };
-
-  systemd.services.vps-route = {
-    description = "Policy route home-to-VPS via wg-vps";
-    after = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = "yes";
-    };
-    serviceConfig.ExecStart = ''
-      ${ip} route replace default dev wg-vps table 200
-      ${ip} rule add from 10.100.0.1 lookup 200 pref 1000 || true
-      ${ip} route flush cache
     '';
   };
 }
