@@ -57,7 +57,7 @@ in
           ];
         };
         wg1 = {
-          ips = [ "10.300.0.100/32" ];
+          ips = [ "10.150.0.100/32" ];
           listenPort = 51822;
           privateKeyFile = "/etc/wireguard/server.key";
           mtu = 1340;
@@ -66,7 +66,7 @@ in
             {
               publicKey = "rGShQxK1qfo6GCmgVBoan3KKxq0Z+ZkF1/WxLKvM030=";
               allowedIPs = [
-                "10.300.0.0/24"
+                "10.150.0.0/24"
                 "10.200.0.0/24"
               ];
             }
