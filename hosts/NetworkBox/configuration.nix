@@ -261,6 +261,11 @@ in
                 
                 # This is the key setting to enable DNS-over-TLS.
                 forward-tls-upstream = true;
+                forward-addr = [
+                    "94.140.14.14@853#dns.adguard-dns.com"
+                    "1.1.1.1@853#cloudflare-dns.com"
+                    "9.9.9.9@853#dns.quad9.net"
+                ];
             };
         };
     };  
