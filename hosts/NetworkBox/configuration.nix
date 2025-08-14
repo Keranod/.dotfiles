@@ -96,8 +96,8 @@ in
           mtu = 1340;
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           table = "102";
-          postUp = "ip rule add from 10.150.0.1 lookup 102";
-          postDown = "ip rule del from 10.150.0.1 lookup 102";
+          postSetup = "ip rule add from 10.150.0.1 lookup 102";
+          postShutdown = "ip rule del from 10.150.0.1 lookup 102";
           peers = [
             # VPS Connection
             {
