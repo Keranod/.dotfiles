@@ -94,6 +94,7 @@ in
           ips = [ "10.150.0.1/24" ]; # home end of the tunnel
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           mtu = 1340;
+          # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           table = "102";
           peers = [
             # VPS Connection
@@ -258,7 +259,6 @@ in
             };  
             forward-zone = {
                 name = ".";
-                
                 # This is the key setting to enable DNS-over-TLS.
                 forward-tls-upstream = true;
                 forward-addr = [
