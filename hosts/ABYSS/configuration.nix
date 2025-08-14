@@ -91,14 +91,17 @@ in
             chain postrouting {
                 type nat hook postrouting priority 100; policy accept;
 
-                # This rule is for when your connected device (10.200.0.0/24)
-                # wants to access the INTERNET via the VPS. It's still useful!
+                # M A S Q U E R A D E 
+                # Masquerade traffic from the 10.150.0.0/24 subnet (your NetworkBox)
+                ip saddr 10.150.0.0/24 oifname "enp1s0" masquerade;
+
+                # Masquerade traffic from the 10.200.0.0/24 subnet (your phone)
                 ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
 
-                # NEW MASQUERADE RULE:
                 # Change the source IP of the packet from your phone to the VPS's
                 # WireGuard IP so it's accepted by the NetworkBox's WireGuard peer.
                 oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
+                
             }
         }
 
@@ -107,16 +110,26 @@ in
                 type filter hook input priority 0; policy drop;
                 iif "lo" accept;
                 ct state established,related accept;
-                # Allow the outer WG tunnel to connect
-                iifname "enp1s0" udp dport 51820 accept;
-                iifname "enp1s0" udp dport 51821 accept; # allow the forwarded traffic
+                
 
-                # Allow all traffic that comes IN from the WireGuard tunnel.
+                # Allow the outer WG tunnels to connect
+                iifname "enp1s0" udp dport 51820 accept;
+                iifname "enp1s0" udp dport 51822 accept; # Allow wg1 traffic
+                iifname "enp1s0" udp dport 51821 accept; # allow the forwarded traffic
+                
                 iifname "wg0" accept;
+                iifname "wg1" accept;
             }
 
             chain forward {
-                type filter hook forward priority 0; policy drop; # More secure
+                type filter hook forward priority 0; policy drop;
+                # A L L O W   F O R W A R D I N G
+                # Forward traffic from your NetworkBox (wg1) to the internet (enp1s0)
+                iifname "wg1" oifname "enp1s0" ct state new,established,related accept;
+
+                # Forward return traffic from the internet (enp1s0) to your NetworkBox (wg1)
+                iifname "enp1s0" oifname "wg1" ct state established,related accept;
+                
                 # Allow the relayed traffic from the phone to be forwarded
                 # through the tunnel to your NetworkBox.
                 iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
