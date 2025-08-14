@@ -9,7 +9,6 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
-  ip = "${pkgs.iproute2}/bin/ip";
 in
 {
   imports = [
@@ -91,25 +90,25 @@ in
 
           ];
         };
-        # "wg-vps2" = {
-        #   ips = [ "10.150.0.1/24" ]; # home end of the tunnel
-        #   privateKeyFile = "/etc/wireguard/NetworkBox.key";
-        #   mtu = 1340;
-        #   peers = [
-        #     # VPS Connection
-        #     {
-        #       publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-        #       # tell it to reach VPS on its public IP:51822
-        #       endpoint = "46.62.157.130:51822";
-        #       allowedIPs = [
-        #         "10.150.0.100/32"
-        #         "10.200.0.0/24"
-        #       ]; # VPS tunnel IP
-        #       persistentKeepalive = 25;
-        #     }
-
-        #   ];
-        # };
+        "wg-vps2" = {
+          ips = [ "10.150.0.1/24" ]; # home end of the tunnel
+          privateKeyFile = "/etc/wireguard/NetworkBox.key";
+          mtu = 1340;
+          table = "102";
+          peers = [
+            # VPS Connection
+            {
+              publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
+              endpoint = "46.62.157.130:51822";
+              # AllowedIPs still needs to be 0.0.0.0/0. This is a cryptographic
+              # firewall and tells WireGuard what IPs it's allowed to accept/send
+              # traffic for. It is not a routing instruction in this context
+              # because we are overriding routing with the `table` option.
+              allowedIPs = [ "0.0.0.0/0" ];
+              persistentKeepalive = 25;
+            }
+          ];
+        };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
           listenPort = 51821; # pick a distinct port
@@ -129,6 +128,17 @@ in
     nftables = {
       enable = true;
       ruleset = ''
+        # Define a table for our custom rules
+        table ip myfilter {
+            # Define a chain that runs on outbound traffic
+            chain output {
+            type filter hook output priority 0; policy accept;
+
+            # Mark outbound packets with a source IP of 10.150.0.1
+            ip saddr 10.150.0.1 meta mark set 0x01
+            }
+        }
+
         table inet mangle {
           chain prerouting {
             type filter hook prerouting priority raw; policy accept;
@@ -228,23 +238,32 @@ in
     '';
   };
 
-  services.unbound = {
-    enable = true;
-    settings = {
-      server = {
-        interface = [ "127.0.0.1" ];
-        port = 5335;
-        access-control = [ "127.0.0.1 allow" ];
-        harden-glue = true;
-        harden-dnssec-stripped = true;
-        use-caps-for-id = false;
-        prefetch = true;
-        edns-buffer-size = 1232;
-        hide-identity = true;
-        hide-version = true;
-      };
-    };
-  };
+    # To test if working use `dig @127.0.0.1 -p 5335 google.com`
+    services.unbound = {
+        enable = true;
+        settings = {
+            server = {
+                interface = [ "127.0.0.1" ];
+                port = 5335;
+                access-control = [ "127.0.0.1 allow" ];
+                harden-glue = true;
+                harden-dnssec-stripped = true;
+                use-caps-for-id = false;
+                prefetch = true;
+                edns-buffer-size = 1232;
+                hide-identity = true;
+                hide-version = true;  
+                # force outbound queries to use this IP.
+                outgoing-interface = "10.150.0.1";
+            };  
+            forward-zone = {
+                name = ".";
+                
+                # This is the key setting to enable DNS-over-TLS.
+                forward-tls-upstream = true;
+            };
+        };
+    };  
 
   # AdGuard Home: DNS
   services.adguardhome = {
@@ -256,15 +275,22 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          "127.0.0.1"
+          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
           "10.200.0.1"
           "fd00:9::1"
         ];
         port = 53;
-        upstream_dns = [ "127.0.0.1:5335" ];
+        upstream_dns = [
+          "https://dns.adguard-dns.com/dns-query"
+          "tls://dns.adguard-dns.com"
+          #"127.0.0.1:5335"
+        ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [ ];
+        bootstrap_dns = [
+          "9.9.9.10"
+          "149.112.112.10"
+        ];
       };
 
       # DHCP
