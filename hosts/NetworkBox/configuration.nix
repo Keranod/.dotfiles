@@ -96,6 +96,8 @@ in
           mtu = 1340;
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           table = "102";
+          postUp = "ip rule add from 10.150.0.1 lookup 102";
+          postDown = "ip rule del from 10.150.0.1 lookup 102";
           peers = [
             # VPS Connection
             {
@@ -260,12 +262,11 @@ in
             forward-zone = {
                 name = ".";
                 # This is the key setting to enable DNS-over-TLS.
-                forward-tls-upstream = false;
+                forward-tls-upstream = true;
                 forward-addr = [
-                    "94.140.14.14"
-                    # "94.140.14.14@853#dns.adguard-dns.com"
-                    # "1.1.1.1@853#cloudflare-dns.com"
-                    # "9.9.9.9@853#dns.quad9.net"
+                    "94.140.14.14@853#dns.adguard-dns.com"
+                    "1.1.1.1@853#cloudflare-dns.com"
+                    "9.9.9.9@853#dns.quad9.net"
                 ];
             };
         };
