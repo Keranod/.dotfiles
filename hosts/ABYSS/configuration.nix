@@ -74,7 +74,7 @@ in
       };
     };
 
-    firewall.enable = false;
+    firewall.enable = true;
 
     nftables = {
       enable = true;
