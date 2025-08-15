@@ -332,6 +332,7 @@ in
       signupsAllowed = false;
     };
     # !!! Create secrets file with some random string using
+    # sudo mkdir /etc/secrets
     # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
     environmentFile = "/etc/secrets/vaultwarden";
   };

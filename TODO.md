@@ -1,3 +1,5 @@
+- make more things autogenerate
+- auto create /etc/secrets folder
 - autogenerate wireguard keys on creation?
 - fail2ban on abyss
 - custom command to git pull and nix rebuild
