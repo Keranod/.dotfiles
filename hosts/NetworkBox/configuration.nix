@@ -9,6 +9,7 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
+  vaultDomain = "vault.keranod.dev";
 in
 {
   imports = [
@@ -128,6 +129,7 @@ in
       };
     };
 
+    # !!! REMEMBER TO SORT OUT IPV6 ALSO WHEN SENDING TRAFFIC VIA VPS OUT
     nftables = {
       enable = true;
       ruleset = ''
@@ -241,36 +243,36 @@ in
     '';
   };
 
-    # To test if working use `dig @127.0.0.1 -p 5335 google.com`
-    services.unbound = {
-        enable = true;
-        settings = {
-            server = {
-                interface = [ "127.0.0.1" ];
-                port = 5335;
-                access-control = [ "127.0.0.1 allow" ];
-                harden-glue = true;
-                harden-dnssec-stripped = true;
-                use-caps-for-id = false;
-                prefetch = true;
-                edns-buffer-size = 1232;
-                hide-identity = true;
-                hide-version = true;  
-                # force outbound queries to use this IP.
-                outgoing-interface = "10.150.0.1";
-            };  
-            forward-zone = {
-                name = ".";
-                # This is the key setting to enable DNS-over-TLS.
-                forward-tls-upstream = true;
-                forward-addr = [
-                    "94.140.14.14@853#dns.adguard-dns.com"
-                    "1.1.1.1@853#cloudflare-dns.com"
-                    "9.9.9.9@853#dns.quad9.net"
-                ];
-            };
-        };
-    };  
+  # To test if working use `dig @127.0.0.1 -p 5335 google.com`
+  services.unbound = {
+      enable = true;
+      settings = {
+          server = {
+              interface = [ "127.0.0.1" ];
+              port = 5335;
+              access-control = [ "127.0.0.1 allow" ];
+              harden-glue = true;
+              harden-dnssec-stripped = true;
+              use-caps-for-id = false;
+              prefetch = true;
+              edns-buffer-size = 1232;
+              hide-identity = true;
+              hide-version = true;  
+              # force outbound queries to use this IP.
+              outgoing-interface = "10.150.0.1";
+          };  
+          forward-zone = {
+              name = ".";
+              # This is the key setting to enable DNS-over-TLS.
+              forward-tls-upstream = true;
+              forward-addr = [
+                  "94.140.14.14@853#dns.adguard-dns.com"
+                  "1.1.1.1@853#cloudflare-dns.com"
+                  "9.9.9.9@853#dns.quad9.net"
+              ];
+          };
+      };
+  };  
 
   # AdGuard Home: DNS
   services.adguardhome = {
@@ -309,10 +311,71 @@ in
         rewrites = [
           # equivalent of vault.keranod.dev → 10.100.0.1
           {
-            domain = "vault.keranod.dev";
-            answer = "10.100.0.1";
+            domain = "${vaultDomain}";
+            answer = "10.200.0.1";
           }
         ];
+      };
+    };
+  };
+
+  services.vaultwarden = {
+    enable = true;
+    config = {
+      rocketAddress = "127.0.0.1";
+      rocketPort = 8222; # or whatever port you want
+      domain = "https://${vaultDomain}"; # for local/VPN access only
+      signupsAllowed = false;
+    };
+    environmentFile = "/etc/secrets/vaultwarden";
+  };
+
+  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
+    security.acme = {
+    acceptTerms = true;
+    defaults = {
+        email = "konrad.konkel@wp.pl";
+        dnsProvider = "hetzner";
+        dnsResolver = "1.1.1.1:53";
+        credentialFiles = {
+        # Need to suffix variable name with _FILE
+        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+        };
+        postRun = "systemctl restart nginx";
+    };
+    certs = {
+        # the Vaultwarden subdomain
+        "${vaultDomain}" = { };
+    };
+    };
+
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
+
+    virtualHosts."${vaultDomain}" = {
+      enableACME = true; # uses the DNS-01 cert above
+      addSSL = true; # auto-creates your HTTPS vhost
+
+      # bind your real UI only to the VPN interface:
+      listen = [
+        {
+          addr = "10.200.0.1";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+        extraConfig = ''
+          proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
       };
     };
   };
