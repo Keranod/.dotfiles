@@ -153,51 +153,6 @@ in
     };
   };
 
-  services.adguardhome = {
-    enable = false;
-    openFirewall = true; # opens port 3000 (UI) and 53 (DNS)
-    mutableSettings = false;
-
-    settings = {
-      dns = {
-        bind_hosts = [
-          "127.0.0.1"
-          "10.100.0.1"
-        ]; # VPN + localhost access
-        port = 53;
-        upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "tls://dns.adguard-dns.com"
-        ];
-        # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
-      };
-
-      # DHCP
-      dhcp = {
-        enabled = false;
-      };
-
-      # Blocklists / filtering (defaults)
-      filtering = {
-        protection_enabled = true;
-        filtering_enabled = true;
-        parental = false;
-
-        rewrites = [
-          # equivalent of vault.keranod.dev → 10.100.0.1
-          {
-            domain = "vault.keranod.dev";
-            answer = "10.100.0.1";
-          }
-        ];
-      };
-    };
-  };
-
   services.vaultwarden = {
     enable = false;
     config = {

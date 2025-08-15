@@ -289,15 +289,10 @@ in
         ];
         port = 53;
         upstream_dns = [
-        #   "https://dns.adguard-dns.com/dns-query"
-        #   "tls://dns.adguard-dns.com"
           "127.0.0.1:5335"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
+        bootstrap_dns = [ ];
       };
 
       # DHCP
@@ -310,6 +305,14 @@ in
         protection_enabled = true;
         filtering_enabled = true;
         parental = false;
+
+        rewrites = [
+          # equivalent of vault.keranod.dev → 10.100.0.1
+          {
+            domain = "vault.keranod.dev";
+            answer = "10.100.0.1";
+          }
+        ];
       };
     };
   };
