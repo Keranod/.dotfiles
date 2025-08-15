@@ -363,7 +363,6 @@ in
     virtualHosts."${vaultDomain}" = {
       enableACME = false; # uses the DNS-01 cert above
       forceSSL = true;
-      addSSL = true; # auto-creates your HTTPS vhost
 
       sslCertificate = "${acmeVaultDomainDir}/full.pem";
       sslCertificateKey = "${acmeVaultDomainDir}/key.pem";
