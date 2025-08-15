@@ -144,7 +144,7 @@ in
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
-    openssh = false;
+    openFirewall = false;
     settings = {
       PasswordAuthentication = false; # Disable password login
       PermitRootLogin = "no"; # Root login disabled
