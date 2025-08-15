@@ -331,6 +331,8 @@ in
       domain = "https://${vaultDomain}"; # for local/VPN access only
       signupsAllowed = false;
     };
+    # !!! Create secrets file with some random string using
+    # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
     environmentFile = "/etc/secrets/vaultwarden";
   };
 
@@ -340,7 +342,7 @@ in
     defaults = {
         email = "konrad.konkel@wp.pl";
         dnsProvider = "hetzner";
-        dnsResolver = "127.0.0.1:53";
+        dnsResolver = "127.0.0.1:5335";
         credentialFiles = {
         # Need to suffix variable name with _FILE
         # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
@@ -350,7 +352,9 @@ in
     };
     certs = {
         # the Vaultwarden subdomain
-        "${vaultDomain}" = { };
+        "${vaultDomain}" = { 
+            group = "nginx";
+        };
     };
     };
 
