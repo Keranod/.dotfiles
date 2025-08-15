@@ -336,9 +336,10 @@ in
     defaults = {
         email = "konrad.konkel@wp.pl";
         dnsProvider = "hetzner";
-        dnsResolver = "1.1.1.1:53";
+        dnsResolver = "127.0.0.1:53";
         credentialFiles = {
         # Need to suffix variable name with _FILE
+        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
         };
         postRun = "systemctl restart nginx";
