@@ -9,7 +9,11 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
+
   vaultDomain = "vault.keranod.dev";
+
+  acmeRoot = "/var/lib/acme";
+  acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
 in
 {
   imports = [
@@ -357,8 +361,12 @@ in
     recommendedOptimisation = true;
 
     virtualHosts."${vaultDomain}" = {
-      enableACME = true; # uses the DNS-01 cert above
+      enableACME = false; # uses the DNS-01 cert above
+      forceSSL = true;
       addSSL = true; # auto-creates your HTTPS vhost
+
+      sslCertificate = "${acmeVaultDomainDir}/full.pem";
+      sslCertificateKey = "${acmeVaultDomainDir}/key.pem";
 
       # bind your real UI only to the VPN interface:
       listen = [
