@@ -52,6 +52,7 @@ in
   networking = {
     hostName = "NetworkBox";
     firewall.enable = false;
+    nameservers = [ "127.0.0.1" ];
 
     # physical uplink, no IP here
     interfaces.enp3s0 = {
@@ -148,53 +149,64 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        # Define a table for our custom rules
-        table ip myfilter {
-            # Define a chain that runs on outbound traffic
-            chain output {
-            type filter hook output priority 0; policy accept;
+        table inet myfilter {
+          # The 'input' chain filters traffic coming IN to the NetworkBox host.
+          chain input {
+            type filter hook input priority 0; policy drop;
+            
+            # Allow inbound connections for existing connections
+            # This is CRITICAL for all client tunnels (wg-vps, wg-vps2).
+            # It accepts the return packets from the VPS.
+            ct state { established, related } accept;
 
-            # Mark outbound packets with a source IP of 10.150.0.1
-            ip saddr 10.150.0.1 meta mark set 0x01
-            }
-        }
+            # Allow all loopback traffic
+            iifname "lo" accept;
 
-        table inet mangle {
-          chain prerouting {
-            type filter hook prerouting priority raw; policy accept;
-            # ether saddr ${tvMAC} counter mark set ${tvFwmark}
+            # Allow incoming SSH connections from specified interfaces.
+            iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } ip protocol tcp dport 22 accept;
+            
+            # Allow incoming traffic from the LAN
+            iifname "enp0s20u1c2" accept;
+
+            # Allow traffic from VPN devices. This traffic has already been
+            # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
+            # virtual interface. This single rule is all need for this tunnel.
+            iifname "wg-devices" accept;
+          }
+
+          # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+          chain output {
+            type filter hook output priority 0; policy drop;
+
+            # Allow traffic for established connections to continue
+            ct state { established, related } accept;
+
+            # Allow loopback traffic (AdGuard Home -> Unbound on 127.0.0.1)
+            oifname "lo" accept;
+
+            # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+            # on the physical WAN interface, regardless of port.
+            ip dport { 53, 853 } oifname { "enp3s0", "wg-vps" } drop;
+
+            # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
+            ip protocol { udp, tcp } dport 853 oifname "wg-vps2" accept;
+
+            # Allow encrypted WireGuard packets to reach the VPS servers.
+            # These are the actual VPN packets, which go out physical interface.
+            ip protocol udp dport { 51820, 51822 } oifname "enp3s0" accept;
+
+            # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
+            oifname "enp3s0" accept;
           }
         }
 
-        # This is the new, critical piece for NetworkBox
-        table inet filter {
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-
-            # Allow traffic from your VPN devices to your LAN
-            iifname "wg-devices" oifname "enp0s20u1c2" accept;
-
-            # Allow return traffic from your LAN to your VPN devices
-            iifname "enp0s20u1c2" oifname "wg-devices" accept;
-          }
-        }
-
+        # NAT table remains unchanged and separate.
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
-
-            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
-          }
-        }
-
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
       '';
