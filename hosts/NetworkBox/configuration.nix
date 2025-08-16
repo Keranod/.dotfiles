@@ -161,9 +161,9 @@ in
             iifname "lo" accept;
 
             # Allow incoming SSH connections from specified interfaces.
-            iifname "enp3s0" protocol tcp dport 22 accept;
-            iifname "enp0s20u1c2" protocol tcp dport 22 accept;
-            iifname "wg-vps" protocol tcp dport 22 accept;
+            iifname "enp3s0" tcp dport 22 accept;
+            iifname "enp0s20u1c2" tcp dport 22 accept;
+            iifname "wg-vps" tcp dport 22 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
