@@ -184,7 +184,9 @@ in
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
-            dport { 53, 853 } oifname { "enp3s0", "wg-vps" } drop;
+            dport 53 oifname { "enp3s0", "wg-vps" } drop;
+            dport 853 oifname { "enp3s0", "wg-vps" } drop;
+
 
             # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
             { udp, tcp } dport 853 oifname "wg-vps2" accept;
