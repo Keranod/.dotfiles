@@ -161,9 +161,7 @@ in
             iifname "lo" accept;
 
             # Allow incoming SSH connections from specified interfaces.
-            iifname "enp3s0" tcp dport 22 accept;
-            iifname "enp0s20u1c2" tcp dport 22 accept;
-            iifname "wg-vps" tcp dport 22 accept;
+            iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
@@ -186,18 +184,13 @@ in
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
-            ip dport 53 oifname "enp3s0" drop;
-            ip dport 853 oifname "enp3s0" drop;
-            ip dport 53 oifname "wg-vps" drop;
-            ip dport 853 oifname "wg-vps" drop;
+            dport { 53, 853 } oifname { "enp3s0", "wg-vps" } drop;
 
             # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
-            ip protocol udp dport 853 oifname "wg-vps2" accept;
-            ip protocol tcp dport 853 oifname "wg-vps2" accept;
+            { udp, tcp } dport 853 oifname "wg-vps2" accept;
 
             # Allow encrypted WireGuard packets to reach the VPS servers.
-            ip protocol udp dport 51820 oifname "enp3s0" accept;
-            ip protocol udp dport 51822 oifname "enp3s0" accept;
+            udp dport { 51820, 51822 } oifname "enp3s0" accept;
 
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
