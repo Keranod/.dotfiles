@@ -82,61 +82,43 @@ in
         table ip nat {
             chain prerouting {
                 type nat hook prerouting priority -100;
-
-                # Correct DNAT rule:
-                # Change destination to the NetworkBox's wg-devices interface
                 iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51821;
             }
 
             chain postrouting {
                 type nat hook postrouting priority 100; policy accept;
 
-                # M A S Q U E R A D E 
-                # Masquerade traffic from the 10.150.0.0/24 subnet (your NetworkBox)
                 ip saddr 10.150.0.0/24 oifname "enp1s0" masquerade;
-
-                # Masquerade traffic from the 10.200.0.0/24 subnet (your phone)
                 ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
-
-                # Change the source IP of the packet from your phone to the VPS's
-                # WireGuard IP so it's accepted by the NetworkBox's WireGuard peer.
-                oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
                 
+                oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
             }
         }
 
         table ip filter {
             chain input {
                 type filter hook input priority 0; policy drop;
+                
                 iif "lo" accept;
                 ct state established,related accept;
                 
-
                 # Allow the outer WG tunnels to connect
-                iifname "enp1s0" udp dport 51820 accept;
-                iifname "enp1s0" udp dport 51822 accept; # Allow wg1 traffic
-                iifname "enp1s0" udp dport 51821 accept; # allow the forwarded traffic
-                
+                iifname "enp1s0" udp dport { 51820, 51821, 51822 } accept;
+
+                # SSH is now only allowed from the wg0 interface
+                iifname "wg0" tcp dport 22 accept;
+
                 iifname "wg0" accept;
                 iifname "wg1" accept;
             }
 
             chain forward {
                 type filter hook forward priority 0; policy drop;
-                # A L L O W   F O R W A R D I N G
-                # Forward traffic from your NetworkBox (wg1) to the internet (enp1s0)
+                
                 iifname "wg1" oifname "enp1s0" ct state new,established,related accept;
-
-                # Forward return traffic from the internet (enp1s0) to your NetworkBox (wg1)
                 iifname "enp1s0" oifname "wg1" ct state established,related accept;
                 
-                # Allow the relayed traffic from the phone to be forwarded
-                # through the tunnel to your NetworkBox.
                 iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
-                # This rule is also needed for the return traffic
-                iifname "wg0" oifname "enp1s0" ct state established,related accept;
-
-                # Allow the connected device to access the internet via the VPS
                 iifname "wg0" oifname "enp1s0" ct state established,related accept;
             }
         }
@@ -160,6 +142,7 @@ in
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
+    openFirewall = false;
     settings = {
       PasswordAuthentication = false; # Disable password login
       PermitRootLogin = "no"; # Root login disabled
@@ -167,116 +150,6 @@ in
       KexAlgorithms = [ "curve25519-sha256" ];
       Ciphers = [ "chacha20-poly1305@openssh.com" ];
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
-    };
-  };
-
-  services.adguardhome = {
-    enable = false;
-    openFirewall = true; # opens port 3000 (UI) and 53 (DNS)
-    mutableSettings = false;
-
-    settings = {
-      dns = {
-        bind_hosts = [
-          "127.0.0.1"
-          "10.100.0.1"
-        ]; # VPN + localhost access
-        port = 53;
-        upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "tls://dns.adguard-dns.com"
-        ];
-        # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
-      };
-
-      # DHCP
-      dhcp = {
-        enabled = false;
-      };
-
-      # Blocklists / filtering (defaults)
-      filtering = {
-        protection_enabled = true;
-        filtering_enabled = true;
-        parental = false;
-
-        rewrites = [
-          # equivalent of vault.keranod.dev → 10.100.0.1
-          {
-            domain = "vault.keranod.dev";
-            answer = "10.100.0.1";
-          }
-        ];
-      };
-    };
-  };
-
-  services.vaultwarden = {
-    enable = false;
-    config = {
-      rocketAddress = "127.0.0.1";
-      rocketPort = 8222; # or whatever port you want
-      domain = "https://${vaultDomain}"; # for local/VPN access only
-      signupsAllowed = false;
-    };
-    environmentFile = "/etc/secrets/vaultwarden";
-  };
-
-  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
-  # security.acme = {
-  #   acceptTerms = true;
-  #   defaults = {
-  #     email = "konrad.konkel@wp.pl";
-  #     dnsProvider = "hetzner";
-  #     dnsResolver = "1.1.1.1:53";
-  #     credentialFiles = {
-  #       # Need to suffix variable name with _FILE
-  #       "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
-  #     };
-  #     postRun = "systemctl restart nginx";
-  #   };
-
-  #   certs = {
-  #     # your root domain, in case you need it:
-  #     "${domain}" = { };
-
-  #     # the Vaultwarden subdomain
-  #     "${vaultDomain}" = { };
-  #   };
-  # };
-
-  services.nginx = {
-    enable = false;
-    recommendedProxySettings = true;
-    recommendedGzipSettings = true;
-    recommendedOptimisation = true;
-
-    virtualHosts."${vaultDomain}" = {
-      enableACME = true; # uses the DNS-01 cert above
-      addSSL = true; # auto-creates your HTTPS vhost
-
-      # bind your real UI only to the VPN interface:
-      listen = [
-        {
-          addr = "10.100.0.1";
-          port = 443;
-          ssl = true;
-        }
-      ];
-
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8222";
-        extraConfig = ''
-          proxy_set_header Host            $host;
-          proxy_set_header X-Real-IP       $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
     };
   };
 

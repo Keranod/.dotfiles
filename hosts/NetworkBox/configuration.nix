@@ -9,6 +9,11 @@ let
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
+
+  vaultDomain = "vault.keranod.dev";
+
+  acmeRoot = "/var/lib/acme";
+  acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
 in
 {
   imports = [
@@ -96,6 +101,8 @@ in
           mtu = 1340;
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           table = "102";
+          postSetup = "ip rule add from 10.150.0.1 lookup 102";
+          postShutdown = "ip rule del from 10.150.0.1 lookup 102";
           peers = [
             # VPS Connection
             {
@@ -126,6 +133,7 @@ in
       };
     };
 
+    # !!! REMEMBER TO SORT OUT IPV6 ALSO WHEN SENDING TRAFFIC VIA VPS OUT
     nftables = {
       enable = true;
       ruleset = ''
@@ -287,15 +295,10 @@ in
         ];
         port = 53;
         upstream_dns = [
-          "https://dns.adguard-dns.com/dns-query"
-          "tls://dns.adguard-dns.com"
-          #"127.0.0.1:5335"
+          "127.0.0.1:5335"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
-        bootstrap_dns = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ];
+        bootstrap_dns = [ ];
       };
 
       # DHCP
@@ -308,6 +311,83 @@ in
         protection_enabled = true;
         filtering_enabled = true;
         parental = false;
+
+        rewrites = [
+          # equivalent of vault.keranod.dev → 10.100.0.1
+          {
+            domain = "${vaultDomain}";
+            answer = "10.200.0.1";
+          }
+        ];
+      };
+    };
+  };
+
+  services.vaultwarden = {
+    enable = true;
+    config = {
+      rocketAddress = "127.0.0.1";
+      rocketPort = 8222; # or whatever port you want
+      domain = "https://${vaultDomain}"; # for local/VPN access only
+      signupsAllowed = false;
+    };
+    # !!! Create secrets file with some random string using
+    # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
+    environmentFile = "/etc/secrets/vaultwarden";
+  };
+
+  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      email = "konrad.konkel@wp.pl";
+      dnsProvider = "hetzner";
+      dnsResolver = "127.0.0.1:5335";
+      credentialFiles = {
+        # Need to suffix variable name with _FILE
+        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
+        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+      };
+      postRun = "systemctl restart nginx";
+    };
+    certs = {
+      # the Vaultwarden subdomain
+      "${vaultDomain}" = {
+        group = "nginx";
+      };
+    };
+  };
+
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
+
+    virtualHosts."${vaultDomain}" = {
+      enableACME = false; # uses the DNS-01 cert above
+      forceSSL = true;
+
+      sslCertificate = "${acmeVaultDomainDir}/full.pem";
+      sslCertificateKey = "${acmeVaultDomainDir}/key.pem";
+
+      # bind your real UI only to the VPN interface:
+      listen = [
+        {
+          addr = "10.200.0.1";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8222";
+        extraConfig = ''
+          proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
       };
     };
   };
