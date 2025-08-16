@@ -170,7 +170,7 @@ in
 
             # Allow traffic from VPN devices. This traffic has already been
             # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
-            # virtual interface. This single rule is all need for this tunnel.
+            # virtual interface. This single rule is all you need for this tunnel.
             iifname "wg-devices" accept;
           }
 
@@ -188,14 +188,16 @@ in
             # on the physical WAN interface or the wg-vps tunnel.
             ip dport 53 oifname "enp3s0" drop;
             ip dport 853 oifname "enp3s0" drop;
-            ip dport { 53, 853 } oifname "wg-vps" drop;
+            ip dport 53 oifname "wg-vps" drop;
+            ip dport 853 oifname "wg-vps" drop;
 
             # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
-            ip protocol { udp, tcp } dport 853 oifname "wg-vps2" accept;
+            ip protocol udp dport 853 oifname "wg-vps2" accept;
+            ip protocol tcp dport 853 oifname "wg-vps2" accept;
 
             # Allow encrypted WireGuard packets to reach the VPS servers.
-            # These are the actual VPN packets, which go out physical interface.
-            ip protocol udp dport { 51820, 51822 } oifname "enp3s0" accept;
+            ip protocol udp dport 51820 oifname "enp3s0" accept;
+            ip protocol udp dport 51822 oifname "enp3s0" accept;
 
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
