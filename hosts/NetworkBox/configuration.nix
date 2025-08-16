@@ -14,6 +14,12 @@ let
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
+
+  # Wireguard
+  # Keys dir
+  wireguardKeysDir = "/etc/wireguard/keys";
+  # Connection 1
+
 in
 {
   imports = [
@@ -127,6 +133,11 @@ in
             {
               publicKey = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
               allowedIPs = [ "10.200.0.2/32" ];
+            }
+            # TufNix
+            {
+              publicKey = "PtnqtGZnHgoknbZuXuQyRH/kc85am3f66eHRAwG4lAc=";
+              allowedIPs = [ "10.200.0.3/32" ];
             }
           ];
         };
