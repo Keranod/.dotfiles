@@ -155,15 +155,15 @@ in
             type filter hook input priority 0; policy drop;
             
             # Allow inbound connections for existing connections
-            # This is CRITICAL for all client tunnels (wg-vps, wg-vps2).
-            # It accepts the return packets from the VPS.
             ct state { established, related } accept;
 
             # Allow all loopback traffic
             iifname "lo" accept;
 
             # Allow incoming SSH connections from specified interfaces.
-            iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } ip protocol tcp dport 22 accept;
+            iifname "enp3s0" ip protocol tcp dport 22 accept;
+            iifname "enp0s20u1c2" ip protocol tcp dport 22 accept;
+            iifname "wg-vps" ip protocol tcp dport 22 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
@@ -185,8 +185,9 @@ in
             oifname "lo" accept;
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-            # on the physical WAN interface, regardless of port.
-            ip dport { 53, 853 } oifname { "enp3s0", "wg-vps" } drop;
+            # on the physical WAN interface or the wg-vps tunnel.
+            ip dport { 53, 853 } oifname "enp3s0" drop;
+            ip dport { 53, 853 } oifname "wg-vps" drop;
 
             # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
             ip protocol { udp, tcp } dport 853 oifname "wg-vps2" accept;
