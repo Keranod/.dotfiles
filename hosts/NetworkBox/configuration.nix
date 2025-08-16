@@ -192,7 +192,7 @@ in
             ip dport 853 oifname "wg-vps" drop;
 
             # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
-            ip protocol udp dport 853 oifname "wg-vps2" accept;
+            oifname "wg-vps2" ip protocol udp dport 853 accept;
             ip protocol tcp dport 853 oifname "wg-vps2" accept;
 
             # Allow encrypted WireGuard packets to reach the VPS servers.
