@@ -111,7 +111,7 @@ in
                 iifname "wg0" tcp dport 22 ct state new limit rate 1/minute accept;
 
                 # Accept DoH only from wg1
-                iifname "wg1" tcp dport 853 accept;
+                iifname "wg1" { tcp, udp } dport 853 accept;
             }
 
             chain forward {
