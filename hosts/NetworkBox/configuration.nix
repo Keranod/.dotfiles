@@ -179,15 +179,6 @@ in
             iifname "wg-devices" accept;
           }
 
-          chain prerouting {
-            type nat hook prerouting priority 0; policy accept;
-            
-            # Redirect all DNS queries from the LAN to AdGuard Home
-            # This works for both IPv4 and IPv6
-            iifname "enp0s20u1c2" tcp dport 53 dnat to 192.168.9.1:53;
-            iifname "enp0s20u1c2" udp dport 53 dnat to 192.168.9.1:53;
-          }
-
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
           chain output {
             type filter hook output priority 0; policy drop;
@@ -217,6 +208,14 @@ in
 
         # NAT table remains unchanged and separate.
         table ip nat {
+          chain prerouting {
+            type nat hook prerouting priority 0; policy accept;
+            
+            # Redirect all DNS queries from the LAN to AdGuard Home
+            # This works for both IPv4 and IPv6
+            iifname "enp0s20u1c2" tcp dport 53 dnat to 192.168.9.1:53;
+            iifname "enp0s20u1c2" udp dport 53 dnat to 192.168.9.1:53;
+          }
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
