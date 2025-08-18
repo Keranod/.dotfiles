@@ -1,6 +1,8 @@
 - make more things autogenerate
 - auto create /etc/secrets folder
+- harden firewall on TufNix and NetworkBox
 - autogenerate wireguard keys on creation?
+- manage browsers extensiosn via nix?
 - fail2ban on abyss
 - custom command to git pull and nix rebuild
 - VPN working on laptop

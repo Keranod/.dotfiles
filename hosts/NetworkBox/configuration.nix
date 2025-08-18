@@ -14,6 +14,12 @@ let
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
+
+  # Wireguard
+  # Keys dir
+  wireguardKeysDir = "/etc/wireguard/keys";
+  # Connection 1
+
 in
 {
   imports = [
@@ -127,6 +133,11 @@ in
             {
               publicKey = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
               allowedIPs = [ "10.200.0.2/32" ];
+            }
+            # TufNix
+            {
+              publicKey = "PtnqtGZnHgoknbZuXuQyRH/kc85am3f66eHRAwG4lAc=";
+              allowedIPs = [ "10.200.0.3/32" ];
             }
           ];
         };
@@ -249,34 +260,34 @@ in
 
   # To test if working use `dig @127.0.0.1 -p 5335 google.com`
   services.unbound = {
-      enable = true;
-      settings = {
-          server = {
-              interface = [ "127.0.0.1" ];
-              port = 5335;
-              access-control = [ "127.0.0.1 allow" ];
-              harden-glue = true;
-              harden-dnssec-stripped = true;
-              use-caps-for-id = false;
-              prefetch = true;
-              edns-buffer-size = 1232;
-              hide-identity = true;
-              hide-version = true;  
-              # force outbound queries to use this IP.
-              outgoing-interface = "10.150.0.1";
-          };  
-          forward-zone = {
-              name = ".";
-              # This is the key setting to enable DNS-over-TLS.
-              forward-tls-upstream = true;
-              forward-addr = [
-                  "94.140.14.14@853#dns.adguard-dns.com"
-                  "1.1.1.1@853#cloudflare-dns.com"
-                  "9.9.9.9@853#dns.quad9.net"
-              ];
-          };
+    enable = true;
+    settings = {
+      server = {
+        interface = [ "127.0.0.1" ];
+        port = 5335;
+        access-control = [ "127.0.0.1 allow" ];
+        harden-glue = true;
+        harden-dnssec-stripped = true;
+        use-caps-for-id = false;
+        prefetch = true;
+        edns-buffer-size = 1232;
+        hide-identity = true;
+        hide-version = true;
+        # force outbound queries to use this IP.
+        outgoing-interface = "10.150.0.1";
       };
-  };  
+      forward-zone = {
+        name = ".";
+        # This is the key setting to enable DNS-over-TLS.
+        forward-tls-upstream = true;
+        forward-addr = [
+          "94.140.14.14@853#dns.adguard-dns.com"
+          "1.1.1.1@853#cloudflare-dns.com"
+          "9.9.9.9@853#dns.quad9.net"
+        ];
+      };
+    };
+  };
 
   # AdGuard Home: DNS
   services.adguardhome = {
@@ -338,26 +349,26 @@ in
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
-    security.acme = {
+  security.acme = {
     acceptTerms = true;
     defaults = {
-        email = "konrad.konkel@wp.pl";
-        dnsProvider = "hetzner";
-        dnsResolver = "127.0.0.1:5335";
-        credentialFiles = {
+      email = "konrad.konkel@wp.pl";
+      dnsProvider = "hetzner";
+      dnsResolver = "127.0.0.1:5335";
+      credentialFiles = {
         # Need to suffix variable name with _FILE
         # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
         "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
-        };
-        postRun = "systemctl restart nginx";
+      };
+      postRun = "systemctl restart nginx";
     };
     certs = {
-        # the Vaultwarden subdomain
-        "${vaultDomain}" = { 
-            group = "nginx";
-        };
+      # the Vaultwarden subdomain
+      "${vaultDomain}" = {
+        group = "nginx";
+      };
     };
-    };
+  };
 
   services.nginx = {
     enable = true;
