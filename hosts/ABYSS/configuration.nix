@@ -103,10 +103,11 @@ in
                 ct state established,related accept;
                 
                 # Allow the outer WG tunnels to connect
-                iifname "enp1s0" udp dport { 51820, 51821, 51822 } accept;
+                # Rate-limit new connections to the WireGuard tunnels on the public interface
+                iifname "enp1s0" udp dport { 51820, 51821, 51822 } ct state new limit rate 5/second accept;
 
                 # SSH is now only allowed from the wg0 interface
-                iifname "wg0" tcp dport 22 accept;
+                iifname "wg0" tcp dport 22 ct state new limit rate 1/minute accept;
 
                 # Accept DoH only from wg1
                 iifname "wg1" tcp dport 853 accept;
