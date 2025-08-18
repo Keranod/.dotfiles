@@ -126,7 +126,7 @@ in
         };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
-          listenPort = 51821; # pick a distinct port
+          listenPort = 51821;
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           mtu = 1340;
           peers = [
@@ -154,11 +154,15 @@ in
           chain input {
             type filter hook input priority 0; policy drop;
             
+            # Allow all loopback traffic
+            iifname "lo" accept;
+
             # Allow inbound connections for existing connections
             ct state { established, related } accept;
 
-            # Allow all loopback traffic
-            iifname "lo" accept;
+            # Allow the outer WG tunnel to connect
+            # Rate-limit new connections to the WireGuard tunnel on the public interface
+            iifname "wg-vps" udp dport 51821 ct state new limit rate 5/second accept;
 
             # Allow incoming SSH connections from specified interfaces.
             iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
@@ -179,11 +183,11 @@ in
           chain output {
             type filter hook output priority 0; policy drop;
 
-            # Allow traffic for established connections to continue
-            ct state { established, related } accept;
-
             # Allow loopback traffic (AdGuard Home -> Unbound on 127.0.0.1)
             oifname "lo" accept;
+
+            # Allow traffic for established connections to continue
+            ct state { established, related } accept;
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
