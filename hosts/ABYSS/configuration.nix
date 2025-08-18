@@ -95,7 +95,7 @@ in
             }
         }
 
-        table ip filter {
+        table inet filter {
             chain input {
                 type filter hook input priority 0; policy drop;
                 
@@ -108,8 +108,8 @@ in
                 # SSH is now only allowed from the wg0 interface
                 iifname "wg0" tcp dport 22 accept;
 
-                iifname "wg0" accept;
-                iifname "wg1" accept;
+                # Accept DoH only from wg1
+                iifname "wg1" tcp dport 853 accept;
             }
 
             chain forward {
