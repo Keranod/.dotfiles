@@ -162,6 +162,9 @@ in
 
             # Allow incoming SSH connections from specified interfaces.
             iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
+
+            # Allow DNS on LAN both ways
+            iifname { "enp3s0", "enp0s20u1c2" } tcp dport 53 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
