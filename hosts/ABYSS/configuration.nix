@@ -91,7 +91,8 @@ in
                 ip saddr 10.150.0.0/24 oifname "enp1s0" masquerade;
                 ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
                 
-                #oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
+                # !!! DO NOT RMEOVE NEEDE FOR PROPER WORKING OF WG IN WG TUNNELS
+                oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
             }
         }
 
