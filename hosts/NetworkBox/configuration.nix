@@ -207,6 +207,8 @@ in
 
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
+
+            oifname "enp0s20u1c2" accept;
           }
         }
 
