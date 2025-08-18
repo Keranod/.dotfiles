@@ -177,6 +177,10 @@ in
             # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
             # virtual interface. This single rule is all need for this tunnel.
             iifname "wg-devices" accept;
+
+            # Allow DHCP traffic from the LAN
+            iifname "enp0s20u1c2" udp dport 67 accept;
+            iifname "enp0s20u1c2" udp sport 68 accept;
           }
 
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
