@@ -166,9 +166,6 @@ in
 
             # Allow incoming SSH connections from specified interfaces.
             iifname { "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
-
-            # Allow DNS on LAN
-            iifname { "enp0s20u1c2" } tcp dport 53 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
@@ -177,10 +174,6 @@ in
             # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
             # virtual interface. This single rule is all need for this tunnel.
             iifname "wg-devices" accept;
-
-            # Allow DHCP traffic from the LAN
-            iifname "enp0s20u1c2" udp dport 67 accept;
-            iifname "enp0s20u1c2" udp sport 68 accept;
           }
 
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
@@ -198,9 +191,9 @@ in
             oifname { "enp3s0", "wg-vps" } tcp dport { 53, 853 } drop;
             oifname { "enp3s0", "wg-vps" } udp dport { 53, 853 } drop;
 
-            # Allow DNS-over-TLS ONLY via the wg-vps2 interface.
-            oifname "wg-vps2" tcp dport 853 accept;
-            oifname "wg-vps2" udp dport 853 accept;
+            # Allow DNS ONLY via the wg-vps2 interface.
+            oifname "wg-vps2" tcp dport 53 accept;
+            oifname "wg-vps2" udp dport 53 accept;
 
             # Allow encrypted WireGuard packets to reach the VPS servers.
             udp dport { 51820, 51822 } oifname "enp3s0" accept;
