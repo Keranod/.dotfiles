@@ -52,6 +52,7 @@ in
   networking = {
     hostName = "NetworkBox";
     firewall.enable = false;
+    nameservers = [ "127.0.0.1" ];
 
     # physical uplink, no IP here
     interfaces.enp3s0 = {
@@ -125,7 +126,7 @@ in
         };
         "wg-devices" = {
           ips = [ "10.200.0.1/24" ];
-          listenPort = 51821; # pick a distinct port
+          listenPort = 51821;
           privateKeyFile = "/etc/wireguard/NetworkBox.key";
           mtu = 1340;
           peers = [
@@ -148,53 +149,72 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        # Define a table for our custom rules
-        table ip myfilter {
-            # Define a chain that runs on outbound traffic
-            chain output {
-            type filter hook output priority 0; policy accept;
+        table inet myfilter {
+          # The 'input' chain filters traffic coming IN to the NetworkBox host.
+          chain input {
+            type filter hook input priority 0; policy drop;
+            
+            # Allow all loopback traffic
+            iifname "lo" accept;
 
-            # Mark outbound packets with a source IP of 10.150.0.1
-            ip saddr 10.150.0.1 meta mark set 0x01
-            }
-        }
+            # Allow inbound connections for existing connections
+            ct state { established, related } accept;
 
-        table inet mangle {
-          chain prerouting {
-            type filter hook prerouting priority raw; policy accept;
-            # ether saddr ${tvMAC} counter mark set ${tvFwmark}
+            # Allow the outer WG tunnel to connect
+            # Rate-limit new connections to the WireGuard tunnel on the public interface
+            iifname "wg-vps" udp dport 51821 ct state new limit rate 5/second accept;
+
+            # Allow incoming SSH connections from specified interfaces.
+            iifname { "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
+            
+            # Allow incoming traffic from the LAN
+            iifname "enp0s20u1c2" accept;
+
+            # Allow traffic from VPN devices. This traffic has already been
+            # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
+            # virtual interface. This single rule is all need for this tunnel.
+            iifname "wg-devices" accept;
+          }
+
+          # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+          chain output {
+            type filter hook output priority 0; policy drop;
+
+            # Allow loopback traffic (AdGuard Home -> Unbound on 127.0.0.1)
+            oifname "lo" accept;
+
+            # Allow traffic for established connections to continue
+            ct state { established, related } accept;
+
+            # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+            # on the physical WAN interface or the wg-vps tunnel.
+            oifname { "enp3s0", "wg-vps" } tcp dport { 53, 853 } drop;
+            oifname { "enp3s0", "wg-vps" } udp dport { 53, 853 } drop;
+
+            # Allow DNS ONLY via the wg-vps2 interface.
+            oifname "wg-vps2" tcp dport 53 accept;
+            oifname "wg-vps2" udp dport 53 accept;
+
+            # Allow encrypted WireGuard packets to reach the VPS servers.
+            udp dport { 51820, 51822 } oifname "enp3s0" accept;
+
+            # Allow SSH from NetworkBox over wg0 to VPS
+            oifname "wg-vps" tcp dport 22 accept;
+
+            # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
+            oifname "enp3s0" accept;
+
+            oifname "enp0s20u1c2" accept;
           }
         }
 
-        # This is the new, critical piece for NetworkBox
-        table inet filter {
-          chain forward {
-            type filter hook forward priority 0; policy accept;
-
-            # Allow traffic from your VPN devices to your LAN
-            iifname "wg-devices" oifname "enp0s20u1c2" accept;
-
-            # Allow return traffic from your LAN to your VPN devices
-            iifname "enp0s20u1c2" oifname "wg-devices" accept;
-          }
-        }
-
+        # NAT table remains unchanged and separate.
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
-
-            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
-          }
-        }
-
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # meta mark ${tvFwmark} oifname "${tvInterface}" masquerade
           }
         }
       '';
@@ -275,16 +295,6 @@ in
         hide-version = true;
         # force outbound queries to use this IP.
         outgoing-interface = "10.150.0.1";
-      };
-      forward-zone = {
-        name = ".";
-        # This is the key setting to enable DNS-over-TLS.
-        forward-tls-upstream = true;
-        forward-addr = [
-          "94.140.14.14@853#dns.adguard-dns.com"
-          "1.1.1.1@853#cloudflare-dns.com"
-          "9.9.9.9@853#dns.quad9.net"
-        ];
       };
     };
   };

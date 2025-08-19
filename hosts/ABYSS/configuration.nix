@@ -91,6 +91,7 @@ in
                 ip saddr 10.150.0.0/24 oifname "enp1s0" masquerade;
                 ip saddr 10.200.0.0/24 oifname "enp1s0" masquerade;
                 
+                # !!! DO NOT RMEOVE NEEDE FOR PROPER WORKING OF WG IN WG TUNNELS
                 oifname "wg0" ip saddr 0.0.0.0/0 snat to 10.100.0.100;
             }
         }
@@ -103,12 +104,15 @@ in
                 ct state established,related accept;
                 
                 # Allow the outer WG tunnels to connect
-                iifname "enp1s0" udp dport { 51820, 51821, 51822 } accept;
+                # Rate-limit new connections to the WireGuard tunnels on the public interface
+                iifname "enp1s0" udp dport { 51820, 51821, 51822 } ct state new limit rate 5/second accept;
 
                 # SSH is now only allowed from the wg0 interface
-                iifname "wg0" tcp dport 22 accept;
+                iifname "wg0" tcp dport 22 ct state new limit rate 1/minute accept;
 
-                iifname "wg1" tcp dport 853 accept;
+                # Accept only DNS 53 from wg1
+                iifname "wg1" tcp dport { 53, 853 } accept;
+                iifname "wg1" udp dport { 53, 853 } accept;
             }
 
             chain forward {
