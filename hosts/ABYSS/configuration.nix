@@ -82,11 +82,6 @@ in
         table ip nat {
             chain prerouting {
                 type nat hook prerouting priority -100;
-
-                # Redirect all DNS queries from your VPN clients to your Unbound server.
-                ip saddr 10.200.0.0/24 udp dport 53 dnat to 10.150.0.1:53;
-                ip saddr 10.200.0.0/24 tcp dport 53 dnat to 10.150.0.1:53;
-
                 iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51821;
             }
 
@@ -122,17 +117,15 @@ in
 
             chain forward {
                 type filter hook forward priority 0; policy drop;
+                
+                iifname "enp1s0" oifname "wg1" ct state established,related accept;
 
-                # Allow established and related connections to pass
-                ct state established,related accept;
-
-                # Allow all traffic from your main VPN tunnel (wg0) to be forwarded.
-                iifname "wg0" oifname "enp1s0" accept;
-                iifname "enp1s0" oifname "wg0" ct state established,related accept;
-
-                # Only allow DNS-over-TLS traffic from your home server (wg1) to the internet.
-                iifname "wg1" oifname "enp1s0" tcp dport 853 accept;
-                iifname "wg1" oifname "enp1s0" udp dport 853 accept;
+                # Allow only DoT traffic from wg1 to the internet
+                iifname "wg1" oifname "enp1s0" tcp dport 853 ct state new,established,related accept;
+                iifname "wg1" oifname "enp1s0" udp dport 853 ct state new,established,related accept;
+                
+                iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
+                iifname "wg0" oifname "enp1s0" ct state established,related accept;
             }
         }
       '';
