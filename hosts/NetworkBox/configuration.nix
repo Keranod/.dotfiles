@@ -152,6 +152,11 @@ in
         table ip nat {
             chain prerouting {
                 type nat hook prerouting priority -100;
+
+                # Redirect all standard DNS queries from your LAN and VPN clients
+                # to your AdGuard Home instance.
+                iifname { "enp0s20u1c2", "wg-devices" } udp dport { 53, 853 } dnat to 192.168.9.1;
+                iifname { "enp0s20u1c2", "wg-devices" } tcp dport { 53, 853 } dnat to 192.168.9.1;
             }
             chain postrouting {
                 type nat hook postrouting priority 100; policy accept;
@@ -192,17 +197,20 @@ in
             chain forward {
                 type filter hook forward priority 0; policy drop;
 
-                # Allow forwarding of all traffic from the VPN clients to the wg-vps tunnel
+                # Allow forwarding of all traffic from the LAN and VPN clients to the WAN
+                iifname { "enp0s20u1c2", "wg-devices" } oifname "enp3s0" accept;
+
+                # Allow forwarding of return traffic from the WAN back to LAN and VPN clients
+                iifname "enp3s0" oifname { "enp0s20u1c2", "wg-devices" } ct state established,related accept;
+
+                # Allow forwarding to the tunnels for specific traffic
+                # This is needed for services on the VPS like vaultwarden
+                iifname "enp0s20u1c2" oifname "wg-vps" accept;
                 iifname "wg-devices" oifname "wg-vps" accept;
 
-                # Allow forwarding of all traffic from the wg-vps tunnel back to the VPN clients
-                iifname "wg-vps" oifname "wg-devices" ct state established,related accept;
-
-                # Allow forwarding of all traffic from the LAN to the WAN
-                iifname "enp0s20u1c2" oifname "enp3s0" accept;
-
-                # Allow forwarding of all traffic from the WAN back to the LAN
-                iifname "enp3s0" oifname "enp0s20u1c2" ct state established,related accept;
+                # Allow DNS queries to be forwarded through the wg-vps2 tunnel
+                iifname "enp0s20u1c2" oifname "wg-vps2" accept;
+                iifname "wg-devices" oifname "wg-vps2" accept;
             }
 
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
@@ -233,6 +241,7 @@ in
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
 
+            # Allow traffic to LAN
             oifname "enp0s20u1c2" accept;
           }
         }
