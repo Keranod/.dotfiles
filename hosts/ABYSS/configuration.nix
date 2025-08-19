@@ -110,9 +110,9 @@ in
                 # SSH is now only allowed from the wg0 interface
                 iifname "wg0" tcp dport 22 ct state new limit rate 1/minute accept;
 
-                # Accept DoH only from wg1
-                iifname "wg1" tcp dport 853 accept;
-                iifname "wg1" udp dport 853 accept;
+                # Accept only DNS 53 from wg1
+                iifname "wg1" tcp dport 53 accept;
+                iifname "wg1" udp dport 53 accept;
             }
 
             chain forward {
