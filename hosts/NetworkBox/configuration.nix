@@ -176,17 +176,6 @@ in
             iifname "wg-devices" accept;
           }
 
-          # The 'forward' chain filters traffic passing THROUGH the NetworkBox.
-          chain forward {
-            type filter hook forward priority 0; policy drop;
-
-            # New Rule: Allow traffic from the 'wg-devices' interface to be forwarded out the 'enp3s0' WAN interface.
-            iifname "wg-devices" oifname "enp3s0" ct state new,established,related accept;
-
-            # New Rule: Allow the return traffic from 'enp3s0' back to 'wg-devices'.
-            iifname "enp3s0" oifname "wg-devices" ct state established,related accept;          
-          }
-
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
           chain output {
             type filter hook output priority 0; policy drop;
@@ -226,9 +215,6 @@ in
 
             # LAN → WAN (default NAT)
             ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
-
-            # All traffic from wg-devices also needs masquerade on enp3s0
-            ip saddr 10.200.0.0/24 oifname "enp3s0" masquerade;
           }
         }
       '';
