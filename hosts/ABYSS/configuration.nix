@@ -36,6 +36,7 @@ in
   networking = {
     hostName = "ABYSS";
     networkmanager.enable = false;
+    nameservers = [ "127.0.0.1" ];
 
     wireguard = {
       enable = true;
