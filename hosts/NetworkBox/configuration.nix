@@ -303,6 +303,7 @@ in
         # force outbound queries to use this IP.
         outgoing-interface = "10.150.0.1";
       };
+    };
   };
 
   # AdGuard Home: DNS
