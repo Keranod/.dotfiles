@@ -163,6 +163,9 @@ in
 
                 # LAN → WAN (default NAT)
                 ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
+
+                # Masquerade traffic from the VPN clients as it leaves the home router
+                ip saddr 10.200.0.0/24 oifname "wg-vps" masquerade;
             }
         }
 
@@ -170,6 +173,12 @@ in
           # The 'input' chain filters traffic coming IN to the NetworkBox host.
           chain input {
             type filter hook input priority 0; policy drop;
+
+            # Allow forwarding of all traffic from the VPN clients to the wg-vps tunnel
+            iifname "wg-devices" oifname "wg-vps" accept;
+
+            # Allow forwarding of return traffic from the wg-vps tunnel to the VPN clients
+            iifname "wg-vps" oifname "wg-devices" ct state established,related accept;
             
             # Allow all loopback traffic
             iifname "lo" accept;
