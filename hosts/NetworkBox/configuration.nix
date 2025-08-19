@@ -149,6 +149,23 @@ in
     nftables = {
       enable = true;
       ruleset = ''
+        table ip nat {
+            chain prerouting {
+                type nat hook prerouting priority -100;
+
+                # Redirect all standard DNS queries from your LAN and VPN clients
+                # to your AdGuard Home instance.
+                iifname { "enp0s20u1c2", "wg-devices" } udp dport { 53, 853 } dnat to 192.168.9.1;
+                iifname { "enp0s20u1c2", "wg-devices" } tcp dport { 53, 853 } dnat to 192.168.9.1;
+            }
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
+
+                # LAN → WAN (default NAT)
+                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
+            }
+        }
+
         table inet myfilter {
           # The 'input' chain filters traffic coming IN to the NetworkBox host.
           chain input {
@@ -212,16 +229,6 @@ in
             oifname "enp3s0" accept;
 
             oifname "enp0s20u1c2" accept;
-          }
-        }
-
-        # NAT table remains unchanged and separate.
-        table ip nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # LAN → WAN (default NAT)
-            ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
           }
         }
       '';
