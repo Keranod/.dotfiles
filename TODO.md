@@ -1,3 +1,4 @@
+- cannot ssh from networkbox to vps,FIX
 - harden firewall on TufNix and NetworkBox
 - autogenerate wireguard keys on creation?
 - manage browsers extensiosn via nix?
