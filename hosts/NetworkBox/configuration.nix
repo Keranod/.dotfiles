@@ -188,12 +188,12 @@ in
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
-            oifname { "wg-vps2", "wg-vps" } tcp dport { 53, 853 } drop;
-            oifname { "wg-vps2", "wg-vps" } udp dport { 53, 853 } drop;
+            oifname { "enp3s0", "wg-vps" } tcp dport { 53, 853 } drop;
+            oifname { "enp3s0", "wg-vps" } udp dport { 53, 853 } drop;
 
             # Allow DNS ONLY via the wg-vps2 interface.
-            oifname "enp3s0" tcp dport 53 accept;
-            oifname "enp3s0" udp dport 53 accept;
+            oifname "wg-vps2" tcp dport 53 accept;
+            oifname "wg-vps2" udp dport 53 accept;
 
             # Allow encrypted WireGuard packets to reach the VPS servers.
             udp dport { 51820, 51822 } oifname "enp3s0" accept;
@@ -294,7 +294,7 @@ in
         hide-identity = true;
         hide-version = true;
         # force outbound queries to use this IP.
-        # outgoing-interface = "10.150.0.1";
+        outgoing-interface = "10.150.0.1";
       };
     };
   };
