@@ -83,6 +83,9 @@ in
             chain prerouting {
                 type nat hook prerouting priority -100;
                 iifname "enp1s0" udp dport 51821 dnat to 10.200.0.1:51821;
+
+                iifname "wg0" ip saddr 10.200.0.0/24 udp dport { 53, 853 } dnat to 10.200.0.1;
+                iifname "wg0" ip saddr 10.200.0.0/24 tcp dport { 53, 853 } dnat to 10.200.0.1;
             }
 
             chain postrouting {
