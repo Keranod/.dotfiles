@@ -117,12 +117,20 @@ in
 
             chain forward {
                 type filter hook forward priority 0; policy drop;
-                
-                iifname "wg1" oifname "enp1s0" ct state new,established,related accept;
-                iifname "enp1s0" oifname "wg1" ct state established,related accept;
-                
-                iifname "enp1s0" oifname "wg0" ct state new,established,related accept;
-                iifname "wg0" oifname "enp1s0" ct state established,related accept;
+
+                # Allow traffic for established connections to continue
+                ct state established,related accept;
+
+                # Allow only DNS-over-TLS traffic from your home server's wg-vps2 tunnel (10.150.0.1/32)
+                # to your specific DNS upstream (94.140.14.14).
+                # This prevents any other DNS traffic from leaking out.
+                ip saddr 10.150.0.1 ip daddr 94.140.14.14 tcp dport 853 accept;
+                ip saddr 10.150.0.1 ip daddr 94.140.14.14 udp dport 853 accept;
+
+                # Allow all other traffic (non-DNS) from your wg-vps tunnel (10.100.0.0/24)
+                # to be forwarded to the internet. This is for your general internet browsing.
+                iifname "wg0" oifname "enp1s0" accept;
+                iifname "enp1s0" oifname "wg0" ct state established,related accept;
             }
         }
       '';
