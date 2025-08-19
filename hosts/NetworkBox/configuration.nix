@@ -201,6 +201,9 @@ in
             # Allow encrypted WireGuard packets to reach the VPS servers.
             udp dport { 51820, 51822 } oifname "enp3s0" accept;
 
+            # Allow SSH from NetworkBox over wg0 to VPS
+            oifname "wg-vps" tcp dport 22 accept;
+
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
           }
