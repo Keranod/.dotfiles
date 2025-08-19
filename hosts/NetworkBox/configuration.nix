@@ -165,10 +165,10 @@ in
             iifname "wg-vps" udp dport 51821 ct state new limit rate 5/second accept;
 
             # Allow incoming SSH connections from specified interfaces.
-            iifname { "enp3s0", "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
+            iifname { "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
 
-            # Allow DNS on LAN both ways
-            iifname { "enp3s0", "enp0s20u1c2" } tcp dport 53 accept;
+            # Allow DNS on LAN
+            iifname { "enp0s20u1c2" } tcp dport 53 accept;
             
             # Allow incoming traffic from the LAN
             iifname "enp0s20u1c2" accept;
@@ -177,6 +177,10 @@ in
             # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
             # virtual interface. This single rule is all need for this tunnel.
             iifname "wg-devices" accept;
+
+            # Allow DHCP traffic from the LAN
+            iifname "enp0s20u1c2" udp dport 67 accept;
+            iifname "enp0s20u1c2" udp sport 68 accept;
           }
 
           # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
@@ -206,6 +210,8 @@ in
 
             # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
             oifname "enp3s0" accept;
+
+            oifname "enp0s20u1c2" accept;
           }
         }
 
