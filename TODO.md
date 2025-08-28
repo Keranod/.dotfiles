@@ -1,3 +1,4 @@
+- TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
 - harden firewall on TufNix and NetworkBox
 - autogenerate wireguard keys on creation?
 - manage browsers extensiosn via nix?
