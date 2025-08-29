@@ -1,3 +1,5 @@
+- VPN network 
+ - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
 - harden firewall on TufNix and NetworkBox
 - autogenerate wireguard keys on creation?
