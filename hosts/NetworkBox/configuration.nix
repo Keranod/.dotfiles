@@ -4,6 +4,8 @@
 }:
 
 let
+  serverHostName = "NetworkBox";
+
   tvMAC = "A8:23:FE:FD:19:ED";
   tvFwmark = "200";
   tvTable = tvFwmark;
@@ -14,12 +16,6 @@ let
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
-
-  # Wireguard
-  # Keys dir
-  wireguardKeysDir = "/etc/wireguard/keys";
-  # Connection 1
-
 in
 {
   imports = [
@@ -50,7 +46,7 @@ in
 
   # Networking
   networking = {
-    hostName = "NetworkBox";
+    hostName = serverHostName;
     firewall.enable = false;
     nameservers = [ "127.0.0.1" ];
 
@@ -83,62 +79,18 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        "wg-vps" = {
-          ips = [ "10.100.0.1/24" ]; # home end of the tunnel
-          privateKeyFile = "/etc/wireguard/NetworkBox.key";
-          mtu = 1340;
+        "vpn-network" = {
+          ips = [ "10.0.0.2/32" ];
+          generatePrivateKeyFile = true;
+          privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           peers = [
-            # VPS Connection
             {
+              name = "ABYSS";
               publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-              # tell it to reach VPS on its public IP:51820
               endpoint = "46.62.157.130:51820";
               allowedIPs = [
-                "10.100.0.100/32"
-                "10.200.0.0/24"
-              ]; # VPS tunnel IP
-              persistentKeepalive = 25;
-            }
-
-          ];
-        };
-        "wg-vps2" = {
-          ips = [ "10.150.0.1/24" ]; # home end of the tunnel
-          privateKeyFile = "/etc/wireguard/NetworkBox.key";
-          mtu = 1340;
-          # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
-          table = "102";
-          postSetup = "ip rule add from 10.150.0.1 lookup 102";
-          postShutdown = "ip rule del from 10.150.0.1 lookup 102";
-          peers = [
-            # VPS Connection
-            {
-              publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
-              endpoint = "46.62.157.130:51822";
-              # AllowedIPs still needs to be 0.0.0.0/0. This is a cryptographic
-              # firewall and tells WireGuard what IPs it's allowed to accept/send
-              # traffic for. It is not a routing instruction in this context
-              # because we are overriding routing with the `table` option.
-              allowedIPs = [ "0.0.0.0/0" ];
-              persistentKeepalive = 25;
-            }
-          ];
-        };
-        "wg-devices" = {
-          ips = [ "10.200.0.1/24" ];
-          listenPort = 51821;
-          privateKeyFile = "/etc/wireguard/NetworkBox.key";
-          mtu = 1340;
-          peers = [
-            # myAndroid
-            {
-              publicKey = "hrsWUOfTMhdwyyR+iVogT4OcPTVUMYoUwLFe9VFrVg4=";
-              allowedIPs = [ "10.200.0.2/32" ];
-            }
-            # TufNix
-            {
-              publicKey = "PtnqtGZnHgoknbZuXuQyRH/kc85am3f66eHRAwG4lAc=";
-              allowedIPs = [ "10.200.0.3/32" ];
+                "10.100.0.1/24"
+              ];
             }
           ];
         };
@@ -150,72 +102,76 @@ in
       enable = true;
       ruleset = ''
         table inet myfilter {
-          # The 'input' chain filters traffic coming IN to the NetworkBox host.
-          chain input {
-            type filter hook input priority 0; policy drop;
-            
-            # Allow all loopback traffic
-            iifname "lo" accept;
+            # The 'input' chain filters traffic coming IN to the NetworkBox host.
+            chain input {
+                type filter hook input priority 0; policy drop;
+                
+                # Allow all loopback traffic
+                iifname "lo" accept;
 
-            # Allow inbound connections for existing connections
-            ct state { established, related } accept;
+                # Allow inbound connections for existing connections
+                ct state { established, related } accept;
 
-            # Allow the outer WG tunnel to connect
-            # Rate-limit new connections to the WireGuard tunnel on the public interface
-            iifname "wg-vps" udp dport 51821 ct state new limit rate 5/second accept;
+                # Allow incoming SSH connections from specified interfaces.
+                iifname { "enp0s20u1c2", "vpn-network" } tcp dport 22 accept;
 
-            # Allow incoming SSH connections from specified interfaces.
-            iifname { "enp0s20u1c2", "wg-vps" } tcp dport 22 accept;
-            
-            # Allow incoming traffic from the LAN
-            iifname "enp0s20u1c2" accept;
+                # Allow incoming traffic from the LAN (e.g., DNS queries to the NetworkBox)
+                iifname "enp0s20u1c2" accept;
+                
+                # Allow traffic from the 'vpn-network' tunnel destined for the NetworkBox.
+                iifname "vpn-network" accept;
+            }
 
-            # Allow traffic from VPN devices. This traffic has already been
-            # decrypted by the 'wg-vps' tunnel and now arrives on the 'wg-devices'
-            # virtual interface. This single rule is all need for this tunnel.
-            iifname "wg-devices" accept;
-          }
+            # The 'forward' chain filters traffic passing THROUGH the NetworkBox.
+            chain forward {
+                type filter hook forward priority 0; policy drop;
+                
+                # Allow devices to see each other: LAN to VPN and vice-versa
+                iifname "enp0s20u1c2" oifname "vpn-network" accept;
+                iifname "vpn-network" oifname "enp0s20u1c2" accept;
 
-          # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
-          chain output {
-            type filter hook output priority 0; policy drop;
+                # Allow ALL OTHER traffic from the LAN to be forwarded to the internet (WAN).
+                iifname "enp0s20u1c2" oifname "enp3s0" accept;
+            }
 
-            # Allow loopback traffic (AdGuard Home -> Unbound on 127.0.0.1)
-            oifname "lo" accept;
+            # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+            chain output {
+                type filter hook output priority 0; policy drop;
 
-            # Allow traffic for established connections to continue
-            ct state { established, related } accept;
+                # Allow loopback traffic
+                oifname "lo" accept;
 
-            # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-            # on the physical WAN interface or the wg-vps tunnel.
-            oifname { "enp3s0", "wg-vps" } tcp dport { 53, 853 } drop;
-            oifname { "enp3s0", "wg-vps" } udp dport { 53, 853 } drop;
+                # Allow traffic for established connections to continue
+                ct state { established, related } accept;
 
-            # Allow DNS ONLY via the wg-vps2 interface.
-            oifname "wg-vps2" tcp dport 53 accept;
-            oifname "wg-vps2" udp dport 53 accept;
+                # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+                # on the physical WAN interface or the wg-vps tunnel.
+                oifname "enp3s0" tcp dport { 53, 853 } drop;
+                oifname "enp3s0" udp dport { 53, 853 } drop;
 
-            # Allow encrypted WireGuard packets to reach the VPS servers.
-            udp dport { 51820, 51822 } oifname "enp3s0" accept;
+                # Allow the WireGuard tunnel's own traffic to reach the VPS
+                udp dport 51820 oifname "enp3s0" accept;
 
-            # Allow SSH from NetworkBox over wg0 to VPS
-            oifname "wg-vps" tcp dport 22 accept;
+                # Allow DNS ONLY to exit via the vpn-network tunnel.
+                oifname "vpn-network" tcp dport 53 accept;
+                oifname "vpn-network" udp dport 53 accept;
 
-            # Allow all other traffic (non-DNS) to go out of the physical WAN interface.
-            oifname "enp3s0" accept;
+                # Allow all other traffic from the NetworkBox to go directly to the WAN.
+                oifname "enp3s0" accept;
+                
+                # Allow traffic to local LAN
+                oifname "enp0s20u1c2" accept;
+            }
+            }
 
-            oifname "enp0s20u1c2" accept;
-          }
-        }
-
-        # NAT table remains unchanged and separate.
+            # The NAT table for masquerading traffic from the LAN.
         table ip nat {
-          chain postrouting {
-            type nat hook postrouting priority 100; policy accept;
-
-            # LAN → WAN (default NAT)
-            ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade
-          }
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
+                
+                # Masquerade all other LAN traffic to exit via the WAN.
+                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
+            }
         }
       '';
     };
@@ -294,7 +250,7 @@ in
         hide-identity = true;
         hide-version = true;
         # force outbound queries to use this IP.
-        outgoing-interface = "10.150.0.1";
+        outgoing-interface = "10.0.0.2";
       };
     };
   };
@@ -311,7 +267,7 @@ in
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
-          "10.200.0.1"
+          "10.0.0.1"
           "fd00:9::1"
         ];
         port = 53;
@@ -334,10 +290,10 @@ in
         parental = false;
 
         rewrites = [
-          # equivalent of vault.keranod.dev → 10.100.0.1
+          # equivalent of vault.keranod.dev → 10.0.0.1
           {
             domain = "${vaultDomain}";
-            answer = "10.200.0.1";
+            answer = "10.0.0.1";
           }
         ];
       };
@@ -396,7 +352,7 @@ in
       # bind your real UI only to the VPN interface:
       listen = [
         {
-          addr = "10.200.0.1";
+          addr = "10.0.0.1";
           port = 443;
           ssl = true;
         }
