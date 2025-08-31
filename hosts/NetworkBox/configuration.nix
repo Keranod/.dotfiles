@@ -81,7 +81,6 @@ in
       interfaces = {
         "vpn-network" = {
           ips = [ "10.0.0.2/32" ];
-          generatePrivateKeyFile = true;
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           peers = [
             {
@@ -89,7 +88,7 @@ in
               publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
               endpoint = "46.62.157.130:51820";
               allowedIPs = [
-                "10.100.0.1/24"
+                "10.0.0.1/24"
               ];
             }
           ];

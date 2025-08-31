@@ -40,7 +40,7 @@ in
           peers = [
             {
               name = "NetworkBox";
-              publicKey = "rGShQxK1qfo6GCmgVBoan3KKxq0Z+ZkF1/WxLKvM030=";
+              publicKey = "bz6RDT3d0Ht0rnOLh3idAcc7H4Jf4CsNkJ3eE5wAC0g=";
               allowedIPs = [
                 "10.0.0.2/32"
               ];
