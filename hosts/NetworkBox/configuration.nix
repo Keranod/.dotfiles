@@ -121,18 +121,6 @@ in
                 iifname "vpn-network" accept;
             }
 
-            # The 'forward' chain filters traffic passing THROUGH the NetworkBox.
-            chain forward {
-                type filter hook forward priority 0; policy drop;
-                
-                # Allow devices to see each other: LAN to VPN and vice-versa
-                iifname "enp0s20u1c2" oifname "vpn-network" accept;
-                iifname "vpn-network" oifname "enp0s20u1c2" accept;
-
-                # Allow ALL OTHER traffic from the LAN to be forwarded to the internet (WAN).
-                iifname "enp0s20u1c2" oifname "enp3s0" accept;
-            }
-
             # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
             chain output {
                 type filter hook output priority 0; policy drop;
@@ -227,8 +215,8 @@ in
 
         # Add this to tell clients to route all IPv6 traffic via you
         route ::/0 {
-        AdvRoutePreference medium;
-      };
+            AdvRoutePreference medium;
+        };
       };
     '';
   };
