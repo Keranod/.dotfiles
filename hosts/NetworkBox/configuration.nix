@@ -80,15 +80,23 @@ in
       enable = true;
       interfaces = {
         "vpn-network" = {
-          ips = [ "10.0.0.2/32" ];
+          ips = [ "10.0.0.2/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
+          # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
+          table = "102";
+          postSetup = "ip rule add from 10.0.0.2 lookup 102";
+          postShutdown = "ip rule del from 10.0.0.2 lookup 102";
           peers = [
             {
               name = "ABYSS";
               publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
               endpoint = "46.62.157.130:51820";
+              # AllowedIPs still needs to be 0.0.0.0/0. This is a cryptographic
+              # firewall and tells WireGuard what IPs it's allowed to accept/send
+              # traffic for. It is not a routing instruction in this context
+              # because we are overriding routing with the `table` option.
               allowedIPs = [
-                "10.0.0.0/24"
+                "0.0.0.0/0"
               ];
             }
           ];
@@ -100,66 +108,57 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        table inet myfilter {
-            # The 'input' chain filters traffic coming IN to the NetworkBox host.
-            chain input {
-                type filter hook input priority 0; policy drop;
-                
-                # Allow all loopback traffic
-                iifname "lo" accept;
+                table inet myfilter {
+                    # The 'input' chain filters traffic coming IN to the NetworkBox host.
+                    chain input {
+                        type filter hook input priority 0; policy drop;
+                        
+                        # Allow all loopback traffic
+                        iifname "lo" accept;
 
-                # Allow inbound connections for existing connections
-                ct state { established, related } accept;
+                        # Allow inbound connections for existing connections
+                        ct state { established, related } accept;
 
-                # Allow incoming SSH connections from specified interfaces.
-                iifname { "enp0s20u1c2", "vpn-network" } tcp dport 22 accept;
+                        # Allow incoming SSH connections from specified interfaces.
+                        iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
 
-                # Allow incoming traffic from the LAN (e.g., DNS queries to the NetworkBox)
-                iifname "enp0s20u1c2" accept;
-                
-                # Allow traffic from the 'vpn-network' tunnel destined for the NetworkBox.
-                iifname "vpn-network" accept;
-            }
+        		# Allow all traffic from LAN and VPN interfaces to the NetworkBox
+                    	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
+                    	iifname { "enp0s20u1c2", "vpn-network" } accept;
+                    }
 
-            # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
-            chain output {
-                type filter hook output priority 0; policy drop;
+                    # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+                    chain output {
+                        type filter hook output priority 0; policy drop;
 
-                # Allow loopback traffic
-                oifname "lo" accept;
+                        # Allow loopback traffic
+                        oifname "lo" accept;
 
-                # Allow traffic for established connections to continue
-                ct state { established, related } accept;
+                        # Allow traffic for established connections to continue
+                        ct state { established, related } accept;
 
-                # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-                # on the physical WAN interface or the wg-vps tunnel.
-                oifname "enp3s0" tcp dport { 53, 853 } drop;
-                oifname "enp3s0" udp dport { 53, 853 } drop;
+        		# Allow all traffic destined for VPN and LAN interfaces to pass.
+        		oifname { "vpn-network", "enp0s20u1c2" } accept;
 
-                # Allow the WireGuard tunnel's own traffic to reach the VPS
-                udp dport 51820 oifname "enp3s0" accept;
+                        # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+                        # on the physical WAN interface or the wg-vps tunnel.
+                        oifname "enp3s0" tcp dport { 53, 853 } drop;
+                        oifname "enp3s0" udp dport { 53, 853 } drop;
 
-                # Allow DNS ONLY to exit via the vpn-network tunnel.
-                oifname "vpn-network" tcp dport 53 accept;
-                oifname "vpn-network" udp dport 53 accept;
+                        # Allow all other traffic from the NetworkBox to go directly to the WAN.
+                        oifname "enp3s0" accept;
+                    }
+                }
 
-                # Allow all other traffic from the NetworkBox to go directly to the WAN.
-                oifname "enp3s0" accept;
-                
-                # Allow traffic to local LAN
-                oifname "enp0s20u1c2" accept;
-            }
-            }
-
-            # The NAT table for masquerading traffic from the LAN.
-        table ip nat {
-            chain postrouting {
-                type nat hook postrouting priority 100; policy accept;
-                
-                # Masquerade all other LAN traffic to exit via the WAN.
-                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
-            }
-        }
+                    # The NAT table for masquerading traffic from the LAN.
+                table ip nat {
+                    chain postrouting {
+                        type nat hook postrouting priority 100; policy accept;
+                        
+                        # Masquerade all other LAN traffic to exit via the WAN.
+                        ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
+                    }
+                }
       '';
     };
   };
@@ -202,22 +201,22 @@ in
     enable = true;
     config = ''
       interface enp0s20u1c2 {
-        AdvSendAdvert on;
-        prefix fd00:9::/64 {
-          AdvOnLink      on;
-          AdvAutonomous  on;   # clients auto-SLAAC a ULA
-        };
+          AdvSendAdvert on;
+          prefix fd00:9::/64 {
+            AdvOnLink      on;
+            AdvAutonomous  on;   # clients auto-SLAAC a ULA
+          };
 
-        # tell clients to use your ULA DNS
-        RDNSS fd00:9::1 {
-          AdvRDNSSLifetime 600;
-        };
+          # tell clients to use your ULA DNS
+          RDNSS fd00:9::1 {
+            AdvRDNSSLifetime 600;
+          };
 
-        # Add this to tell clients to route all IPv6 traffic via you
-        route ::/0 {
-            AdvRoutePreference medium;
+          # Add this to tell clients to route all IPv6 traffic via you
+          route ::/0 {
+              AdvRoutePreference medium;
+          };
         };
-      };
     '';
   };
 
@@ -254,7 +253,7 @@ in
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
-          "10.0.0.1"
+          "10.0.0.2"
           "fd00:9::1"
         ];
         port = 53;
@@ -277,10 +276,10 @@ in
         parental = false;
 
         rewrites = [
-          # equivalent of vault.keranod.dev → 10.0.0.1
+          # equivalent of vault.keranod.dev → 10.0.0.2
           {
             domain = "${vaultDomain}";
-            answer = "10.0.0.1";
+            answer = "10.0.0.2";
           }
         ];
       };
@@ -339,7 +338,7 @@ in
       # bind your real UI only to the VPN interface:
       listen = [
         {
-          addr = "10.0.0.1";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
