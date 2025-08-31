@@ -98,21 +98,7 @@ in
               }
 
               chain forward {
-                type filter hook forward priority 0; policy drop;
-
-                # 1. Allow all VPN clients to see each other.
-                iifname "vpn-network" oifname "vpn-network" accept;
-
-                # 2. Explicitly ALLOW DNS traffic from the NetworkBox (10.0.0.2) to the internet.
-                iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 udp dport 53 accept;
-                iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 tcp dport 53 accept;
-                
-                # 3. Block all other DNS traffic from the VPN to the internet.
-                iifname "vpn-network" oifname "enp1s0" udp dport 53 drop;
-                iifname "vpn-network" oifname "enp1s0" tcp dport 53 drop;
-                
-                # 4. Allow all other traffic (non-DNS) from the VPN to the internet.
-                iifname "vpn-network" oifname "enp1s0" accept;
+                type filter hook forward priority 0; policy accept;
             }
         }
 
