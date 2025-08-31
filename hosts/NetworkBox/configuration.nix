@@ -86,7 +86,7 @@ in
           peers = [
             {
               name = "ABYSS";
-              publicKey = "51Nk/d1A63/M59DHV9vOz5qlWfX8Px/QDym54o1z0l0=";
+              publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
               endpoint = "46.62.157.130:51820";
               allowedIPs = [
                 "10.100.0.1/24"
