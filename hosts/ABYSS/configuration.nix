@@ -98,14 +98,7 @@ in
               }
 
               chain forward {
-                type filter hook forward priority 0; policy drop;
-
-                # Allow traffic from the VPN clients to the internet and back.
-                # This will allow your NetworkBox's DNS queries and your phone's web traffic.
-                iifname "vpn-network" oifname "enp1s0" accept;
-
-                # Allow peer-to-peer traffic within the VPN.
-                iifname "vpn-network" oifname "vpn-network" accept;
+                type filter hook forward priority 0; policy accept;
             }
         }
 
