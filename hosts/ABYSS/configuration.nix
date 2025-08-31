@@ -76,30 +76,55 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-                table inet filter {
-            chain input {
-                type filter hook input priority 0; policy accept;
-                # You can also use a "drop" policy and be more specific:
-                # type filter hook input priority 0; policy drop;
-                # iifname "lo" accept;
-                # ct state { established, related } accept;
-                # iifname { "vpn-network", "enp1s0" } accept; # This is just for testing!
-            }
+        table inet filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
 
-            chain forward {
-                type filter hook forward priority 0; policy accept;
-            }
+            # Allow loopback traffic
+            iif "lo" accept;
+
+            # Allow established and related connections
+            ct state established,related accept;
+
+            # Allow incoming WireGuard connections on the public interface
+            iifname "enp1s0" udp dport 51820 ct state new accept;
+            
+            # Allow all VPN clients to send DNS queries to the NetworkBox
+            iifname "vpn-network" ip daddr 10.0.0.2 tcp dport 53 accept;
+            iifname "vpn-network" ip daddr 10.0.0.2 udp dport 53 accept;
+
+            # Allow SSH connections from any VPN client
+            iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
+          }
+
+          chain forward {
+            type filter hook forward priority 0; policy drop;
+
+            # EXPLICITLY ALLOW DNS traffic from the NetworkBox.
+            # This takes precedence over all other rules.
+            iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 udp dport 53 accept;
+            iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 tcp dport 53 accept;
+            
+            # DROP DNS traffic from all other VPN clients trying to reach the internet.
+            iifname "vpn-network" oifname "enp1s0" udp dport 53 drop;
+            iifname "vpn-network" oifname "enp1s0" tcp dport 53 drop;
+            
+            # ALLOW all other traffic from the VPN to go to the internet.
+            iifname "vpn-network" oifname "enp1s0" accept;
+
+            # Allow all VPN clients to see each other.
+            iifname "vpn-network" oifname "vpn-network" accept;
+        }
         }
 
+        table ip nat {
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
 
-                table ip nat {
-                    chain postrouting {
-                        type nat hook postrouting priority 100; policy accept;
-
-                        # Masquerade traffic from the VPN network as it exits to the internet via enp1s0
-                        ip saddr 10.0.0.0/24 oifname "enp1s0" masquerade;
-                    }
-                }
+                # Masquerade traffic from the VPN network as it exits to the internet via enp1s0
+                ip saddr 10.0.0.0/24 oifname "enp1s0" masquerade;
+            }
+        }
       '';
     };
   };
