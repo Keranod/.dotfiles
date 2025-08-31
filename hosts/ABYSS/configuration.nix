@@ -100,17 +100,18 @@ in
               chain forward {
                 type filter hook forward priority 0; policy drop;
 
-                # 1. Allow all VPN clients to see each other (peer-to-peer).
+                # 1. Allow all VPN clients to see each other.
                 iifname "vpn-network" oifname "vpn-network" accept;
 
-                # 2. Block any DNS traffic from a VPN client that is NOT destined for the NetworkBox.
-                # This forces all DNS queries from the VPN to go to the NetworkBox.
-                iifname "vpn-network" oifname "enp1s0" ip daddr != 10.0.0.2 udp dport 53 drop;
-                iifname "vpn-network" oifname "enp1s0" ip daddr != 10.0.0.2 tcp dport 53 drop;
-
-                # 3. Allow all other (non-DNS) traffic from the VPN to the internet.
-                # This will also allow DNS traffic that is destined for the NetworkBox (which passed rule #2)
-                # to proceed to the NAT table.
+                # 2. Explicitly ALLOW DNS traffic from the NetworkBox (10.0.0.2) to the internet.
+                iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 udp dport 53 accept;
+                iifname "vpn-network" oifname "enp1s0" ip saddr 10.0.0.2 tcp dport 53 accept;
+                
+                # 3. Block all other DNS traffic from the VPN to the internet.
+                iifname "vpn-network" oifname "enp1s0" udp dport 53 drop;
+                iifname "vpn-network" oifname "enp1s0" tcp dport 53 drop;
+                
+                # 4. Allow all other traffic (non-DNS) from the VPN to the internet.
                 iifname "vpn-network" oifname "enp1s0" accept;
             }
         }
