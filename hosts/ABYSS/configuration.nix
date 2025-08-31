@@ -103,19 +103,14 @@ in
             # Allow all VPN clients to see each other
             iifname "vpn-network" oifname "vpn-network" accept;
 
-            # Forward all traffic from VPN clients out to the internet via the public interface
-            iifname "vpn-network" oifname "enp1s0" ct state new,established,related accept;
-            oifname "vpn-network" iifname "enp1s0" ct state established,related accept;
+            # GOAL: Enforce that only NetworkBox (10.0.0.2) can be the DNS source for the VPN.
+            # Explicitly DROP DNS/DoT traffic from any *other* VPN client trying to reach the internet.
+            iifname "vpn-network" oifname "enp1s0" ip saddr != 10.0.0.2 udp dport { 53, 853 } drop;
+            iifname "vpn-network" oifname "enp1s0" ip saddr != 10.0.0.2 tcp dport { 53, 853 } drop;
             
-            # Allow the NetworkBox to forward DNS queries to the internet.
-            # The NetworkBox's DNS queries will have a source address of 10.0.0.2.
-            iifname "vpn-network" ip saddr 10.0.0.2 oifname "enp1s0" ct state new,established,related tcp dport 53 accept;
-            iifname "vpn-network" ip saddr 10.0.0.2 oifname "enp1s0" ct state new,established,related udp dport 53 accept;
-
-            # Explicitly drop DNS/DoT from any other VPN client to the internet
-            # This prevents other clients from bypassing the NetworkBox for DNS.
-            iifname "vpn-network" ip saddr != 10.0.0.2 oifname "enp1s0" tcp dport { 53, 853 } drop;
-            iifname "vpn-network" ip saddr != 10.0.0.2 oifname "enp1s0" udp dport 53 drop;
+            # Now, allow all (remaining) traffic from the VPN to go to the internet.
+            # This will include DNS from 10.0.0.2 and all other traffic (HTTP, etc.) from all clients.
+            iifname "vpn-network" oifname "enp1s0" accept;
           }
         }
 
