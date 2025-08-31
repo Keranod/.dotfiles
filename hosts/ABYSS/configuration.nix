@@ -38,6 +38,7 @@ in
           listenPort = 51820;
           generatePrivateKeyFile = true;
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
+          postSetup = ''wg genkey | tee /etc/wireguard/${serverHostName}.key | wg pubkey > /etc/wireguard/${serverHostName}.pub'';
           peers = [
             {
               name = "NetworkBox";
