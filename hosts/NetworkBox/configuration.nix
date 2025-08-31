@@ -88,7 +88,7 @@ in
               publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
               endpoint = "46.62.157.130:51820";
               allowedIPs = [
-                "10.0.0.1/24"
+                "10.0.0.0/24"
               ];
             }
           ];
