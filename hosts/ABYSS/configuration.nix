@@ -5,8 +5,6 @@ let
 in
 {
   imports = [
-    # This imports the sops-nix module
-    "${builtins.fetchTarball "https://github.com/Mic92/sops-nix/archive/master.tar.gz"}/modules/sops"
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
