@@ -156,5 +156,8 @@ in
     # Create password file 
     passwordFile = config.sops.secrets.shadowsocks_password.path;
     encryptionMethod = "chacha20-ietf-poly1305";
+
+    plugins = [ pkgs.shadowsocks-libev-plugins.v2ray-plugin ];
+    plugin_opts = "server"; # This is the correct option for the server side
   };
 }
