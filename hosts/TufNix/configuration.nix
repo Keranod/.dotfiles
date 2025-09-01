@@ -120,28 +120,22 @@ in
       allowedUDPPorts = [ 51820 ]; # Clients and peers can use the same port, see listenport
     };
 
-    wireguard = {
-      enable = true;
-      interfaces = {
-        "vpn-network" = {
-          ips = [ "10.0.0.4/24" ];
-          privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-          peers = [
-            {
-              name = "ABYSS";
-              publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
-              endpoint = "46.62.157.130:51820";
-              # AllowedIPs still needs to be 0.0.0.0/0. This is a cryptographic
-              # firewall and tells WireGuard what IPs it's allowed to accept/send
-              # traffic for. It is not a routing instruction in this context
-              # because we are overriding routing with the `table` option.
-              allowedIPs = [
-                "0.0.0.0/0"
-                "::/0"
-              ];
-            }
-          ];
-        };
+    wg-quick.interfaces = {
+      "vpn-network" = {
+        address = [ "10.0.0.4/24" ];
+        dns = [ "10.0.0.2" ];
+        privateKeyFile = "/etc/wireguard/${serverHostName}.key";
+
+        peers = [
+          {
+            publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
+            allowedIPs = [
+              "0.0.0.0/0"
+              "::/0"
+            ];
+            endpoint = "46.62.157.130:51820";
+          }
+        ];
       };
     };
   };
