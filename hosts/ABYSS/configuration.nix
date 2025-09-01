@@ -172,6 +172,11 @@ in
       dnsProvider = "hetzner";
       dnsResolver = "10.0.0.2";
     };
+    certs = {
+      "${domain}" = {
+        group = "xray";
+      };
+    };
   };
 
   services.xray = {
