@@ -180,7 +180,7 @@ in
   };
 
   services.xray = {
-    enable = true;
+    enable = false;
     # A base configuration that enables the Trojan protocol.
     settings = {
       inbounds = [
