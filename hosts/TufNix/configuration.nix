@@ -92,6 +92,7 @@ in
     gnome-tweaks
     gnome-online-accounts
     anydesk
+    wireguard-tools
   ];
 
   programs.steam = {
