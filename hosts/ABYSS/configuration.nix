@@ -141,7 +141,7 @@ in
 
   sops = {
     age.keyFile = "/etc/nixos/sops-keys/key";
-    defaultSopsFile = "./secrets.yaml.enc";
+    defaultSopsFile = ./secrets.yaml.enc;
     secrets.shadowsocks_password = {
       # This points to the encrypted file you created
       path = "./secrets.yaml.enc";
