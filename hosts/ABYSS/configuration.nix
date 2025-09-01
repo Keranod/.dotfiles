@@ -147,8 +147,5 @@ in
     # Create password file 
     passwordFile = "/etc/secrets/shadowsocks";
     encryptionMethod = "chacha20-ietf-poly1305";
-    extraConfig ={
-        nameserver = "10.0.0.2";
-    }
   };
 }
