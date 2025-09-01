@@ -207,7 +207,7 @@ in
               serverName = "${domain}";
               certificates = [
                 {
-                  certificateFile = "${acmeDomainDir}/fullchain.pem";
+                  certificateFile = "${acmeDomainDir}/cert.pem";
                   keyFile = "${acmeDomainDir}/key.pem";
                 }
               ];
