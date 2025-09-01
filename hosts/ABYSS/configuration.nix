@@ -5,6 +5,8 @@ let
 in
 {
   imports = [
+    # This imports the sops-nix module
+    "${builtins.fetchTarball "https://github.com/Mic92/sops-nix/archive/master.tar.gz"}/modules/sops"
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
@@ -139,21 +141,23 @@ in
     };
   };
 
+  sops = {
+    age.keyFile = "/etc/nixos/sops-keys/key.txt";
+    secrets.shadowsocks_password = {
+      # This points to the encrypted file you created
+      path = "/etc/nixos/secrets.yaml.enc";
+      # This tells sops-nix to create a decrypted file and give it to the shadowsocks user
+      owner = "ss-server";
+    };
+  };
+
   # Service is names `shadowsocks-libev` not `shadowsocks` when using systemctl etc.
   services.shadowsocks = {
     enable = true;
     mode = "tcp_only";
     port = 443;
     # Create password file 
-    passwordFile = "/etc/secrets/shadowsocks";
+    passwordFile = config.sops.secrets.shadowsocks_password.path;
     encryptionMethod = "chacha20-ietf-poly1305";
   };
-
-  systemd.services."shadowsocks-libev".serviceConfig = {
-    # This option grants read/write access to a specific directory.
-    # Using a path without a '+' prefix will grant full access.
-    # The path must be absolute.
-    # We use a space-separated list of directories.
-    ReadWritePaths = [ "/etc/secrets" ];
-    };
 }
