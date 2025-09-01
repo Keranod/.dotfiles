@@ -147,7 +147,7 @@ in
     defaultSopsFile = ./../../secrets.yaml.enc;
     secrets.shadowsocks_password = {
       # This tells sops-nix to create a decrypted file and give it to the nobody user
-      owner = "nobody";
+      #owner = "nobody";
     };
   };
 
@@ -177,7 +177,7 @@ in
   services.xray = {
     enable = true;
     # A base configuration that enables the Trojan protocol.
-    config = {
+    settings = {
       inbounds = [
         {
           listen = "0.0.0.0";
