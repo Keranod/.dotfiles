@@ -148,4 +148,12 @@ in
     passwordFile = "/etc/secrets/shadowsocks";
     encryptionMethod = "chacha20-ietf-poly1305";
   };
+
+  systemd.services."shadowsocks-libev".serviceConfig = {
+    # This option grants read/write access to a specific directory.
+    # Using a path without a '+' prefix will grant full access.
+    # The path must be absolute.
+    # We use a space-separated list of directories.
+    ReadWritePaths = [ "/etc/secrets" ];
+    };
 }
