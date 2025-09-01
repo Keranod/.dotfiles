@@ -202,16 +202,7 @@ in
           };
           streamSettings = {
             network = "tcp";
-            security = "tls";
-            tlsSettings = {
-              serverName = "${domain}";
-              certificates = [
-                {
-                  certificateFile = "${acmeDomainDir}/cert.pem";
-                  keyFile = "${acmeDomainDir}/key.pem";
-                }
-              ];
-            };
+            security = "none";
           };
         }
       ];
