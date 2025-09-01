@@ -143,8 +143,6 @@ in
     age.keyFile = "/etc/nixos/sops-keys/key";
     defaultSopsFile = ./../../secrets.yaml.enc;
     secrets.shadowsocks_password = {
-      # This points to the encrypted file you created
-      path = "./secrets.yaml.enc";
       # This tells sops-nix to create a decrypted file and give it to the shadowsocks user
       owner = "ss-server";
     };
