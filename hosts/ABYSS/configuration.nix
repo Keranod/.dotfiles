@@ -191,7 +191,7 @@ in
           settings = {
             users = [
               {
-                password = config.sops.secrets.shadowsocks_password.text;
+                password = "test PASSWORD";
               }
             ];
             fallbacks = [
