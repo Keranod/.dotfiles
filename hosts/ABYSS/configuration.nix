@@ -157,7 +157,7 @@ in
     passwordFile = config.sops.secrets.shadowsocks_password.path;
     encryptionMethod = "chacha20-ietf-poly1305";
 
-    plugins = "${pkgs.shadowsocks-v2ray-plugin}/bin/v2ray-plugin";
+    plugin = "${pkgs.shadowsocks-v2ray-plugin}/bin/v2ray-plugin";
     pluginOpts = "server"; # This is the correct option for the server side
   };
 }
