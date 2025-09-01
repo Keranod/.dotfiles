@@ -139,11 +139,16 @@ in
     };
   };
 
+  # Service is names `shadowsocks-libev` not `shadowsocks` when using systemctl etc.
   services.shadowsocks = {
     enable = true;
     mode = "tcp_only";
     port = 443;
     # Create password file 
     passwordFile = "/etc/secrets/shadowsocks";
+    encryptionMethod = "chacha20-ietf-poly1305";
+    extraConfig ={
+        nameserver = "10.0.0.2";
+    }
   };
 }
