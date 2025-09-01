@@ -16,3 +16,4 @@
 `sudo su`
 `sops --encrypt --age <YOUR_PUBLIC_KEY> /tmp/secrets.yaml > <config folder>/secrets.yaml.enc`
 `exit`
+`rm -rf /tmp/secrets.yaml`
