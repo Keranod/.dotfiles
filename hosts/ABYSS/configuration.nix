@@ -156,7 +156,7 @@ in
     mode = "tcp_only";
     port = 443;
     # Create password file 
-    passwordFile = config.sops.secrets.shadowsocks_password.path;
+    password = config.sops.secrets.shadowsocks_password.path;
     encryptionMethod = "chacha20-ietf-poly1305";
   };
 }
