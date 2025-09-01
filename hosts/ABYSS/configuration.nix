@@ -120,7 +120,6 @@ in
     nodePackages_latest.nodejs
     home-manager
     wireguard-tools
-    hysteria
   ];
 
   # Enable the OpenSSH service
@@ -135,5 +134,13 @@ in
       Ciphers = [ "chacha20-poly1305@openssh.com" ];
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
     };
+  };
+
+  services.shadowsocks = {
+    enable = true;
+    mode = "tcp_only";
+    port = 443;
+    # Create password file 
+    passwordFile = "/etc/secrets/shadowsocks";
   };
 }
