@@ -2,6 +2,9 @@
 
 let
   serverHostName = "ABYSS";
+  domain = "keranod.dev";
+  acmeRoot = "/var/lib/acme";
+  acmeDomainDir = "${acmeRoot}/${domain}";
 in
 {
   imports = [
@@ -150,7 +153,7 @@ in
 
   # Service is names `shadowsocks-libev` not `shadowsocks` when using systemctl etc.
   services.shadowsocks = {
-    enable = true;
+    enable = false;
     mode = "tcp_only";
     port = 443;
     # Create password file 
@@ -159,5 +162,59 @@ in
 
     plugin = "${pkgs.shadowsocks-v2ray-plugin}/bin/v2ray-plugin";
     pluginOpts = "server"; # This is the correct option for the server side
+  };
+
+  
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      email = "konrad.konkel@wp.pl";
+      dnsProvider = "hetzner";
+      dnsResolver = "10.0.0.2";
+    };
+  };
+
+  services.xray = {
+    enable = true;
+    # A base configuration that enables the Trojan protocol.
+    config = {
+      inbounds = [
+        {
+          listen = "0.0.0.0";
+          port = 443;
+          protocol = "trojan";
+          settings = {
+            users = [
+              {
+                password = "${config.sops.secrets.shadowsocks_password.text}";
+              }
+            ];
+            fallbacks = [
+              {
+                dest = 80;
+              }
+            ];
+          };
+          streamSettings = {
+            network = "tcp";
+            security = "tls";
+            tlsSettings = {
+              serverName = "${domain}";
+              certificates = [
+                {
+                  certificateFile = "${acmeDomainDir}/fullchain.pem";
+                  keyFile = "${acmeDomainDir}/key.pem";
+                }
+              ];
+            };
+          };
+        }
+      ];
+      outbounds = [
+        {
+          protocol = "freedom";
+        }
+      ];
+    };
   };
 }
