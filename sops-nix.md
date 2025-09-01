@@ -14,5 +14,5 @@
 # Encrypt the file using the public key you copied earlier
 
 `sudo su`
-`sops --encrypt --age <YOUR_PUBLIC_KEY> /tmp/secrets.yaml > /etc/nixos/secrets.yaml.enc`
+`sops --encrypt --age <YOUR_PUBLIC_KEY> /tmp/secrets.yaml > <config folder>/secrets.yaml.enc`
 `exit`
