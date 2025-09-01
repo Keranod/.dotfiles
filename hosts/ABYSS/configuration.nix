@@ -145,8 +145,7 @@ in
     mode = "tcp_only";
     port = 443;
     # Create password file 
-    #passwordFile = "/etc/secrets/shadowsocks";
-    password = "testpass";
+    passwordFile = "/etc/secrets/shadowsocks";
     encryptionMethod = "chacha20-ietf-poly1305";
   };
 }
