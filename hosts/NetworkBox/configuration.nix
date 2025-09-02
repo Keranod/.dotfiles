@@ -309,7 +309,7 @@ in
   services.gitea = {
     enable = true;
     database = {
-      type = "sqlite";
+      type = "sqlite3";
       path = "/var/lib/gitea/gitea.db";
     };
     httpPort = 3000; # We'll expose this via Nginx
