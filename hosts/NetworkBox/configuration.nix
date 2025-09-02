@@ -13,9 +13,11 @@ let
   tvInterface = "wg0";
 
   vaultDomain = "vault.keranod.dev";
+  giteaDomain = "git.keranod.dev";
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
+  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
 in
 {
   imports = [
@@ -281,6 +283,10 @@ in
             domain = "${vaultDomain}";
             answer = "10.0.0.2";
           }
+          {
+            domain = "${giteaDomain}";
+            answer = "10.0.0.2";
+          }
         ];
       };
     };
@@ -300,6 +306,24 @@ in
     environmentFile = "/etc/secrets/vaultwarden";
   };
 
+  services.gitea = {
+    enable = true;
+    database = {
+      type = "sqlite";
+      path = "/var/lib/gitea/gitea.db";
+    };
+    httpPort = 3000; # We'll expose this via Nginx
+    httpListen = "127.0.0.1"; # Only listen on localhost
+    # Set the root URL to the public domain you'll use
+    rootUrl = "https://${giteaDomain}";
+    # This is important for the Git server to handle clone URLs correctly
+    ssh = {
+      enable = true;
+      port = 22; # Gitea handles SSH on the standard port
+      listenAddress = "10.0.0.2"; # Only listen on the VPN interface
+    };
+  };
+
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
   security.acme = {
     acceptTerms = true;
@@ -317,6 +341,9 @@ in
     certs = {
       # the Vaultwarden subdomain
       "${vaultDomain}" = {
+        group = "nginx";
+      };
+      "${giteaDomain}" = {
         group = "nginx";
       };
     };
@@ -351,6 +378,34 @@ in
           proxy_set_header X-Real-IP       $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+    };
+    virtualHosts."${giteaDomain}" = {
+      enableACME = false;
+      forceSSL = true;
+
+      sslCertificate = "${acmeGiteaDomainDir}/full.pem";
+      sslCertificateKey = "${acmeGiteaDomainDir}/key.pem";
+
+      # bind the UI only to the VPN interface, just like Vaultwarden
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:3000"; # Point to Gitea's localhost port
+        extraConfig = ''
+          proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          # Required for Git LFS and other features
+          proxy_read_timeout 3600;
         '';
       };
     };
