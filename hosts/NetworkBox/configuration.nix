@@ -309,18 +309,21 @@ in
   services.gitea = {
     enable = true;
     database = {
-      type = "sqlite3";
+      type = "sqlite";
       path = "/var/lib/gitea/gitea.db";
     };
-    httpPort = 3000; # We'll expose this via Nginx
-    httpListen = "127.0.0.1"; # Only listen on localhost
-    # Set the root URL to the public domain you'll use
-    rootUrl = "https://${giteaDomain}";
-    # This is important for the Git server to handle clone URLs correctly
-    ssh = {
-      enable = true;
-      port = 22; # Gitea handles SSH on the standard port
-      listenAddress = "10.0.0.2"; # Only listen on the VPN interface
+    settings = {
+      server = {
+        HTTP_PORT = 3000;
+        HTTP_ADDR = "127.0.0.1";
+        ROOT_URL = "https://${giteaDomain}/"; # Make sure to have a trailing slash
+      };
+      ssh = {
+        # The SSH settings are nested under 'settings'
+        ENABLE_SSH = true;
+        SSH_PORT = 22;
+        SSH_LISTEN_ADDR = "10.0.0.2"; # Or "10.0.0.2:22" if needed
+      };
     };
   };
 
