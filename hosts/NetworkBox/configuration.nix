@@ -19,7 +19,7 @@ let
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
   acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
 
-  giteaPort = 3000;
+  giteaPort = 4000;
 in
 {
   imports = [
