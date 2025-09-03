@@ -23,6 +23,11 @@ in
       # Set boot partition label for GRUB to use
       useOSProber = true;
     };
+
+    kernelPackages = pkgs.linuxPackages_zen;
+    extraModulePackages = with config.boot.kernelPackages; [
+        amneziawg
+    ];
   };
 
   # Networking
@@ -140,7 +145,6 @@ in
     home-manager
     wireguard-tools
     amneziawg-tools
-    linuxKernel.packages.linux_zen.amneziawg
   ];
 
   # Enable the OpenSSH service
