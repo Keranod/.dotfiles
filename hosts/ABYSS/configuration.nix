@@ -138,7 +138,7 @@ in
     nodePackages_latest.nodejs
     home-manager
     wireguard-tools
-    hysteria
+    amneziawg-go
   ];
 
   # Enable the OpenSSH service
@@ -154,4 +154,4 @@ in
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
     };
   };
-}
+};
