@@ -76,7 +76,7 @@ in
         "vpn-network2" = {
           ips = [ "10.0.1.1/24" ];
           type = "amneziawg";
-          listenPort = 51821;
+          listenPort = 443;
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           peers = [
             {
@@ -114,7 +114,7 @@ in
                 ct state established,related accept;
 
                 # Allow incoming WireGuard connections on the public interface
-                iifname "enp1s0" udp dport { 51820, 51821 } ct state new accept;
+                iifname "enp1s0" udp dport { 51820, 443 } ct state new accept;
                 
                 # Allow all VPN clients to send DNS queries to the NetworkBox
                 iifname "vpn-network" ip daddr 10.0.0.2 tcp dport 53 accept;
