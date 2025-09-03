@@ -353,6 +353,7 @@ in
       };
       "${giteaDomain}" = {
         group = "nginx";
+        extraArgs = [ "--force" ];
       };
     };
   };
