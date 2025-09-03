@@ -23,10 +23,6 @@ in
       # Set boot partition label for GRUB to use
       useOSProber = true;
     };
-
-    extraModulePackages = with config.boot.kernelPackages; [
-        amneziawg
-    ];
   };
 
   # Networking
@@ -71,21 +67,6 @@ in
               ];
             }
           ];
-        };
-        "vpn-network2" = {
-          ips = [ "10.0.1.1/24" ];
-          type = "amneziawg";
-          listenPort = 443;
-          privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-          peers = [
-            {
-              name = "myAndroid";
-              publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw=";
-              allowedIPs = [
-                "10.0.1.3/32"
-              ];
-            }
-            ];
         };
       };
     };
@@ -144,6 +125,7 @@ in
     home-manager
     wireguard-tools
     amneziawg-tools
+    amneziawg-go
   ];
 
   # Enable the OpenSSH service
@@ -157,6 +139,29 @@ in
       KexAlgorithms = [ "curve25519-sha256" ];
       Ciphers = [ "chacha20-poly1305@openssh.com" ];
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
+    };
+  };
+
+  systemd.services.amneziawg = {
+    description = "AmneziaWG user-space VPN service";
+    wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [ iproute2 wireguard-tools ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "5s";
+      ExecStart = ''
+        ${pkgs.amneziawg-go}/bin/amneziawg \
+          --private-key /etc/wireguard/${serverHostName}.key \
+          --listen-port 443 \
+          --interface-name vpn-amnezia \
+          --address 10.0.1.1/24 \
+          --peers '${
+            builtins.toJSON [
+              { publicKey = "VzIT73Ifb+gnEoT8FNCBihAuOPYREXL6HdMwAjNCJmw="; allowedIPs = [ "10.0.1.3/32" ]; }
+            ]
+          }'
+      '';
     };
   };
 }
