@@ -19,7 +19,7 @@ let
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
   acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
 
-  giteaPort = "3000";
+  giteaPort = 3000;
 in
 {
   imports = [
@@ -406,7 +406,7 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${giteaPort}"; # Point to Gitea's localhost port
+        proxyPass = "http://127.0.0.1:${toString giteaPort}"; # Point to Gitea's localhost port
         extraConfig = ''
           proxy_set_header Host            $host;
           proxy_set_header X-Real-IP       $remote_addr;
