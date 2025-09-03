@@ -171,6 +171,11 @@ in
       email = "konrad.konkel@wp.pl";
       dnsProvider = "hetzner";
       dnsResolver = "10.0.0.2";
+      credentialFiles = {
+        # Need to suffix variable name with _FILE
+        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
+        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+      };
     };
     certs = {
       "${domain}" = {
