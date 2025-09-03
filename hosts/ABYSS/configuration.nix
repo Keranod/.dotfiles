@@ -90,7 +90,7 @@ in
               name = "TufNix";
               publicKey = "Pegp2QEADJjV/zDPCXxA4OKObSCSBOFm0dRJvEPRjzg=";
               allowedIPs = [
-                "10.0.0.4/32"
+                "10.0.1.4/32"
               ];
             }
           ];
