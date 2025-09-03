@@ -23,6 +23,10 @@ in
       # Set boot partition label for GRUB to use
       useOSProber = true;
     };
+
+    extraModulePackages = with config.boot.kernelPackages; [
+        amneziawg
+    ];
   };
 
   # Networking
