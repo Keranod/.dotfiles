@@ -154,4 +154,4 @@ in
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
     };
   };
-};
+}
