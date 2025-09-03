@@ -145,7 +145,7 @@ in
         		        oifname { "vpn-network", "enp0s20u1c2" } accept;
 
                         # Allow for ACME DNS challange
-                        ip saddr 192.168.8.2 oifname "enp3s0" udp dport { 53, 853 } accept;
+                        #ip saddr 192.168.8.2 oifname "enp3s0" udp dport { 53, 853 } accept;
 
                         # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
                         # on the physical WAN interface or the wg-vps tunnel.
