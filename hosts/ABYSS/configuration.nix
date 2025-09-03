@@ -86,7 +86,14 @@ in
                 "10.0.1.3/32"
               ];
             }
-            ];
+            {
+              name = "TufNix";
+              publicKey = "Pegp2QEADJjV/zDPCXxA4OKObSCSBOFm0dRJvEPRjzg=";
+              allowedIPs = [
+                "10.0.0.4/32"
+              ];
+            }
+          ];
         };
       };
     };
