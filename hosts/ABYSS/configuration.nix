@@ -76,7 +76,7 @@ in
         "vpn-network2" = {
           ips = [ "10.0.1.1/24" ];
           type = "amneziawg";
-          listenPort = 443;
+          listenPort = 51821;
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           peers = [
             {
