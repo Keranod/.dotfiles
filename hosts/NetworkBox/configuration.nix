@@ -18,6 +18,8 @@ let
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
   acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
+
+  giteaPort = 3000;
 in
 {
   imports = [
@@ -317,7 +319,7 @@ in
     };
     settings = {
       server = {
-        HTTP_PORT = 3000;
+        HTTP_PORT = giteaPort;
         HTTP_ADDR = "127.0.0.1";
         ROOT_URL = "https://${giteaDomain}/"; # Make sure to have a trailing slash
       };
@@ -404,7 +406,7 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:3000"; # Point to Gitea's localhost port
+        proxyPass = "http://127.0.0.1:${giteaPort}"; # Point to Gitea's localhost port
         extraConfig = ''
           proxy_set_header Host            $host;
           proxy_set_header X-Real-IP       $remote_addr;
