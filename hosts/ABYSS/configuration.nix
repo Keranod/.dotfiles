@@ -139,7 +139,7 @@ in
     nodePackages_latest.nodejs
     home-manager
     wireguard-tools
-    amneziawg-go
+    amneziawg-tools
   ];
 
   # Enable the OpenSSH service
