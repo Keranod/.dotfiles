@@ -151,7 +151,7 @@ in
       Restart = "always";
       RestartSec = "5s";
       ExecStart = ''
-        ${pkgs.amneziawg-go}/bin/amneziawg \
+        ${pkgs.amneziawg-go}/bin/amneziawg-go \
           --private-key /etc/wireguard/${serverHostName}.key \
           --listen-port 443 \
           --interface-name vpn-amnezia \
