@@ -14,10 +14,12 @@ let
 
   vaultDomain = "vault.keranod.dev";
   giteaDomain = "git.keranod.dev";
+  testDomain = "test.keranod.dev";
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
   acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
+  acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   giteaPort = 4000;
 in
@@ -143,9 +145,6 @@ in
 
         		        # Allow all traffic destined for VPN and LAN interfaces to pass.
         		        oifname { "vpn-network", "enp0s20u1c2" } accept;
-
-                        # Allow for ACME DNS challange
-                        #ip saddr 192.168.8.2 oifname "enp3s0" udp dport { 53, 853 } accept;
 
                         # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
                         # on the physical WAN interface or the wg-vps tunnel.
@@ -352,6 +351,9 @@ in
         group = "nginx";
       };
       "${giteaDomain}" = {
+        group = "nginx";
+      };
+      "${testDomain}" = {
         group = "nginx";
       };
     };
