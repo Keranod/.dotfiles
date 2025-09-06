@@ -368,6 +368,11 @@ in
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
 
+    extraConfig = ''
+      proxy_headers_hash_max_size 1024;
+      proxy_headers_hash_bucket_size 128;
+    '';
+
     virtualHosts."${vaultDomain}" = {
       enableACME = false; # uses the DNS-01 cert above
       forceSSL = true;
