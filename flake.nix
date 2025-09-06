@@ -20,6 +20,10 @@
     sambaPkgs = {
       url = "github:NixOS/nixpkgs/94c4dbe77c0740ebba36c173672ca15a7926c993";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # Importing self ans nixpkgs
@@ -30,6 +34,7 @@
       home-manager,
       bindPkgs,
       sambaPkgs,
+      sops-nix,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
@@ -37,7 +42,7 @@
       lib = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = import nixpkgs {
-      inherit system;
+        inherit system;
         config = {
           allowUnfree = true;
         };
@@ -107,6 +112,7 @@
             ./hosts/NetworkBox/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
+            sops-nix.nixosModules.sops
           ];
         };
         FranzNix = lib.nixosSystem {
