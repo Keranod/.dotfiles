@@ -444,30 +444,30 @@ in
           proxy_read_timeout 3600;
         '';
       };
+    };
 
-      virtualHosts."${webdavDomain}" = {
-        enableACME = false; # Cert is handled by DNS-01 in the acme block
-        forceSSL = true;
+    virtualHosts."${webdavDomain}" = {
+      enableACME = false; # Cert is handled by DNS-01 in the acme block
+      forceSSL = true;
 
-        sslCertificate = "${acmeWebdavDomainDir}/full.pem";
-        sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
+      sslCertificate = "${acmeWebdavDomainDir}/full.pem";
+      sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
 
-        # Bind to the VPN interface, just like your other services
-        listen = [
-          {
-            addr = "10.0.0.2";
-            port = 443;
-            ssl = true;
-          }
-        ];
+      # Bind to the VPN interface, just like your other services
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
 
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:8080";
-          extraConfig = ''
-            auth_basic "Restricted Access";
-            auth_basic_user_file /run/secrets/webdav.users;
-          '';
-        };
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8080";
+        extraConfig = ''
+          auth_basic "Restricted Access";
+          auth_basic_user_file /run/secrets/webdav.users;
+        '';
       };
     };
   };
