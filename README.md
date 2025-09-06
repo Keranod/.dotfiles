@@ -79,7 +79,14 @@ creation_rules:
           - *server_host
 ```
 
-- cd to `~/.dotfiles` and run `nix run nixpkgs#sops -- hosts/NetworkBox/secrets.yaml`. Make sure that the host you are running it on has `.sops.yaml`
+- generate hashed password eg. `nix-shell -p apacheHttpd --run "htpasswd -n -B floccus_user"` and copy it
+- cd to `~/.dotfiles` and run for eg. `nix run nixpkgs#sops -- hosts/NetworkBox/secrets.yaml`. Make sure that the host you are running it on has `.sops.yaml`
+
+```yaml
+# secrets.yaml (in your editor)
+nginx_webdav_users: |
+  floccus_user:your-hashed-password-here # <-- Paste the output from `htpasswd` here
+```
 
 # One line installer:
 
