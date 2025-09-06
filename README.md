@@ -79,8 +79,7 @@ creation_rules:
           - *server_host
 ```
 
-- cd to host dir eg. `~/.dotfiles/hosts/ABYSS`
-- run this inside of host dir to create secret content `nix run nixpkgs#sops -- secrets.yaml`
+- cd to `~/.dotfiles` and run `nix run nixpkgs#sops -- hosts/NetworkBox/secrets.yaml`. Make sure that the host you are running it on has `.sops.yaml`
 
 # One line installer:
 

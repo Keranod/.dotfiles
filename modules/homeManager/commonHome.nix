@@ -42,7 +42,7 @@ in
   #  /etc/profiles/per-user/keranod/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    # EDITOR = "emacs";
+    EDITOR = "vi";
   };
 
   # User programs settings
