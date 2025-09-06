@@ -10,5 +10,5 @@ creation_rules:
   - path_regex: hosts/NetworkBox/secrets\.yaml$
     key_groups:
       - age:
-          - *personal_key
           - *tufnix_key
+          - *networkbox_host
