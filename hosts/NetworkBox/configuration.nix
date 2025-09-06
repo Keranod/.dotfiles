@@ -13,9 +13,17 @@ let
   tvInterface = "wg0";
 
   vaultDomain = "vault.keranod.dev";
+  giteaDomain = "git.keranod.dev";
+  webdavDomain = "webdav.keranod.dev";
+  testDomain = "test.keranod.dev";
 
   acmeRoot = "/var/lib/acme";
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
+  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
+  acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
+  acmeTestDomainDir = "${acmeRoot}/${testDomain}";
+
+  giteaPort = 4000;
 in
 {
   imports = [
@@ -108,57 +116,60 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-                table inet myfilter {
-                    # The 'input' chain filters traffic coming IN to the NetworkBox host.
-                    chain input {
-                        type filter hook input priority 0; policy drop;
-                        
-                        # Allow all loopback traffic
-                        iifname "lo" accept;
+        table inet myfilter {
+            # The 'input' chain filters traffic coming IN to the NetworkBox host.
+            chain input {
+                type filter hook input priority 0; policy drop;
+                
+                # Allow all loopback traffic
+                iifname "lo" accept;
 
-                        # Allow inbound connections for existing connections
-                        ct state { established, related } accept;
+                # Allow inbound connections for existing connections
+                ct state { established, related } accept;
 
-                        # Allow incoming SSH connections from specified interfaces.
-                        iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
+                # Allow incoming SSH connections from specified interfaces.
+                iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
 
-        		# Allow all traffic from LAN and VPN interfaces to the NetworkBox
-                    	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
-                    	iifname { "enp0s20u1c2", "vpn-network" } accept;
-                    }
+                # Allow all traffic from LAN and VPN interfaces to the NetworkBox
+            	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
+            	iifname { "enp0s20u1c2", "vpn-network" } accept;
+            }
 
-                    # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
-                    chain output {
-                        type filter hook output priority 0; policy drop;
+            # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+            chain output {
+                type filter hook output priority 0; policy drop;
 
-                        # Allow loopback traffic
-                        oifname "lo" accept;
+                # Allow loopback traffic
+                oifname "lo" accept;
 
-                        # Allow traffic for established connections to continue
-                        ct state { established, related } accept;
+                # Allow traffic for established connections to continue
+                ct state { established, related } accept;
 
-        		# Allow all traffic destined for VPN and LAN interfaces to pass.
-        		oifname { "vpn-network", "enp0s20u1c2" } accept;
+                # Allow all traffic destined for VPN and LAN interfaces to pass.
+                oifname { "vpn-network", "enp0s20u1c2" } accept;
 
-                        # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-                        # on the physical WAN interface or the wg-vps tunnel.
-                        oifname "enp3s0" tcp dport { 53, 853 } drop;
-                        oifname "enp3s0" udp dport { 53, 853 } drop;
+                # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
+                oifname "enp3s0" meta skuid 989 udp dport 53 accept;
 
-                        # Allow all other traffic from the NetworkBox to go directly to the WAN.
-                        oifname "enp3s0" accept;
-                    }
-                }
+                # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+                # on the physical WAN interface or the wg-vps tunnel.
+                oifname "enp3s0" tcp dport { 53, 853 } drop;
+                oifname "enp3s0" udp dport { 53, 853 } drop;
 
-                    # The NAT table for masquerading traffic from the LAN.
-                table ip nat {
-                    chain postrouting {
-                        type nat hook postrouting priority 100; policy accept;
-                        
-                        # Masquerade all other LAN traffic to exit via the WAN.
-                        ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
-                    }
-                }
+                # Allow all other traffic from the NetworkBox to go directly to the WAN.
+                oifname "enp3s0" accept;
+            }
+        }
+
+            # The NAT table for masquerading traffic from the LAN.
+        table ip nat {
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
+                
+                # Masquerade all other LAN traffic to exit via the WAN.
+                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
+            }
+        }
       '';
     };
   };
@@ -281,6 +292,14 @@ in
             domain = "${vaultDomain}";
             answer = "10.0.0.2";
           }
+          {
+            domain = "${giteaDomain}";
+            answer = "10.0.0.2";
+          }
+          {
+            domain = "${webdavDomain}";
+            answer = "10.0.0.2";
+          }
         ];
       };
     };
@@ -298,6 +317,33 @@ in
     # sudo mkdir /etc/secrets
     # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
     environmentFile = "/etc/secrets/vaultwarden";
+  };
+
+  sops.defaultSopsFile = ./secrets.yaml;
+  sops.secrets.nginx_webdav_users = {
+    path = "/run/secrets/webdav.users";
+    owner = "root";
+    group = "nginx";
+    mode = "0640";
+  };
+
+  systemd.tmpfiles.settings."10-webdav" = {
+    "d" = {
+      path = "/var/lib/webdav-files";
+      mode = "0750";
+      user = "webdav";
+      group = "webdav";
+    };
+  };
+
+  services.webdav = {
+    enable = true;
+    settings = {
+      port = 8080;
+      host = "127.0.0.1";
+      root = "/var/lib/webdav-files";
+      basicAuth.enable = false;
+    };
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
@@ -319,6 +365,15 @@ in
       "${vaultDomain}" = {
         group = "nginx";
       };
+      "${giteaDomain}" = {
+        group = "nginx";
+      };
+      "${webdavDomain}" = {
+        group = "nginx";
+      };
+      "${testDomain}" = {
+        group = "nginx";
+      };
     };
   };
 
@@ -327,6 +382,12 @@ in
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
+
+    appendHttpConfig = ''
+      large_client_header_buffers 4 16k;
+      proxy_headers_hash_max_size 1024;
+      proxy_headers_hash_bucket_size 128;
+    '';
 
     virtualHosts."${vaultDomain}" = {
       enableACME = false; # uses the DNS-01 cert above
@@ -352,6 +413,61 @@ in
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
         '';
+      };
+    };
+
+    virtualHosts."${giteaDomain}" = {
+      enableACME = false;
+      forceSSL = true;
+
+      sslCertificate = "${acmeGiteaDomainDir}/full.pem";
+      sslCertificateKey = "${acmeGiteaDomainDir}/key.pem";
+
+      # bind the UI only to the VPN interface, just like Vaultwarden
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${toString giteaPort}"; # Point to Gitea's localhost port
+        extraConfig = ''
+          # Do not use in Gitea otherwise cannot access it via web
+          # proxy_set_header Host            $host;
+          proxy_set_header X-Real-IP       $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          # Required for Git LFS and other features
+          proxy_read_timeout 3600;
+        '';
+      };
+
+      virtualHosts."${webdavDomain}" = {
+        enableACME = false; # Cert is handled by DNS-01 in the acme block
+        forceSSL = true;
+
+        sslCertificate = "${acmeWebdavDomainDir}/full.pem";
+        sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
+
+        # Bind to the VPN interface, just like your other services
+        listen = [
+          {
+            addr = "10.0.0.2";
+            port = 443;
+            ssl = true;
+          }
+        ];
+
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8080";
+          extraConfig = ''
+            auth_basic "Restricted Access";
+            auth_basic_user_file /run/secrets/webdav.users;
+          '';
+        };
       };
     };
   };
