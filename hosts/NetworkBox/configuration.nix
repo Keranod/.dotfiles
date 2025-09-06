@@ -327,13 +327,13 @@ in
     mode = "0640";
   };
 
+  # Create the data directory for WebDAV
   systemd.tmpfiles.settings."10-webdav" = {
-    # The `d` indicates we are creating a directory.
-    # The `path` is the file or directory we're creating.
-    d = "/var/lib/webdav-files";
-
-    # These properties should be at the same level as `d`
-    # and apply to the path we just defined.
+    # The `type` option specifies the file type.
+    type = "d";
+    # The `path` option specifies the location.
+    path = "/var/lib/webdav-files";
+    # The remaining options apply to this path.
     user = "webdav";
     group = "webdav";
     mode = "0750";
