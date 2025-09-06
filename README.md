@@ -54,6 +54,34 @@ sudo systemctl set-environment http_proxy="http://proxy:3128" https_proxy="http:
 sudo systemctl restart nix-daemon
 ```
 
+# sops-nix
+
+- Run below on your machine or any other machine and copy string from output
+  `nix run nixpkgs#ssh-to-age -- < ~/.dotfiles/.ssh/id_ed25519.pub`
+
+```yaml
+# .sops.yaml
+# Placed at ~/.dotfiles/
+
+keys:
+  # Your personal key for managing secrets
+  - &personal_key age1... # <-- Paste your personal key here
+  # The host's key, which allows the server to decrypt secrets
+  - &server_host age1... # <-- Paste the server host key here
+
+creation_rules:
+  # This rule applies to any file named `secrets.yaml`
+  # inside the `hosts/server` directory.
+  - path_regex: hosts/server/secrets\.yaml$
+    key_groups:
+      - age:
+          - *personal_key
+          - *server_host
+```
+
+- cd to host dir eg. `~/.dotfiles/hosts/ABYSS`
+- run this inside of host dir to create secret content `nix run nixpkgs#sops -- secrets.yaml`
+
 # One line installer:
 
 - For `Legacy` in `configuration.nix`

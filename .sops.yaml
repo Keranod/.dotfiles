@@ -1,0 +1,14 @@
+keys:
+  # Personal key for managing secrets
+  - &tufnix_key age1r2ekxaa0z8vlws0s6acmjmkecflk2hkez2mw38zxhd0xae7xfu2qvw8pkx
+  # The host's key, which allows the server to decrypt secrets
+  - &networkbox_host age10aqh89rjhyfxq4dzhs2c8dyhfgkq2utn5jaj9qc3ne8qewrk5qwqcc7hxg
+
+creation_rules:
+  # This rule applies to any file named `secrets.yaml`
+  # inside the `hosts/NetworkBox` directory.
+  - path_regex: hosts/NetworkBox/secrets\.yaml$
+    key_groups:
+      - age:
+          - *personal_key
+          - *tufnix_key

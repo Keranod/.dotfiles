@@ -71,6 +71,7 @@
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
             ./modules/config/virtualBox.nix
+            sops-nix.nixosModules.sops
           ];
         };
         MainServer = lib.nixosSystem {
