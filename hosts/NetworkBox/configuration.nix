@@ -418,7 +418,8 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString giteaPort}"; # Point to Gitea's localhost port
         extraConfig = ''
-          proxy_set_header Host            $host;
+          # Do not use in Gitea otherwise cannot access it via web
+          # proxy_set_header Host            $host;
           proxy_set_header X-Real-IP       $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
