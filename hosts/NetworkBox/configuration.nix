@@ -346,7 +346,7 @@ in
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
   sops.secrets.nginx_webdav_users = {
-    path = "/run/secrets/webdav.users";
+    path = "/run/webdav_secrets/webdav.users";
     owner = "root";
     group = "nginx";
     mode = "0640";
@@ -499,7 +499,7 @@ in
         proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
           auth_basic "Restricted Access";
-          auth_basic_user_file /run/secrets/webdav.users;
+          auth_basic_user_file /run/webdav_secrets/webdav.users;
         '';
       };
     };
