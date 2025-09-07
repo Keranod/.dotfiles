@@ -345,10 +345,11 @@ in
   sops.age.sshKeyPaths = [
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
+  # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   sops.secrets.nginx_webdav_users = {
     path = "/run/webdav_secrets/webdav.users";
-    owner = "root";
-    group = "nginx";
+    owner = "webdav";
+    group = "webdav";
     mode = "0640";
   };
 
@@ -374,7 +375,8 @@ in
       port = webdavPort;
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
-      basicAuth.enable = false;
+      basicAuth.enable = true;
+      basicAuth.userFile = "/run/webdav_secrets/webdav.users";
     };
   };
 
@@ -498,8 +500,6 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
-          auth_basic "Restricted Access";
-          auth_basic_user_file /run/webdav_secrets/webdav.users;
           proxy_set_header Authorization $http_authorization;
         '';
       };
