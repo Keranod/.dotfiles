@@ -361,8 +361,8 @@ in
         # file type in this case directory
         d = {
           # The remaining options apply to this path.
-          user = "webdav";
-          group = "webdav";
+          user = "root";
+          group = "nginx";
           mode = "0750";
         };
       };
