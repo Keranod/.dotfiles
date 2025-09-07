@@ -24,6 +24,7 @@ let
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   giteaPort = 4000;
+  webdavPort = 4010;
 in
 {
   imports = [
@@ -367,7 +368,7 @@ in
   services.webdav = {
     enable = true;
     settings = {
-      port = 8080;
+      port = webdavPort;
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
       basicAuth.enable = false;
@@ -491,7 +492,7 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:8080";
+        proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
           auth_basic "Restricted Access";
           auth_basic_user_file /run/secrets/webdav.users;
