@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   ...
 }:
 
@@ -347,13 +348,15 @@ in
   sops.age.sshKeyPaths = [
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
+  sops.secrets.webdav_username = { };
+  sops.secrets.webdav_password = { };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
-  sops.secrets.nginx_webdav_users = {
-    path = "/run/webdav_secrets/webdav.users";
-    owner = "root";
-    group = "nginx";
-    mode = "0640";
-  };
+  #   sops.secrets.nginx_webdav_users = {
+  #     path = "/run/webdav_secrets/webdav.users";
+  #     owner = "root";
+  #     group = "nginx";
+  #     mode = "0640";
+  #   };
 
   # Create the data directory for WebDAV
   systemd.tmpfiles.settings = {
@@ -377,8 +380,29 @@ in
       port = webdavPort;
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
+      baseURL = "/"; # Important: Tell the service it's at the root of the domain.
       behindProxy = true;
-      basicAuth.enable = false;
+
+      # Enable built-in basic authentication
+      basicAuth.enable = true;
+
+      # Define users from sops secrets
+      users = [
+        {
+          # Use file paths provided by sops
+          usernameFile = config.sops.secrets.webdav_username.path;
+          passwordFile = config.sops.secrets.webdav_password.path;
+          # Permissions for this user
+          scope = "/var/lib/webdav-files";
+          modify = true;
+          rules = [
+            {
+              regex = ".*";
+              allow = true;
+            }
+          ];
+        }
+      ];
     };
   };
 
@@ -511,24 +535,15 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
-          auth_basic "Restricted Access";
-          auth_basic_user_file /run/webdav_secrets/webdav.users;
+          # Authentication is now handled by the upstream webdav service.
+          # These lines are no longer needed here.
+          # auth_basic "Restricted Access";
+          # auth_basic_user_file /run/webdav_secrets/webdav.users;
 
-          proxy_pass_request_body on;
-          proxy_pass_request_headers on;
-          proxy_buffering off;
-          proxy_request_buffering off;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $host;
-          proxy_redirect off;
-
-          # This is required for COPY/MOVE commands
-          set $dest $http_destination;
-          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
-              set $dest "http://127.0.0.1:${toString webdavPort}$path";
-          }
-          proxy_set_header Destination $dest;
+          proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
     };
