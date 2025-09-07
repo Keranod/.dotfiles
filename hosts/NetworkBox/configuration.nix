@@ -412,18 +412,6 @@ in
   services.nginx = {
     enable = true;
 
-    serviceConfig = {
-      # Nginx must not start until both secrets and certificates are ready
-      Requires = [
-        "sops-install-secrets.service"
-        "acme-switch.service"
-      ];
-      After = [
-        "sops-install-secrets.service"
-        "acme-switch.service"
-      ];
-    };
-
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
@@ -515,6 +503,17 @@ in
         '';
       };
     };
+  };
+
+  systemd.services.nginx.serviceConfig = {
+    Requires = [
+      "sops-install-secrets.service"
+      "acme-switch.service"
+    ];
+    After = [
+      "sops-install-secrets.service"
+      "acme-switch.service"
+    ];
   };
 
   services.ntopng = {
