@@ -416,14 +416,15 @@ in
   services.nginx = {
     enable = true;
 
-    requires = [
-      "sops-install-secrets.service"
-      "acme-switch.service"
-    ];
-    after = [
-      "sops-install-secrets.service"
-      "acme-switch.service"
-    ];
+    # sort out later
+    # requires = [
+    #   "sops-install-secrets.service"
+    #   "acme-switch.service"
+    # ];
+    # after = [
+    #   "sops-install-secrets.service"
+    #   "acme-switch.service"
+    # ];
 
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
