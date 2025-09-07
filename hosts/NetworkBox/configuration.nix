@@ -342,6 +342,9 @@ in
   };
 
   sops.defaultSopsFile = ./secrets.yaml;
+  sops.age.sshKeyPaths = [
+    "/home/keranod/.dotfiles/.ssh/id_ed25519"
+  ];
   sops.secrets.nginx_webdav_users = {
     path = "/run/secrets/webdav.users";
     owner = "root";
