@@ -316,6 +316,7 @@ in
       signupsAllowed = false;
     };
     # !!! Create secrets file with some random string using
+    # Comment out to turn off admin panel
     # sudo mkdir /etc/secrets
     # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
     environmentFile = "/etc/secrets/vaultwarden";
@@ -377,6 +378,7 @@ in
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
       basicAuth.enable = false;
+      behindProxy = true;
     };
   };
 
@@ -413,6 +415,15 @@ in
 
   services.nginx = {
     enable = true;
+
+    requires = [
+      "sops-install-secrets.service"
+      "acme-switch.service"
+    ];
+    after = [
+      "sops-install-secrets.service"
+      "acme-switch.service"
+    ];
 
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
@@ -506,7 +517,6 @@ in
           proxy_pass_request_headers on;
           proxy_buffering off;
           proxy_request_buffering off;
-
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $host;
@@ -514,17 +524,6 @@ in
         '';
       };
     };
-  };
-
-  systemd.services.nginx.serviceConfig = {
-    Requires = [
-      "sops-install-secrets.service"
-      "acme-switch.service"
-    ];
-    After = [
-      "sops-install-secrets.service"
-      "acme-switch.service"
-    ];
   };
 
   services.ntopng = {
