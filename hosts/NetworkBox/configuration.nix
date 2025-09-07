@@ -501,6 +501,12 @@ in
         proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
           proxy_set_header Authorization $http_authorization;
+
+          # These are critical for WebDAV with proxies
+          proxy_pass_request_body on;
+          proxy_pass_request_headers on;
+          proxy_buffering off;
+          proxy_request_buffering off;
         '';
       };
     };
