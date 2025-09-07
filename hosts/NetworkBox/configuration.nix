@@ -482,13 +482,12 @@ in
     };
 
     virtualHosts."${webdavDomain}" = {
-      enableACME = false; # Cert is handled by DNS-01 in the acme block
+      enableACME = false;
       forceSSL = true;
 
       sslCertificate = "${acmeWebdavDomainDir}/full.pem";
       sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
 
-      # Bind to the VPN interface, just like your other services
       listen = [
         {
           addr = "10.0.0.2";
@@ -503,7 +502,6 @@ in
           auth_basic "Restricted Access";
           auth_basic_user_file /run/webdav_secrets/webdav.users;
 
-          proxy_set_header Authorization $http_authorization;
           proxy_pass_request_body on;
           proxy_pass_request_headers on;
           proxy_buffering off;
@@ -513,13 +511,6 @@ in
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $host;
           proxy_redirect off;
-
-          # This is required for COPY/MOVE commands
-          set $dest $http_destination;
-          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
-              set $dest https://127.0.0.1:${toString webdavPort}$path;
-          }
-          proxy_set_header Destination $dest;
         '';
       };
     };
