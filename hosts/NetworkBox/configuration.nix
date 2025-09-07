@@ -378,8 +378,9 @@ in
       basicAuth.enable = true;
       basicAuth.userFile = "/run/webdav_secrets/webdav.users";
 
-      sslCertificate = "${acmeWebdavDomainDir}/full.pem";
-      sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
+      tls = true;
+      cert = "${acmeWebdavDomainDir}/full.pem";
+      key = "${acmeWebdavDomainDir}/key.pem";
     };
   };
 
@@ -405,7 +406,9 @@ in
       "${giteaDomain}" = {
         group = "nginx";
       };
-      "${webdavDomain}" = { };
+      "${webdavDomain}" = {
+        group = "webdav";
+      };
       "${testDomain}" = {
         group = "nginx";
       };
