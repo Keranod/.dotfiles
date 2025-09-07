@@ -88,6 +88,8 @@ nginx_webdav_users: |
   floccus_user:your-hashed-password-here # <-- Paste the output from `htpasswd` here
 ```
 
+## !!! Remember to commit `secrets.yaml` to the repo otherwise use of it would fail
+
 # One line installer:
 
 - For `Legacy` in `configuration.nix`

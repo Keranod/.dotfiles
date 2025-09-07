@@ -319,6 +319,27 @@ in
     environmentFile = "/etc/secrets/vaultwarden";
   };
 
+  services.gitea = {
+    enable = true;
+    database = {
+      type = "sqlite3";
+      path = "/var/lib/gitea/gitea.db";
+    };
+    settings = {
+      server = {
+        HTTP_PORT = giteaPort;
+        HTTP_ADDR = "127.0.0.1";
+        ROOT_URL = "https://${giteaDomain}/"; # Make sure to have a trailing slash
+      };
+      ssh = {
+        # The SSH settings are nested under 'settings'
+        ENABLE_SSH = true;
+        SSH_PORT = 22;
+        SSH_LISTEN_ADDR = "10.0.0.2"; # Or "10.0.0.2:22" if needed
+      };
+    };
+  };
+
   sops.defaultSopsFile = ./secrets.yaml;
   sops.secrets.nginx_webdav_users = {
     path = "/run/secrets/webdav.users";

@@ -1,3 +1,4 @@
+- SSL ntop and adguard gui with ssl
 - VPN network
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - floccus selfhost bookmarks sync, xbrowsersync, linkding
