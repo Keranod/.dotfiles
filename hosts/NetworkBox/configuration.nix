@@ -377,8 +377,8 @@ in
       port = webdavPort;
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
-      basicAuth.enable = false;
       behindProxy = true;
+      auth = false;
     };
   };
 
@@ -522,6 +522,13 @@ in
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $host;
           proxy_redirect off;
+
+          # This is required for COPY/MOVE commands
+          set $dest $http_destination;
+          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
+              set $dest "http://127.0.0.1:${toString webdavPort}$path";
+          }
+          proxy_set_header Destination $dest;
         '';
       };
     };
