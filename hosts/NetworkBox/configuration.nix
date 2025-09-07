@@ -24,6 +24,7 @@ let
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   giteaPort = 4000;
+  webdavPort = 4010;
 in
 {
   imports = [
@@ -371,16 +372,11 @@ in
   services.webdav = {
     enable = true;
     settings = {
-      port = 443;
-      host = "10.0.0.2";
+      port = webdavPort;
+      host = "127.0.0.1";
       root = "/var/lib/webdav-files";
-
       basicAuth.enable = true;
       basicAuth.userFile = "/run/webdav_secrets/webdav.users";
-
-      tls = true;
-      cert = "${acmeWebdavDomainDir}/full.pem";
-      key = "${acmeWebdavDomainDir}/key.pem";
     };
   };
 
@@ -407,7 +403,7 @@ in
         group = "nginx";
       };
       "${webdavDomain}" = {
-        group = "webdav";
+        group = "nginx";
       };
       "${testDomain}" = {
         group = "nginx";
@@ -484,13 +480,54 @@ in
         '';
       };
     };
+
+    virtualHosts."${webdavDomain}" = {
+      enableACME = false; # Cert is handled by DNS-01 in the acme block
+      forceSSL = true;
+
+      sslCertificate = "${acmeWebdavDomainDir}/full.pem";
+      sslCertificateKey = "${acmeWebdavDomainDir}/key.pem";
+
+      # Bind to the VPN interface, just like your other services
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${toString webdavPort}";
+        extraConfig = ''
+          proxy_set_header Authorization $http_authorization;
+          proxy_pass_request_body on;
+          proxy_pass_request_headers on;
+          proxy_buffering off;
+          proxy_request_buffering off;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $host;
+          proxy_redirect off;
+
+          # This is required for COPY/MOVE commands
+          set $dest $http_destination;
+          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
+              set $dest https://127.0.0.1:${toString webdavPort}$path;
+          }
+          proxy_set_header Destination $dest;
+        '';
+      };
+    };
   };
 
   systemd.services.nginx.serviceConfig = {
     Requires = [
+      "sops-install-secrets.service"
       "acme-switch.service"
     ];
     After = [
+      "sops-install-secrets.service"
       "acme-switch.service"
     ];
   };
