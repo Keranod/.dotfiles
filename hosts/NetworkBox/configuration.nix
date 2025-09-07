@@ -23,6 +23,7 @@ let
   acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
+  vaultwardenPort = 3090;
   giteaPort = 4000;
   webdavPort = 4010;
 in
@@ -310,7 +311,7 @@ in
     enable = true;
     config = {
       rocketAddress = "127.0.0.1";
-      rocketPort = 8222; # or whatever port you want
+      rocketPort = vaultwardenPort; # or whatever port you want
       domain = "https://${vaultDomain}"; # for local/VPN access only
       signupsAllowed = false;
     };
@@ -440,7 +441,7 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:8222";
+        proxyPass = "http://127.0.0.1:${toString vaultwardenPort}";
         extraConfig = ''
           proxy_set_header Host            $host;
           proxy_set_header X-Real-IP       $remote_addr;
