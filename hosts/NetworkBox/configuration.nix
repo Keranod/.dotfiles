@@ -378,7 +378,7 @@ in
       host = "127.0.0.1";
       root = "/var/lib/webdav-files";
       behindProxy = true;
-      auth = false;
+      basicAuth.enable = false;
     };
   };
 
