@@ -500,6 +500,7 @@ in
         extraConfig = ''
           auth_basic "Restricted Access";
           auth_basic_user_file /run/webdav_secrets/webdav.users;
+          proxy_set_header Authorization $http_authorization;
         '';
       };
     };
