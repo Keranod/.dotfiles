@@ -348,8 +348,8 @@ in
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   sops.secrets.nginx_webdav_users = {
     path = "/run/webdav_secrets/webdav.users";
-    owner = "webdav";
-    group = "webdav";
+    owner = "root";
+    group = "nginx";
     mode = "0640";
   };
 
@@ -361,8 +361,8 @@ in
         # file type in this case directory
         d = {
           # The remaining options apply to this path.
-          user = "root";
-          group = "nginx";
+          user = "webdav";
+          group = "webdav";
           mode = "0750";
         };
       };
