@@ -28,7 +28,7 @@ let
   giteaPort = 4000;
   webdavPort = 4010;
 
-  webdavSecretsPath = "/run/secrets/webdav.env";
+  webdavSecretsPath = "/run/webdav_secrets/webdav.env";
   webdavDirPath = "/var/lib/webdav-files";
 in
 {
