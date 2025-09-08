@@ -404,11 +404,6 @@ in
         }
       ];
     };
-
-    serviceConfig = {
-      Requires = "sops-install-secrets.service";
-      After = "sops-install-secrets.service";
-    };
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
