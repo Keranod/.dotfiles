@@ -370,7 +370,7 @@ in
   systemd.tmpfiles.settings = {
     "10-webdav" = {
       # The `path` of the file
-      ${toString webdavDirPath} = {
+      "${webdavDirPath}" = {
         # file type in this case directory
         d = {
           # The remaining options apply to this path.
