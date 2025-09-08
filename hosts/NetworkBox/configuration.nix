@@ -388,7 +388,7 @@ in
       accounts = {
         auth-type = "htpasswd.default";
         # The account type is also htpasswd, not unix.
-        acct-type = "htpasswd.default";
+        acct-type = "htpasswd";
       };
 
       # This is the htpasswd provider.
