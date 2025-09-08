@@ -27,6 +27,9 @@ let
   vaultwardenPort = 3090;
   giteaPort = 4000;
   webdavPort = 4010;
+
+  webdavSecretsPath = "/run/secrets/webdav.env";
+  webdavDirPath = "/var/lib/webdav-files";
 in
 {
   imports = [
@@ -348,8 +351,9 @@ in
   sops.age.sshKeyPaths = [
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
-  sops.secrets.webdav_htpasswd = {
-    path = "/run/webdav-server-rs/htpasswd";
+  sops.secrets.webdav_env_file = {
+    # This path will be referenced by the webdav service
+    path = webdavSecretsPath;
     owner = "webdav";
     group = "webdav";
     mode = "0640";
@@ -366,7 +370,7 @@ in
   systemd.tmpfiles.settings = {
     "10-webdav" = {
       # The `path` of the file
-      "/var/lib/webdav-files" = {
+      webdavDirPath = {
         # file type in this case directory
         d = {
           # The remaining options apply to this path.
@@ -380,15 +384,22 @@ in
 
   services.webdav = {
     enable = true;
+    # Point the service to the environment file created by sops
+    environmentFile = config.sops.secrets.webdav_env_file.path;
     settings = {
       port = webdavPort;
-      host = "127.0.0.1";
-      root = "/var/lib/webdav-files";
-      baseURL = "/";
+      address = "127.0.0.1";
+      directory = webdavDirPath; 
+      prefix = "/"; 
       behindProxy = true;
 
-      basicAuth.enable = true;
-      basicAuth.usersFile = config.sops.secrets.webdav_htpasswd.path;
+      users = [
+        {
+          username = "{env}WEBDAV_USER";
+          password = "{env}WEBDAV_PASS";
+          permissions = "CRUD";
+        }
+      ];
     };
   };
 
@@ -521,15 +532,18 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString webdavPort}";
         extraConfig = ''
-          # Authentication is now handled by the upstream webdav service.
-          # These lines are no longer needed here.
-          # auth_basic "Restricted Access";
-          # auth_basic_user_file /run/webdav_secrets/webdav.users;
-
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-Proto $scheme;
+
+          # ADD THIS BLOCK FOR CORRECT COPY/MOVE SUPPORT
+          # It replaces 'example.com' with your actual domain variable.
+          set $dest $http_destination;
+          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
+            set $dest /$path;
+          }
+          proxy_set_header Destination $dest;
         '';
       };
     };
