@@ -348,17 +348,11 @@ in
   sops.age.sshKeyPaths = [
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
-  sops.secrets.webdav_username = {
-    path = "/run/webdav_secrets/webdav.username";
+  sops.secrets.webdav_htpasswd = {
+    path = "/run/webdav-server-rs/htpasswd";
     owner = "webdav";
     group = "webdav";
-    mode = "0400";
-  };
-  sops.secrets.webdav_password = {
-    path = "/run/webdav_secrets/webdav.password";
-    owner = "webdav";
-    group = "webdav";
-    mode = "0400";
+    mode = "0600";
   };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   #   sops.secrets.nginx_webdav_users = {
@@ -384,33 +378,34 @@ in
     };
   };
 
-  services.webdav = {
+  services.webdav-server-rs = {
     enable = true;
+
     settings = {
-      port = webdavPort;
-      host = "127.0.0.1";
-      root = "/var/lib/webdav-files";
-      baseURL = "/"; # Important: Tell the service it's at the root of the domain.
-      behindProxy = true;
+      server.listen = [ "127.0.0.1:${toString webdavPort}" ];
 
-      # Enable built-in basic authentication
-      basicAuth.enable = true;
+      # The authentication type is set to use the htpasswd provider.
+      accounts = {
+        auth-type = "htpasswd.default";
+        # The account type is also htpasswd, not unix.
+        acct-type = "htpasswd.default";
+      };
 
-      # Define users from sops secrets
-      users = [
+      # This is the htpasswd provider.
+      htpasswd.default = {
+        # Use the path to the file created by sops.
+        htpasswd = config.sops.secrets.webdav_htpasswd.path;
+      };
+
+      # This defines the single location for your WebDAV server.
+      location = [
         {
-          # Use file paths provided by sops
-          usernameFile = "/run/webdav_secrets/webdav.username";
-          passwordFile = "/run/webdav_secrets/webdav.password";
-          # Permissions for this user
-          scope = "/var/lib/webdav-files";
-          modify = true;
-          rules = [
-            {
-              regex = ".*";
-              allow = true;
-            }
-          ];
+          route = [ "/*path" ];
+          directory = "/var/lib/webdav-files";
+          handler = "filesystem";
+          methods = [ "webdav-rw" ];
+          auth = "true";
+          # We don't need 'setuid = true' because we are not mapping to Unix users.
         }
       ];
     };
