@@ -348,8 +348,18 @@ in
   sops.age.sshKeyPaths = [
     "/home/keranod/.dotfiles/.ssh/id_ed25519"
   ];
-  sops.secrets.webdav_username = { };
-  sops.secrets.webdav_password = { };
+  sops.secrets.webdav_username = {
+    path = "/run/webdav_secrets/webdav.username";
+    owner = "webdav";
+    group = "webdav";
+    mode = "0640";
+  };
+  sops.secrets.webdav_password = {
+    path = "/run/webdav_secrets/webdav.password";
+    owner = "webdav";
+    group = "webdav";
+    mode = "0640";
+  };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   #   sops.secrets.nginx_webdav_users = {
   #     path = "/run/webdav_secrets/webdav.users";
@@ -390,8 +400,8 @@ in
       users = [
         {
           # Use file paths provided by sops
-          usernameFile = config.sops.secrets.webdav_username.path;
-          passwordFile = config.sops.secrets.webdav_password.path;
+          usernameFile = "/run/webdav_secrets/webdav.username";
+          passwordFile = "/run/webdav_secrets/webdav.password";
           # Permissions for this user
           scope = "/var/lib/webdav-files";
           modify = true;
