@@ -390,7 +390,6 @@ in
 
       accounts = {
         auth-type = "sops_htpasswd";
-        acct-type = "htpasswd";
         realm = "Floccus WebDAV";
       };
 
