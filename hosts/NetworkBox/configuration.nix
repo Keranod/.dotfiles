@@ -352,7 +352,7 @@ in
     path = "/run/webdav-server-rs/htpasswd";
     owner = "webdav";
     group = "webdav";
-    mode = "0600";
+    mode = "0640";
   };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   #   sops.secrets.nginx_webdav_users = {
@@ -378,38 +378,17 @@ in
     };
   };
 
-  services.webdav-server-rs = {
+  services.webdav = {
     enable = true;
-
     settings = {
-      server = {
-        listen = [ "127.0.0.1:${toString webdavPort}" ];
-        uid = 33; # Run under the nginx user
-        gid = 33; # Run under the nginx group
-      };
+      port = webdavPort;
+      host = "127.0.0.1";
+      root = "/var/lib/webdav-files";
+      baseURL = "/";
+      behindProxy = true;
 
-      accounts = {
-        auth-type = "sops_htpasswd";
-        realm = "Floccus WebDAV";
-      };
-
-      # This is the htpasswd provider.
-      htpasswd.default = {
-        # Use the path to the file created by sops.
-        htpasswd = config.sops.secrets.webdav_htpasswd.path;
-      };
-
-      # This defines the single location for your WebDAV server.
-      location = [
-        {
-          route = [ "/*path" ];
-          directory = "/var/lib/webdav-files";
-          handler = "filesystem";
-          methods = [ "webdav-rw" ];
-          auth = "true";
-          # We don't need 'setuid = true' because we are not mapping to Unix users.
-        }
-      ];
+      basicAuth.enable = true;
+      basicAuth.usersFile = config.sops.secrets.webdav_htpasswd.path;
     };
   };
 
