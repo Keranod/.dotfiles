@@ -382,13 +382,16 @@ in
     enable = true;
 
     settings = {
-      server.listen = [ "127.0.0.1:${toString webdavPort}" ];
+      server = {
+        listen = [ "127.0.0.1:${toString webdavPort}" ];
+        uid = 33; # Run under the nginx user
+        gid = 33; # Run under the nginx group
+      };
 
-      # The authentication type is set to use the htpasswd provider.
       accounts = {
-        auth-type = "htpasswd.default";
-        # The account type is also htpasswd, not unix.
+        auth-type = "sops_htpasswd";
         acct-type = "htpasswd";
+        realm = "Floccus WebDAV";
       };
 
       # This is the htpasswd provider.
