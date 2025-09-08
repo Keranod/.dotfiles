@@ -352,13 +352,13 @@ in
     path = "/run/webdav_secrets/webdav.username";
     owner = "webdav";
     group = "webdav";
-    mode = "0640";
+    mode = "0400";
   };
   sops.secrets.webdav_password = {
     path = "/run/webdav_secrets/webdav.password";
     owner = "webdav";
     group = "webdav";
-    mode = "0640";
+    mode = "0400";
   };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   #   sops.secrets.nginx_webdav_users = {
