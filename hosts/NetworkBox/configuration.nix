@@ -389,8 +389,8 @@ in
     settings = {
       port = webdavPort;
       address = "127.0.0.1";
-      directory = webdavDirPath; 
-      prefix = "/"; 
+      directory = webdavDirPath;
+      prefix = "/";
       behindProxy = true;
 
       users = [
@@ -457,11 +457,6 @@ in
       large_client_header_buffers 8 32k;
       proxy_headers_hash_max_size 1024;
       proxy_headers_hash_bucket_size 128;
-
-      map $http_destination $dest_path {
-          ~^https://${webdavDomain}(?<path>.*)  /$path;
-          default                           $http_destination;
-      }
     '';
 
     virtualHosts."${vaultDomain}" = {
@@ -545,7 +540,7 @@ in
           proxy_set_header Host $host;
           proxy_redirect off;
 
-          proxy_set_header Destination $dest_path;
+          proxy_set_header Destination $http_destination;
         '';
       };
     };
