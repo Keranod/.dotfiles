@@ -447,6 +447,8 @@ in
     #   "acme-switch.service"
     # ];
 
+    errorLog = "stderr debug";
+
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
