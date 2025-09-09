@@ -534,13 +534,20 @@ in
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString webdavPort}/";
         extraConfig = ''
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header REMOTE-HOST $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header Host $host;
           proxy_redirect off;
 
-          proxy_set_header Destination $http_destination;
+          # Your WebDAV server expects the X-Forwarded-Host header.
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Server $host;
+
+          # Let the WebDAV server know what the original request method was
+          proxy_set_header X-HTTP-Method-Override $request_method;
+
+          # These are already set by recommendedProxySettings, so no need to repeat
+          # proxy_set_header X-Real-IP $remote_addr;
+          # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          # proxy_set_header Host $host;
         '';
       };
     };
