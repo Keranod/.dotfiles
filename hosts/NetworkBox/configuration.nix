@@ -516,6 +516,13 @@ in
       };
     };
 
+    appendHttpConfig = ''
+      map $http_destination $dest_path {
+          ~^https://${webdavDomain}(?<path>.*)  /$path;
+          default                           $http_destination;
+      }
+    '';
+
     virtualHosts."${webdavDomain}" = {
       enableACME = false;
       forceSSL = true;
@@ -540,13 +547,7 @@ in
           proxy_set_header Host $host;
           proxy_redirect off;
 
-          # ADD THIS BLOCK FOR CORRECT COPY/MOVE SUPPORT
-          # It replaces 'example.com' with your actual domain variable.
-          set $dest $http_destination;
-          if ($http_destination ~ "^https://${webdavDomain}(?<path>(.+))") {
-            set $dest /$path;
-          }
-          proxy_set_header Destination $dest;
+          proxy_set_header Destination $dest_path;
         '';
       };
     };
