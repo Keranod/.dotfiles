@@ -24,7 +24,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hysteria-nix.url = "github:apernet/hysteria";
   };
 
   # Importing self ans nixpkgs
@@ -36,7 +35,6 @@
       bindPkgs,
       sambaPkgs,
       sops-nix,
-      hysteria-nix,
       ...
     }:
     # Assagning nixpkgs.lib in the scope followed after brackets after in to variable lib
@@ -94,9 +92,6 @@
             ./hosts/ABYSS/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
-            {
-              nixpkgs.overlays = [ hysteria-nix.overlays.default ];
-            }
           ];
         };
         VMNixOSWork = lib.nixosSystem {
