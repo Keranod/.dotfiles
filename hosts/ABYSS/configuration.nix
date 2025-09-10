@@ -95,6 +95,9 @@ in
 
                 # Allow SSH connections from any VPN client
                 iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
+
+                # Allow incoming Hysteria connections on UDP port 443
+                iifname "enp1s0" udp dport 443 ct state new accept;
               }
 
               chain forward {
@@ -134,6 +137,38 @@ in
       KexAlgorithms = [ "curve25519-sha256" ];
       Ciphers = [ "chacha20-poly1305@openssh.com" ];
       Macs = [ "hmac-sha2-512-etm@openssh.com" ];
+    };
+  };
+
+  # This JSON file contains all the settings for the server.
+  environment.etc."hysteria/server.json".text = ''
+    {
+      "listen": ":443",
+      "acme": {
+        "domains": [
+          "keranod.dev"
+        ],
+        "email": "konrad.konkel@wp.pl"
+      },
+      "obfs": "your-secret-password",
+      "masquerade": {
+        "domain": "www.cloudflare.com"
+      },
+      "up_mbps": 100,
+      "down_mbps": 100
+    }
+  '';
+
+  # This service uses the configuration file
+  systemd.services.hysteria-server = {
+    description = "Hysteria Server";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" ];
+    path = [ pkgs.hysteria ];
+    serviceConfig = {
+      ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /etc/hysteria/server.json";
+      Restart = "always";
+      User = "root"; # It needs root to listen on port 443
     };
   };
 }
