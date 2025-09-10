@@ -150,6 +150,7 @@ in
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
+      listenHTTP = ":80";
     };
     certs."keranod.dev" = {
       group = "root";
