@@ -103,7 +103,7 @@ in
                 iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
 
                 # Allow incoming Hysteria connections on TCP port 443
-                iifname "enp1s0" TCP dport 443 ct state new accept;
+                iifname "enp1s0" tcp dport 443 ct state new accept;
               }
 
               chain forward {
