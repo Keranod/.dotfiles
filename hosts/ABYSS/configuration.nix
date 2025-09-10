@@ -143,8 +143,11 @@ in
   security.acme = {
     enable = true;
     acceptTerms = true;
-    email = "konrad.konkel@wp.pl";
-    certificates."keranod.dev" = {
+    defaults = {
+      email = "konrad.konkel@wp.pl";
+      dnsResolver = "10.0.0.2";
+    };
+    certs."keranod.dev" = {
       group = "root";
     };
   };
