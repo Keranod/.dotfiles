@@ -2,6 +2,12 @@
 
 let
   serverHostName = "ABYSS";
+
+  domain = "keranod.dev";
+
+  acmeRoot = "/var/lib/acme";
+
+  acmeDomainDir = "${acmeRoot}/${domain}";
 in
 {
   imports = [
@@ -156,8 +162,8 @@ in
   environment.etc."hysteria/server.json".text = ''
     {
       "listen": ":443",
-      "cert": "${config.services.acme.certs."keranod.dev".path}/fullchain.pem",
-      "key": "${config.services.acme.certs."keranod.dev".path}/key.pem",
+      "cert": "${acmeDomainDir}/full.pem",
+      "key": "${acmeDomainDir}/key.pem",
       "obfs": "your-secret-password",
       "masquerade": {
         "domain": "www.cloudflare.com"
