@@ -150,8 +150,6 @@ in
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
-      dnsProvider = "hetzner";
-      dnsResolver = "10.0.0.2";
     };
     certs."keranod.dev" = {
       group = "root";
