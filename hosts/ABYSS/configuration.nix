@@ -171,6 +171,10 @@ in
         "cert": "${acmeDomainDir}/full.pem",
         "key": "${acmeDomainDir}/key.pem"
       },
+      "auth": {
+        "type": "password",
+        "password": "simplepasswordwithnospacesorcharacters"
+      },
       "obfs": {
         "type": "salamander",
         "salamander": {
