@@ -140,7 +140,7 @@ in
     };
   };
 
-  services.acme = {
+  security.acme = {
     enable = true;
     acceptTerms = true;
     email = "konrad.konkel@wp.pl";
