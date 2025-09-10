@@ -150,7 +150,13 @@ in
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
-      listenHTTP = ":80";
+      dnsProvider = "hetzner";
+      dnsResolver = "10.0.0.2";
+      credentialFiles = {
+        # Need to suffix variable name with _FILE
+        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
+        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+      };
     };
     certs."keranod.dev" = {
       group = "root";
