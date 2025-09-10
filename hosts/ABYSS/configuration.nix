@@ -169,7 +169,10 @@ in
       "listen": ":443",
       "cert": "${acmeDomainDir}/full.pem",
       "key": "${acmeDomainDir}/key.pem",
-      "obfs": "your-secret-password",
+      "obfs": {
+        "type": "salamander",
+        "password": "your-secret-password"
+      },
       "masquerade": {
         "domain": "www.cloudflare.com"
       },
