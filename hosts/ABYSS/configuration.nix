@@ -167,6 +167,7 @@ in
   environment.etc."hysteria/server.json".text = ''
     {
       "listen": ":443",
+      "disableUDP": true,
       "tls": {
         "cert": "${acmeDomainDir}/full.pem",
         "key": "${acmeDomainDir}/key.pem"
