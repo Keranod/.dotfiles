@@ -140,16 +140,21 @@ in
     };
   };
 
+  services.acme = {
+    enable = true;
+    acceptTerms = true;
+    email = "konrad.konkel@wp.pl";
+    certificates."keranod.dev" = {
+      group = "root";
+    };
+  };
+
   # This JSON file contains all the settings for the server.
   environment.etc."hysteria/server.json".text = ''
     {
       "listen": ":443",
-      "acme": {
-        "domains": [
-          "keranod.dev"
-        ],
-        "email": "konrad.konkel@wp.pl"
-      },
+      "cert": "${config.services.acme.certs."keranod.dev".path}/fullchain.pem",
+      "key": "${config.services.acme.certs."keranod.dev".path}/key.pem",
       "obfs": "your-secret-password",
       "masquerade": {
         "domain": "www.cloudflare.com"
@@ -163,7 +168,7 @@ in
   systemd.services.hysteria-server = {
     description = "Hysteria Server";
     wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" ];
+    after = [ "network-online.target" "acme-keranod.dev.service" ];
     path = [ pkgs.hysteria ];
     serviceConfig = {
       ExecStart = "${pkgs.hysteria}/bin/hysteria server --config /etc/hysteria/server.json";
