@@ -167,8 +167,10 @@ in
   environment.etc."hysteria/server.json".text = ''
     {
       "listen": ":443",
-      "cert": "${acmeDomainDir}/full.pem",
-      "key": "${acmeDomainDir}/key.pem",
+      "tls": {
+        "cert": "${acmeDomainDir}/full.pem",
+        "key": "${acmeDomainDir}/key.pem",
+      },
       "obfs": {
         "type": "salamander",
         "salamander": {
