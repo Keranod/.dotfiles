@@ -169,7 +169,7 @@ in
       "listen": ":443",
       "tls": {
         "cert": "${acmeDomainDir}/full.pem",
-        "key": "${acmeDomainDir}/key.pem",
+        "key": "${acmeDomainDir}/key.pem"
       },
       "obfs": {
         "type": "salamander",
