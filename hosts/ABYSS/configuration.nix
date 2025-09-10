@@ -171,7 +171,7 @@ in
       "key": "${acmeDomainDir}/key.pem",
       "obfs": {
         "type": "salamander",
-        "password": "your-secret-password"
+        "password": "LNuCArWKh9h+hYw13K+0NEwjgwSUURrAzPx3DAJ2R9s="
       },
       "masquerade": {
         "domain": "www.cloudflare.com"
