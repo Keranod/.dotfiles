@@ -141,7 +141,6 @@ in
   };
 
   security.acme = {
-    enable = true;
     acceptTerms = true;
     defaults = {
       email = "konrad.konkel@wp.pl";
