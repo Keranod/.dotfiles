@@ -120,6 +120,9 @@ in
       allowedUDPPorts = [ 51820 ]; # Clients and peers can use the same port, see listenport
     };
 
+    # Do not switch off using GNOME interface otherwise will lose all internet
+    # sudo systemctl stop wg-quick-vpn-network.service
+    # sudo systemctl start wg-quick-vpn-network.service
     wg-quick.interfaces = {
       "vpn-network" = {
         address = [ "10.0.0.4/24" ];
