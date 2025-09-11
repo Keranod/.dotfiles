@@ -1,4 +1,5 @@
 - backup daily to external ssd
+- self hosted translation engine
 - make nginx rely on acme finishing its service
 - SSL ntop and adguard gui with ssl
 - VPN network
