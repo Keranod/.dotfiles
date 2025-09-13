@@ -66,6 +66,13 @@ in
                 "10.0.0.5/32"
               ];
             }
+            {
+              name = "grapheneOSMain";
+              publicKey = "yxiAXoxvDN+EjZftnOnPCBXTjxWvtub3WLW+MSDqt3o=";
+              allowedIPs = [
+                "10.0.0.6/32"
+              ];
+            }
           ];
         };
       };
