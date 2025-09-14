@@ -1,4 +1,5 @@
 - backup daily to external ssd
+- AdGuard home TLS/SSL
 - calendar
 - contacts
 - self host smart house control
