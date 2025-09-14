@@ -75,7 +75,7 @@ in
             }
             {
               name = "grapheneOSG";
-              publicKey = "yxiAXoxvDN+EjZftnOnPCBXTjxWvtub3WLW+MSDqt3o=";
+              publicKey = "44So+RhbSuH+nerbdJtaeEIsf1/9anLwW90sbSZ5mXE=";
               allowedIPs = [
                 "10.0.0.7/32"
               ];
