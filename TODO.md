@@ -1,5 +1,7 @@
 - backup daily to external ssd
-- self host smart house control 
+- calendar
+- contacts
+- self host smart house control
 - self hosted translation engine
 - make nginx rely on acme finishing its service
 - SSL ntop and adguard gui with ssl
