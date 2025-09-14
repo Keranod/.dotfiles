@@ -73,6 +73,13 @@ in
                 "10.0.0.6/32"
               ];
             }
+            {
+              name = "grapheneOSG";
+              publicKey = "yxiAXoxvDN+EjZftnOnPCBXTjxWvtub3WLW+MSDqt3o=";
+              allowedIPs = [
+                "10.0.0.7/32"
+              ];
+            }
           ];
         };
       };
