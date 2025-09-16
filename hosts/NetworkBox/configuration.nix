@@ -45,7 +45,7 @@ let
   webdavDomain = "webdav.keranod.dev";
   webdavPort = 4010;
   acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
-  webdavSecretsPath = "${secretsDir}/webdav_secrets/webdav.env";
+  webdavSecretsPath = "${secretsDir}/webdav.env";
   webdavDirPath = "/var/lib/webdav-files";
 
   # Test
@@ -53,7 +53,7 @@ let
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   # Restic
-  resticSecretsPath = "${secretsDir}/restic_secrets/restic.env";
+  resticSecretsPath = "${secretsDir}/restic.env";
 
   # Backup
   backupPaths = [

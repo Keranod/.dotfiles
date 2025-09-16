@@ -79,7 +79,7 @@ creation_rules:
           - *server_host
 ```
 
-- generate hashed password eg. `nix-shell -p apacheHttpd --run "htpasswd -n -B floccus_user"` and copy it
+- `Floccus need hashed password` - generate hashed password eg. `htpasswd -n -B floccus_user` and copy it
 - cd to `~/.dotfiles` and run for eg. `nix run nixpkgs#sops -- hosts/NetworkBox/secrets.yaml`. Make sure that the host you are running it on has `.sops.yaml`
 - to manage secrets later also need to be in `~/.dotfiles` and run `nix-shell -p sops ssh-to-age --run 'SOPS_AGE_KEY=$(ssh-to-age -private-key -i ~/.dotfiles/.ssh/id_ed25519 | grep '\''AGE-SECRET-KEY'\'') sops hosts/NetworkBox/secrets.yaml'`
 - remember to commit after modyfing secrets
