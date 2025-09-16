@@ -601,9 +601,9 @@ in
       user = "keranod";
       repository = "ssh://keranod@10.0.0.1/~/restic-repo";
       passwordFile = "${resticSecretsPath}";
-      env = {
-        GIT_SSH_COMMAND = "ssh -i ${sshKey} -o StrictHostKeyChecking=yes";
-      };
+      extraOptions = [
+        "sftp.command=ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp"
+      ];
       timerConfig = {
         OnCalendar = "daily";
         RandomizedDelaySec = "1h";
