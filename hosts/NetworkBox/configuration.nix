@@ -597,21 +597,21 @@ in
   };
 
   services.restic.backups."vpn-vps" = {
-      paths = backupPaths;
-      user = "keranod";
-      repository = "ssh://keranod@10.0.0.1/~/restic-repo";
-      passwordFile = "${resticSecretsPath}";
-      extraOptions = [
-        "sftp.command=ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp"
-      ];
-      timerConfig = {
-        OnCalendar = "daily";
-        RandomizedDelaySec = "1h";
-        Persistent = true;
-      };
-      initialize = true;
-      pruneOpts = [ "--keep-daily 7" ];
+    paths = backupPaths;
+    user = "keranod";
+    repository = "ssh://keranod@10.0.0.1/~/restic-repo";
+    passwordFile = "${resticSecretsPath}";
+    extraOptions = [
+      "sftp.command=ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp"
+    ];
+    timerConfig = {
+      OnCalendar = "daily 02:00";
+      RandomizedDelaySec = "1h";
+      Persistent = true;
     };
+    initialize = true;
+    pruneOpts = [ "--keep-daily 7" ];
+  };
 
   services.ntopng = {
     enable = true;
