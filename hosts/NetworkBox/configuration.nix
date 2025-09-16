@@ -7,29 +7,61 @@
 let
   serverHostName = "NetworkBox";
 
+  # TV
   tvMAC = "A8:23:FE:FD:19:ED";
   tvFwmark = "200";
   tvTable = tvFwmark;
   tvPriority = "1000";
   tvInterface = "wg0";
 
-  vaultDomain = "vault.keranod.dev";
-  giteaDomain = "git.keranod.dev";
-  webdavDomain = "webdav.keranod.dev";
-  testDomain = "test.keranod.dev";
+  # SSH Key
+  sshKey = "/home/keranod/.dotfiles/.ssh/id_ed25519";
 
+  # Wireguard
+  wireguardDir = "/etc/wireguard";
+
+  # secrets
+  secretsDir = "/etc/secrets";
+
+  # Acme
   acmeRoot = "/var/lib/acme";
+
+  # Vaultwarden
+  vaultDir = "/var/lib/vaultwarden";
+  vaultDomain = "vault.keranod.dev";
+  vaultwardenPort = 3090;
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
-  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
+
+  # Gitea
+  giteaDir = "/var/lib/gitea";
+  giteaDomain = "git.keranod.dev";
+  giteaPort = 4000;
+  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}"; 
+
+  # WebDAV
+  webdavDomain = "webdav.keranod.dev";
+  webdavPort = 4010;
   acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
+  webdavSecretsPath = "${secretsDir}/webdav_secrets/webdav.env";
+  webdavDirPath = "/var/lib/webdav-files";
+
+  # Test
+  testDomain = "test.keranod.dev";  
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
-  vaultwardenPort = 3090;
-  giteaPort = 4000;
-  webdavPort = 4010;
+  # Restic
+  resticSecretsPath = "${secretsDir}/restic_secrets/restic.env";
 
-  webdavSecretsPath = "/run/webdav_secrets/webdav.env";
-  webdavDirPath = "/var/lib/webdav-files";
+  # Backup
+  backupPaths = [
+    "${wireguardDir}"
+    "${secretsDir}"
+    "${acmeRoot}"
+    "${vaultDir}"
+    "${webdavDirPath}"
+    "/home/keranod"
+  ];
+  
 in
 {
   imports = [
@@ -323,14 +355,14 @@ in
     # Comment out to turn off admin panel
     # sudo mkdir /etc/secrets
     # head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 | sudo tee /etc/secrets/vaultwarden
-    environmentFile = "/etc/secrets/vaultwarden";
+    # environmentFile = "/etc/secrets/vaultwarden";
   };
 
   services.gitea = {
     enable = true;
     database = {
       type = "sqlite3";
-      path = "/var/lib/gitea/gitea.db";
+      path = "${giteaDir}/gitea.db";
     };
     settings = {
       server = {
@@ -349,14 +381,22 @@ in
 
   sops.defaultSopsFile = ./secrets.yaml;
   sops.age.sshKeyPaths = [
-    "/home/keranod/.dotfiles/.ssh/id_ed25519"
+    sshKey
   ];
+  # sops.secrets.<name of the secret in the file>
   sops.secrets.webdav_env_file = {
     # This path will be referenced by the webdav service
     path = webdavSecretsPath;
     owner = "webdav";
     group = "webdav";
     mode = "0640";
+  };
+  sops.secrets.restic_password = {
+    # This path will be referenced by the webdav service
+    path = resticSecretsPath;
+    owner = "keranod";
+    group = "keranod";
+    mode = "0600";
   };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
   #   sops.secrets.nginx_webdav_users = {
@@ -413,7 +453,7 @@ in
       credentialFiles = {
         # Need to suffix variable name with _FILE
         # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
-        "HETZNER_API_KEY_FILE" = "/etc/secrets/hetznerDNSApi";
+        "HETZNER_API_KEY_FILE" = "${hetznerAPIFile}";
       };
       postRun = "systemctl restart nginx";
     };
@@ -550,6 +590,26 @@ in
           # proxy_set_header Host $host;
         '';
       };
+    };
+  };
+
+  services.restic = {
+    enable = true;
+    backups."vpn-vps" = {
+      paths = backupPaths;
+      user = "keranod";
+      repository = "ssh://keranod@10.0.0.1/~/restic-repo";
+      passwordFile = "${resticSecretsPath}";
+      env = {
+        GIT_SSH_COMMAND = "ssh -i ${sshKey} -o StrictHostKeyChecking=yes";
+      };
+      timerConfig = {
+        OnCalendar = "daily";
+        RandomizedDelaySec = "1h";
+        Persistent = true;
+      };
+      initialize = true;
+      pruneOpts = [ "--keep-daily 7" ];
     };
   };
 
