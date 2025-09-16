@@ -604,11 +604,11 @@ in
     extraOptions = [
       "sftp.command=ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp"
     ];
-    timerConfig = {
-      OnCalendar = "daily 02:00";
-      RandomizedDelaySec = "1h";
-      Persistent = true;
-    };
+    # timerConfig = {
+    #   OnCalendar = "daily 02:00";
+    #   RandomizedDelaySec = "1h";
+    #   Persistent = true;
+    # };
     initialize = true;
     pruneOpts = [ "--keep-daily 7" ];
   };
