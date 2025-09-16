@@ -596,9 +596,7 @@ in
     };
   };
 
-  services.restic = {
-    enable = true;
-    backups."vpn-vps" = {
+  services.restic.backups."vpn-vps" = {
       paths = backupPaths;
       user = "keranod";
       repository = "ssh://keranod@10.0.0.1/~/restic-repo";
@@ -614,7 +612,6 @@ in
       initialize = true;
       pruneOpts = [ "--keep-daily 7" ];
     };
-  };
 
   services.ntopng = {
     enable = true;
