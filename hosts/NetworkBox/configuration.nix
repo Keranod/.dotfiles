@@ -23,6 +23,9 @@ let
   # secrets
   secretsDir = "/etc/secrets";
 
+  # HETZNER
+  hetznerAPIFile = "/etc/secrets/hetznerDNSApi";
+
   # Acme
   acmeRoot = "/var/lib/acme";
 
