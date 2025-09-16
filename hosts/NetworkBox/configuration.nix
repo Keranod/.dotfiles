@@ -398,7 +398,7 @@ in
     # This path will be referenced by the webdav service
     path = resticSecretsPath;
     owner = "keranod";
-    group = "keranod";
+    group = "root";
     mode = "0600";
   };
   # Do not put secrets files in /run/secrets otherwise there will be race condition issue
