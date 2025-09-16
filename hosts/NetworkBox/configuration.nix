@@ -603,7 +603,7 @@ in
   services.restic.backups."vpn-vps" = {
     paths = backupPaths;
     user = "keranod";
-    repository = "ssh://keranod@10.0.0.1:${keranodHomeDir}/restic-repo";
+    repository = "sftp:keranod@10.0.0.1:${keranodHomeDir}/restic-repo";
     passwordFile = "${resticSecretsPath}";
     extraOptions = [
       "sftp.command='ssh -i ${keranodHomeDir}/.dotfiles/.ssh/id_ed25519 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${keranodHomeDir}/.ssh/known_hosts -s sftp'"
