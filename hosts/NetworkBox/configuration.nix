@@ -596,13 +596,14 @@ in
     };
   };
 
+  # restic-backups-vpn-vps.service
   services.restic.backups."vpn-vps" = {
     paths = backupPaths;
     user = "keranod";
     repository = "ssh://keranod@10.0.0.1/~/restic-repo";
     passwordFile = "${resticSecretsPath}";
     extraOptions = [
-      "sftp.command=ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp"
+      "sftp.command='ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp'"
     ];
     # timerConfig = {
     #   OnCalendar = "daily 02:00";
@@ -614,7 +615,7 @@ in
   };
 
   services.ntopng = {
-    enable = true;
+    enable = false;
     extraConfig = ''
       --http-port=3001
     '';
