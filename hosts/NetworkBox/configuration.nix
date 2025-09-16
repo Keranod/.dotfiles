@@ -7,6 +7,9 @@
 let
   serverHostName = "NetworkBox";
 
+  # My user home dir
+  keranodHomeDir = "/home/keranod";
+
   # TV
   tvMAC = "A8:23:FE:FD:19:ED";
   tvFwmark = "200";
@@ -15,7 +18,7 @@ let
   tvInterface = "wg0";
 
   # SSH Key
-  sshKey = "/home/keranod/.dotfiles/.ssh/id_ed25519";
+  sshKey = "${keranodHomeDir}/.dotfiles/.ssh/id_ed25519";
 
   # Wireguard
   wireguardDir = "/etc/wireguard";
@@ -62,7 +65,7 @@ let
     "${acmeRoot}"
     "${vaultDir}"
     "${webdavDirPath}"
-    "/home/keranod"
+    "${keranodHomeDir}"
   ];
   
 in
@@ -603,7 +606,7 @@ in
     repository = "ssh://keranod@10.0.0.1/~/restic-repo";
     passwordFile = "${resticSecretsPath}";
     extraOptions = [
-      "sftp.command='ssh -i ${sshKey} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/home/keranod/.ssh/known_hosts -s sftp'"
+      "sftp.command='ssh -i ${keranodHomeDir}/.dotfiles/.ssh/id_ed25519 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${keranodHomeDir}/.ssh/known_hosts -s sftp'"
     ];
     # timerConfig = {
     #   OnCalendar = "daily 02:00";
