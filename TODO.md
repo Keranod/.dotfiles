@@ -1,4 +1,5 @@
-- backup daily to external ssd
+- backup daily to external ssd/usb
+  - sort restic server on VPS for weekly archive or/and daily backup
 - AdGuard home TLS/SSL
 - calendar
 - contacts

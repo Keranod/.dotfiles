@@ -85,9 +85,16 @@ in
     fsType = "vfat";
   };
 
-  environment.etc.usbMountDir = {
-    source = null; # This creates the directory
-    mode = "0755";
+  systemd.tmpfiles.settings = {
+    "10-usb-mount" = {
+      "/mnt/usb" = {
+        d = {
+          user = "root"; 
+          group = "root";
+          mode = "0700"; 
+        };
+      };
+    };
   };
 
   # Use UUID to mount for more reliable approach
