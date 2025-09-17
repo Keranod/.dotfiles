@@ -59,7 +59,7 @@ let
   resticSecretsPath = "${secretsDir}/restic.env";
 
   # USB mount dir
-  usbMountDir = "mnt/usb";
+  usbMountDir = "/mnt/usb";
 
   # Backup
   backupPaths = [
@@ -87,7 +87,7 @@ in
 
   systemd.tmpfiles.settings = {
     "10-usb-mount" = {
-      "/mnt/usb" = {
+      usbMountDir = {
         d = {
           user = "root"; 
           group = "root";
@@ -624,10 +624,10 @@ in
     };
   };
 
-  # restic-backups-vpn-vps.service
-  services.restic.backups."vpn-vps" = {
+  # restic-backups-usb.service
+  services.restic.backups."usb" = {
     paths = backupPaths;
-    repository = "/mnt/usb/restic-repo";
+    repository = "${usbMountDir}/restic-repo";
     passwordFile = "${resticSecretsPath}";
     # timerConfig = {
     #   OnCalendar = "daily 02:00";
