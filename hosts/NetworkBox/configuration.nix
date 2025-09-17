@@ -42,7 +42,7 @@ let
   giteaDir = "/var/lib/gitea";
   giteaDomain = "git.keranod.dev";
   giteaPort = 4000;
-  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}"; 
+  acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
 
   # WebDAV
   webdavDomain = "webdav.keranod.dev";
@@ -52,7 +52,7 @@ let
   webdavDirPath = "/var/lib/webdav-files";
 
   # Test
-  testDomain = "test.keranod.dev";  
+  testDomain = "test.keranod.dev";
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   # Restic
@@ -70,7 +70,7 @@ let
     "${webdavDirPath}"
     "${keranodHomeDir}"
   ];
-  
+
 in
 {
   imports = [
@@ -89,9 +89,9 @@ in
     "10-usb-mount" = {
       "${usbMountDir}" = {
         d = {
-          user = "root"; 
+          user = "root";
           group = "root";
-          mode = "0755"; 
+          mode = "0755";
         };
       };
     };
@@ -639,6 +639,8 @@ in
     initialize = true;
     pruneOpts = [ "--keep-daily 7" ];
   };
+
+  # radicale
 
   services.ntopng = {
     enable = false;
