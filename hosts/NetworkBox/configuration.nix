@@ -99,6 +99,7 @@ in
 
   # Use UUID to mount for more reliable approach
   # lsblk -o NAME,UUID
+  # manual mount `sudo mount /dev/sdb1 /mnt/usb`
   # manual mount `sudo mount UUID=3c44cefb-02b2-4299-8e8c-4f029e30889d /mnt/usb`
   # manual unmount `sudo umount /mnt/usb`
   fileSystems."${usbMountDir}" = {
@@ -246,6 +247,7 @@ in
     nodePackages_latest.nodejs
     home-manager
     wireguard-tools
+    restic
   ];
 
   # Enable the OpenSSH service
@@ -628,11 +630,11 @@ in
     paths = backupPaths;
     repository = "${usbMountDir}/restic-repo";
     passwordFile = "${resticSecretsPath}";
-    # timerConfig = {
-    #   OnCalendar = "daily 02:00";
-    #   RandomizedDelaySec = "1h";
-    #   Persistent = true;
-    # };
+    timerConfig = {
+      OnCalendar = "daily 02:00";
+      RandomizedDelaySec = "1h";
+      Persistent = true;
+    };
     initialize = true;
     pruneOpts = [ "--keep-daily 7" ];
   };

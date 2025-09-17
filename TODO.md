@@ -1,5 +1,5 @@
-- backup daily to external ssd/usb
-  - sort restic server on VPS for weekly archive or/and daily backup
+- automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
+- sort restic server on VPS for weekly archive or/and daily backup
 - AdGuard home TLS/SSL
 - calendar
 - contacts
