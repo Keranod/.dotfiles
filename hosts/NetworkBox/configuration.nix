@@ -82,6 +82,14 @@ in
     fsType = "vfat";
   };
 
+  # Use UUID to mount for more reliable approach
+  # lsblk -o NAME,UUID
+  fileSystems."/mnt/usb" = {
+    device = "UUID=3c44cefb-02b2-4299-8e8c-4f029e30889d";
+    fsType = "ext4";
+    options = [ "noauto" ];
+  };
+
   boot.kernel.sysctl = {
     # IPv4
     "net.ipv4.ip_forward" = 1; # Enable IPv4 forwarding
@@ -602,12 +610,8 @@ in
   # restic-backups-vpn-vps.service
   services.restic.backups."vpn-vps" = {
     paths = backupPaths;
-    user = "keranod";
-    repository = "sftp:keranod@10.0.0.1:${keranodHomeDir}/restic-repo";
+    repository = "/mnt/usb/restic-repo";
     passwordFile = "${resticSecretsPath}";
-    extraOptions = [
-      "sftp.command=ssh -i ${keranodHomeDir}/.dotfiles/.ssh/id_ed25519 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${keranodHomeDir}/.ssh/known_hosts -s sftp"
-    ];
     # timerConfig = {
     #   OnCalendar = "daily 02:00";
     #   RandomizedDelaySec = "1h";
