@@ -626,11 +626,13 @@ in
   };
 
   # restic-backups-usb.service
+  # To check backups run as `root` `restic snapshots -r /mnt/usb/restic-repo/`
   services.restic.backups."usb" = {
     paths = backupPaths;
     repository = "${usbMountDir}/restic-repo";
     passwordFile = "${resticSecretsPath}";
     timerConfig = {
+      # Daily at 2am
       OnCalendar = "*-*-* 02:00:00";
       Persistent = true;
     };
