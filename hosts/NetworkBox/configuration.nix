@@ -631,7 +631,7 @@ in
     repository = "${usbMountDir}/restic-repo";
     passwordFile = "${resticSecretsPath}";
     timerConfig = {
-      OnCalendar = "daily 02:00";
+      OnCalendar = "*-*-* 02:00:00";
       Persistent = true;
     };
     initialize = true;
