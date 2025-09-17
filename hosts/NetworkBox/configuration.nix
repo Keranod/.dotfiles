@@ -105,7 +105,6 @@ in
     device = "/dev/disk/by-uuid/3c44cefb-02b2-4299-8e8c-4f029e30889d";
     mountPoint = usbMountDir;
     fsType = "ext4";
-    options = [ "noauto" ];
   };
 
   boot.kernel.sysctl = {
