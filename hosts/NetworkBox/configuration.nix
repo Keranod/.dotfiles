@@ -632,7 +632,6 @@ in
     passwordFile = "${resticSecretsPath}";
     timerConfig = {
       OnCalendar = "daily 02:00";
-      RandomizedDelaySec = "1h";
       Persistent = true;
     };
     initialize = true;
