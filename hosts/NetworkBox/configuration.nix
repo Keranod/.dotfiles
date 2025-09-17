@@ -87,7 +87,7 @@ in
 
   systemd.tmpfiles.settings = {
     "10-usb-mount" = {
-      usbMountDir = {
+      "${usbMountDir}" = {
         d = {
           user = "root"; 
           group = "root";
