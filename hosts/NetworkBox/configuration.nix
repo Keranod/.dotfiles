@@ -58,6 +58,9 @@ let
   # Restic
   resticSecretsPath = "${secretsDir}/restic.env";
 
+  # USB mount dir
+  usbMountDir = "mnt/usb";
+
   # Backup
   backupPaths = [
     "${wireguardDir}"
@@ -82,9 +85,16 @@ in
     fsType = "vfat";
   };
 
+  environment.etc.usbMountDir = {
+    source = null; # This creates the directory
+    mode = "0755";
+  };
+
   # Use UUID to mount for more reliable approach
   # lsblk -o NAME,UUID
-  fileSystems."/mnt/usb" = {
+  # manual mount `sudo mount UUID=3c44cefb-02b2-4299-8e8c-4f029e30889d /mnt/usb`
+  # manual unmount `sudo umount /mnt/usb`
+  fileSystems.usbMountDir = {
     device = "UUID=3c44cefb-02b2-4299-8e8c-4f029e30889d";
     fsType = "ext4";
     options = [ "noauto" ];
