@@ -101,7 +101,7 @@ in
   # lsblk -o NAME,UUID
   # manual mount `sudo mount UUID=3c44cefb-02b2-4299-8e8c-4f029e30889d /mnt/usb`
   # manual unmount `sudo umount /mnt/usb`
-  fileSystems.usbMountDir = {
+  fileSystems."${usbMountDir}" = {
     device = "/dev/disk/by-uuid/3c44cefb-02b2-4299-8e8c-4f029e30889d";
     fsType = "ext4";
   };
