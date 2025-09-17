@@ -1,5 +1,8 @@
 - automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
 - sort restic server on VPS for weekly archive or/and daily backup
+- backup daily to external ssd
+- notes (memos, joplin, turl)
+- email
 - AdGuard home TLS/SSL
 - calendar
 - contacts
@@ -9,7 +12,6 @@
 - SSL ntop and adguard gui with ssl
 - VPN network
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
-- floccus selfhost bookmarks sync, xbrowsersync, linkding
 - TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
 - make more things autogenerate
 - auto create /etc/secrets folder
@@ -21,7 +23,6 @@
 - VPN working on laptop
   - Check firewall comment for laptop to make it more secure
 - Laptop wakeonlan
-- Everything kill switched to VPN
 - Encrypt all devices
   - encryption on the fly, only ssh connection can see unencrypted files, processes?
 - Enhance security
