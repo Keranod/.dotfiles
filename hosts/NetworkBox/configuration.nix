@@ -439,8 +439,8 @@ in
   sops.secrets.radicale_env_file = {
     # This path will be referenced by the webdav service
     path = radicaleSecretsPath;
-    owner = "root";
-    group = "root";
+    owner = "radicale";
+    group = "radicale";
     mode = "0640";
   };
   sops.secrets.restic_password = {
@@ -513,6 +513,7 @@ in
   };
 
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
+  # Sometimes fails for new domain no clue why just run `sudo systemctl start acme-<domain>.service` and if still do not work troubleshoot
   security.acme = {
     acceptTerms = true;
     defaults = {
@@ -664,34 +665,34 @@ in
       };
     };
 
-    # virtualHosts."${radicaleDomain}" = {
-    #   enableACME = true;  # Enable ACME for SSL
-    #   forceSSL = true;
+    virtualHosts."${radicaleDomain}" = {
+      enableACME = false;
+      forceSSL = true;
 
-    #   sslCertificate = "${radicaleDomainDir}/full.pem";
-    #   sslCertificateKey = "${radicaleDomainDir}/key.pem";
+      sslCertificate = "${radicaleDomainDir}/full.pem";
+      sslCertificateKey = "${radicaleDomainDir}/key.pem";
 
-    #   listen = [
-    #     {
-    #       addr = "10.0.0.2";
-    #       port = 443;
-    #       ssl = true;
-    #     }
-    #   ];
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
 
-    #   locations."/radicale/" = {
-    #     proxyPass = "http://127.0.0.1:${toString radicalePort}/";  # Point to Radicale's localhost port
-    #     extraConfig = ''
-    #       proxy_set_header  X-Script-Name /radicale;
-    #       proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
-    #       proxy_set_header  X-Forwarded-Host $host;
-    #       proxy_set_header  X-Forwarded-Port $server_port;
-    #       proxy_set_header  X-Forwarded-Proto $scheme;
-    #       proxy_set_header  Host $http_host;
-    #       proxy_pass_header Authorization;
-    #     '';
-    #   };
-    # };
+      locations."/radicale/" = {
+        proxyPass = "http://127.0.0.1:${toString radicalePort}/";  # Point to Radicale's localhost port
+        extraConfig = ''
+          proxy_set_header  X-Script-Name /radicale;
+          proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header  X-Forwarded-Host $host;
+          proxy_set_header  X-Forwarded-Port $server_port;
+          proxy_set_header  X-Forwarded-Proto $scheme;
+          proxy_set_header  Host $http_host;
+          proxy_pass_header Authorization;
+        '';
+      };
+    };
   };
 
   # restic-backups-usb.service
