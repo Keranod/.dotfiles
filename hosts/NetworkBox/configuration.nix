@@ -499,7 +499,7 @@ in
     enable = true;
     settings = {
       server = {
-        hosts = [ "127.0.0.1:${radicalePort}" ];
+        hosts = [ "127.0.0.1:${toString radicalePort}" ];
       };
       auth = {
         type = "htpasswd";
