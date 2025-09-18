@@ -26,33 +26,45 @@ let
   # secrets
   secretsDir = "/etc/secrets";
 
+  # default services path
+  defaultServicesPath = "/var/lib";
+
   # HETZNER
   hetznerAPIFile = "/etc/secrets/hetznerDNSApi";
 
   # Acme
-  acmeRoot = "/var/lib/acme";
+  acmeRoot = "${defaultServicesPath}/acme";
+
+  defaultDomain = "keranod.dev";
 
   # Vaultwarden
-  vaultDir = "/var/lib/vaultwarden";
-  vaultDomain = "vault.keranod.dev";
+  vaultDir = "${defaultServicesPath}/vaultwarden";
+  vaultDomain = "vault.${defaultDomain}";
   vaultwardenPort = 3090;
   acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
 
   # Gitea
-  giteaDir = "/var/lib/gitea";
-  giteaDomain = "git.keranod.dev";
+  giteaDir = "${defaultServicesPath}/gitea";
+  giteaDomain = "git.${defaultDomain}";
   giteaPort = 4000;
   acmeGiteaDomainDir = "${acmeRoot}/${giteaDomain}";
 
   # WebDAV
-  webdavDomain = "webdav.keranod.dev";
+  webdavDomain = "webdav.${defaultDomain}";
   webdavPort = 4010;
   acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
   webdavSecretsPath = "${secretsDir}/webdav.env";
-  webdavDirPath = "/var/lib/webdav-files";
+  webdavDirPath = "${defaultServicesPath}/webdav-files";
+
+  # Radicale
+  radicaleDomain = "radicale.${defaultDomain}";
+  radicalePort = 4020;
+  radicaleDomainDir = "${acmeRoot}/${radicaleDomain}";
+  radicaleSecretsPath = "${secretsDir}/radicale.env";
+  radicaleDirPath = "${defaultServicesPath}/radicale/collections";
 
   # Test
-  testDomain = "test.keranod.dev";
+  testDomain = "test.${defaultDomain}";
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   # Restic
@@ -69,6 +81,7 @@ let
     "${vaultDir}"
     "${webdavDirPath}"
     "${keranodHomeDir}"
+    "${radicaleDirPath}"
   ];
 
 in
@@ -423,6 +436,13 @@ in
     group = "webdav";
     mode = "0640";
   };
+  sops.secrets.radicale_env_file = {
+    # This path will be referenced by the webdav service
+    path = radicaleSecretsPath;
+    owner = "root";
+    group = "root";
+    mode = "0640";
+  };
   sops.secrets.restic_password = {
     # This path will be referenced by the webdav service
     path = resticSecretsPath;
@@ -475,6 +495,23 @@ in
     };
   };
 
+  service.radicale = {
+    enable = true;
+    settings = {
+      server = {
+        hosts = [ "127.0.0.1:${radicalePort}" ];
+      };
+      auth = {
+        type = "htpasswd";
+        htpasswd_filename = radicaleSecretsPath;
+        htpasswd_encryption = "bcrypt";
+      };
+      storage = {
+        filesystem_folder = radicaleDirPath;
+      };
+    };
+  };
+
   # ACME via DNS-01, using the Hetzner DNS LEGO plugin
   security.acme = {
     acceptTerms = true;
@@ -498,6 +535,9 @@ in
         group = "nginx";
       };
       "${webdavDomain}" = {
+        group = "nginx";
+      };
+      "${radicaleDomain}" = {
         group = "nginx";
       };
       "${testDomain}" = {
@@ -623,6 +663,35 @@ in
         '';
       };
     };
+
+    virtualHosts."${radicaleDomain}" = {
+      enableACME = true;  # Enable ACME for SSL
+      forceSSL = true;
+
+      sslCertificate = "${radicaleDomainDir}/full.pem";
+      sslCertificateKey = "${radicaleDomainDir}/key.pem";
+
+      listen = [
+        {
+          addr = "10.0.0.2";
+          port = 443;
+          ssl = true;
+        }
+      ];
+
+      locations."/radicale/" = {
+        proxyPass = "http://127.0.0.1:${toString radicalePort}/";  # Point to Radicale's localhost port
+        extraConfig = ''
+          proxy_set_header  X-Script-Name /radicale;
+          proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header  X-Forwarded-Host $host;
+          proxy_set_header  X-Forwarded-Port $server_port;
+          proxy_set_header  X-Forwarded-Proto $scheme;
+          proxy_set_header  Host $http_host;
+          proxy_pass_header Authorization;
+        '';
+      };
+    };
   };
 
   # restic-backups-usb.service
@@ -639,8 +708,6 @@ in
     initialize = true;
     pruneOpts = [ "--keep-daily 7" ];
   };
-
-  # radicale
 
   services.ntopng = {
     enable = false;
