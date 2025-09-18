@@ -495,7 +495,7 @@ in
     };
   };
 
-  service.radicale = {
+  services.radicale = {
     enable = true;
     settings = {
       server = {
