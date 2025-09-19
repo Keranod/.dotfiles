@@ -384,6 +384,10 @@ in
             domain = "${webdavDomain}";
             answer = "10.0.0.2";
           }
+          {
+            domain = "${radicaleDomain}";
+            answer = "10.0.0.2";
+          }
         ];
       };
     };
