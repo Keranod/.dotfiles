@@ -261,6 +261,7 @@ in
     home-manager
     wireguard-tools
     restic
+    nginx
   ];
 
   # Enable the OpenSSH service
