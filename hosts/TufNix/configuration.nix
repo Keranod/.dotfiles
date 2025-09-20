@@ -65,6 +65,7 @@ in
       atomix
       yelp
       gnome-initial-setup
+      geary
     ]
   );
 

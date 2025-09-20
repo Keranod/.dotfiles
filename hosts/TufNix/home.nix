@@ -17,6 +17,7 @@ in
     wechat-uos
     unar
     tor-browser-bundle-bin
+    evolution
   ];
 
   # User services
