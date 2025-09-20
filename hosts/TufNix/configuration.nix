@@ -159,6 +159,7 @@ in
 
   # Stop the service to change password and settings
   systemd.services.anydesk = {
+    enable = false;
     description = "AnyDesk remote desktop service";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
