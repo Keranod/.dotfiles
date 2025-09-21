@@ -146,7 +146,7 @@ in
 
   # Postgres Global setup
   services.postgresql = {
-    enable = true;
+    enable = false;
     package = postgresPackage; # Install & enable same version
     enableTCPIP = true;
     # Authentication only to host, cannot make local work with scram
