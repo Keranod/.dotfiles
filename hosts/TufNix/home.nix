@@ -22,9 +22,11 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.librewolf;
+    # https://mozilla.github.io/policy-templates/
     policies = {
       DisableTelemetry = true;
       DisableFirefoxStudies = true;
+      EnableTrackingProtection = true;
       # https://mozilla.github.io/policy-templates/#extensionsettings
       ExtensionSettings = {
         "uBlock0@raymondhill.net" = {
@@ -44,32 +46,24 @@ in
         "Search" = false;
       };
       HardwareAcceleration = true;
+      SanitizeOnShutdown = false;
       Preferences = {
-        "browser.preferences.defaultPerformanceSettings.enabled" = false;
-        "browser.startup.homepage" = "about:home";
-        "browser.toolbar.bookmarks.visibility" = "alwyas";
-        "browser.toolbars.bookmarks.visibility" = "alwyas";
-        "browser.urlbar.suggest.bookmark" = false;
-        "browser.urlbar.suggest.engines" = false;
-        "browser.urlbar.suggest.history" = false;
-        "browser.urlbar.suggest.openpage" = false;
-        "browser.urlbar.suggest.recentsearches" = false;
-        "browser.urlbar.suggest.topsites" = false;
-        "browser.warnOnQuit" = true;
-        "browser.warnOnQuitShortcut" = true;
-        "places.history.enabled" = true;
+        # "browser.startup.homepage" = "about:home";
+        # "browser.toolbar.bookmarks.visibility" = "alwyas";
+        # "browser.toolbars.bookmarks.visibility" = "alwyas";
+        # "browser.urlbar.suggest.bookmark" = false;
+        # "browser.urlbar.suggest.engines" = false;
+        # "browser.urlbar.suggest.history" = false;
+        # "browser.urlbar.suggest.openpage" = false;
+        # "browser.urlbar.suggest.recentsearches" = false;
+        # "browser.urlbar.suggest.topsites" = false;
+        # "browser.warnOnQuit" = true;
+        # "browser.warnOnQuitShortcut" = true;
+        # "places.history.enabled" = true;
         "privacy.resistFingerprinting" = true;
-        "privacy.resistFingerprinting.autoDeclineNoUserInputCanvasPrompts" = true;
-        "privacy.clearOnShutdown.cache" = false;
-        "privacy.clearOnShutdown.cookies" = false;
-        "privacy.clearOnShutdown.downloads" = false;
-        "privacy.clearOnShutdown.formdata" = false;
-        "privacy.clearOnShutdown.history" = false;
-        "privacy.clearOnShutdown.offlineApps" = false;
-        "privacy.clearOnShutdown.openWindows" = false;
-        "privacy.clearOnShutdown.sessions" = false;
-        "privacy.clearOnShutdown.siteSettings" = false;
-        "browser.theme.content-theme" = "dark";
+        # "privacy.resistFingerprinting.autoDeclineNoUserInputCanvasPrompts" = true;
+        "media.peerconnection.enabled" = false;
+        # "browser.theme.content-theme" = "dark";
       };
     };
   };
