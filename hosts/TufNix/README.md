@@ -1,4 +1,3 @@
 - After reinstall of the system do not forget to change public key in `users.nix`
 - Login in settings to accounts
 - Login to github on vscode
-- Login onto google-chrome
