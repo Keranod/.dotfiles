@@ -15,6 +15,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILRtV1pre9LK6ZObyyQNZ38KgNW8wIfHwwt5WclGbFsB"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2Dz0LCMdWC/gW3jcmkrZt0emKoG000YCcdugcHD4d0 konrad.konkel@wp.pl"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO5ImRifgMIp93zuqYkdfON3y8j73K2G1r/57iAS4PWQ keranod@NetworkBox"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFbgYViNpRoNsq9H/PUPM0ZkxOx1hzfIzCoJPDUkv+Th keranod"
     ];
   };
 

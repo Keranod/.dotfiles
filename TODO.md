@@ -1,5 +1,8 @@
 - automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
 - sort restic server on VPS for weekly archive or/and daily backup
+- email notificaions if important services fail
+- restic tet integration of backups and email if failed
+- disk health email if degrating
 - backup daily to external ssd
 - email
 - AdGuard home TLS/SSL
