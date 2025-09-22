@@ -43,6 +43,7 @@
 - Temporary proxy for current shell/session
 - `home-manager generations` -> get home-manager generations
 - `home-manager expire-generations "-1 day"` -> remove all generations older than
+- `tail <path> -f` -> see in real time file chaingn, useful for looking at logs
 
 ```nix
 # Need both for shell and daemon to pickup proxy

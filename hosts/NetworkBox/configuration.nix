@@ -455,13 +455,6 @@ in
     group = "root";
     mode = "0600";
   };
-  # Do not put secrets files in /run/secrets otherwise there will be race condition issue
-  #   sops.secrets.nginx_webdav_users = {
-  #     path = "/run/webdav_secrets/webdav.users";
-  #     owner = "root";
-  #     group = "nginx";
-  #     mode = "0640";
-  #   };
 
   # Create the data directory for WebDAV
   systemd.tmpfiles.settings = {
@@ -661,11 +654,6 @@ in
 
           # Let the WebDAV server know what the original request method was
           proxy_set_header X-HTTP-Method-Override $request_method;
-
-          # These are already set by recommendedProxySettings, so no need to repeat
-          # proxy_set_header X-Real-IP $remote_addr;
-          # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          # proxy_set_header Host $host;
         '';
       };
     };
