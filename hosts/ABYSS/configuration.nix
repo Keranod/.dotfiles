@@ -90,7 +90,7 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-            table inet filter {
+          table inet filter {
               chain input {
                 type filter hook input priority 0; policy drop;
 
@@ -109,6 +109,15 @@ in
 
                 # Allow SSH connections from any VPN client
                 iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
+
+                # Allow incoming SMTP connections encrypted
+                iifname "enp1s0" tcp dport { 587, 465 } accept;
+
+                # Allow incoming IMAP connections encrypted
+                iifname "enp1s0" tcp dport 993 accept;
+
+                # Allow incoming POP3 connections encrypted
+                iifname "enp1s0" tcp dport 995 accept;
               }
 
               chain forward {
