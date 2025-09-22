@@ -44,7 +44,6 @@
     htop
     unzip
     dig
-    apacheHttpd
     ssh-to-age
     sops
   ];

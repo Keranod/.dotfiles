@@ -63,6 +63,11 @@ let
   radicaleSecretsPath = "${secretsDir}/radicale.env";
   radicaleDirPath = "${defaultServicesPath}/radicale/collections";
 
+  # Mail
+  mailDomain = "mail.${defaultDomain}";
+  mailDomainDir = "${acmeRoot}/${mailDomain}";
+  mailDirPath = "/var/mail";
+
   # Test
   testDomain = "test.${defaultDomain}";
   acmeTestDomainDir = "${acmeRoot}/${testDomain}";
@@ -75,13 +80,14 @@ let
 
   # Backup
   backupPaths = [
-    "${wireguardDir}"
-    "${secretsDir}"
-    "${acmeRoot}"
-    "${vaultDir}"
-    "${webdavDirPath}"
-    "${keranodHomeDir}"
-    "${radicaleDirPath}"
+    wireguardDir
+    secretsDir
+    acmeRoot
+    vaultDir
+    webdavDirPath
+    keranodHomeDir
+    radicaleDirPath
+    mailDirPath
   ];
 
 in
@@ -89,6 +95,13 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    (builtins.fetchTarball {
+      # Pick a release version you are interested in and set its hash, e.g.
+      url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/master/nixos-mailserver-nixos-master.tar.gz";
+      # To get the sha256 of the nixos-mailserver tarball, we can use the nix-prefetch-url command:
+      # release="nixos-25.05"; nix-prefetch-url "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/${release}/nixos-mailserver-${release}.tar.gz" --unpack
+      sha256 = "0fkyk226fi2xal16cisb947v1zyzvv5vz3jahjm1m833qzdhv9yy";
+    })
   ];
 
   # Default settings for EFI
@@ -262,6 +275,7 @@ in
     wireguard-tools
     restic
     nginx
+    maddy
   ];
 
   # Enable the OpenSSH service
@@ -701,6 +715,28 @@ in
     };
     initialize = true;
     pruneOpts = [ "--keep-daily 7" ];
+  };
+
+  # Mail
+  mailserver = {
+    enable = true;
+    stateVersion = 3;
+    fqdn = mailDomain;
+    domains = [ defaultDomain ];
+    openFirewall = false;
+
+    # A list of all login accounts. To create the password hashes, use
+    # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
+    loginAccounts = {
+      "user1@example.com" = {
+        hashedPasswordFile = "/a/file/containing/a/hashed/password";
+        aliases = ["postmaster@example.com"];
+      };
+      "user2@example.com" = { ... };
+    };
+
+    certificateScheme = "manual";
+    keyFile = "${mailDomainDir}/key.pem";
   };
 
   services.ntopng = {
