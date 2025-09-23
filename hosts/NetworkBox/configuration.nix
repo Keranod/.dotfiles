@@ -96,13 +96,6 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    (builtins.fetchTarball {
-      # Pick a release version you are interested in and set its hash, e.g.
-      url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/master/nixos-mailserver-nixos-master.tar.gz";
-      # To get the sha256 of the nixos-mailserver tarball, we can use the nix-prefetch-url command:
-      # release="nixos-25.05"; nix-prefetch-url "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/${release}/nixos-mailserver-${release}.tar.gz" --unpack
-      sha256 = "0fkyk226fi2xal16cisb947v1zyzvv5vz3jahjm1m833qzdhv9yy";
-    })
   ];
 
   # Default settings for EFI
@@ -147,6 +140,8 @@ in
     "net.ipv6.conf.default.disable_ipv6" = 0;
     "net.ipv6.conf.default.forwarding" = 1;
   };
+
+  users.groups.mailcert = {};
 
   # Networking
   networking = {
@@ -223,8 +218,8 @@ in
             # Allow inbound connections for existing connections
             ct state { established, related } accept;
 
-            # Allow incoming SSH connections from specified interfaces.
-            iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
+            # Allow incoming SSH connections from wan port
+            iifname "enp3s0" tcp dport 22 accept;
 
             # Allow all traffic from LAN and VPN interfaces to the NetworkBox
           	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
@@ -245,7 +240,7 @@ in
             oifname { "vpn-network", "enp0s20u1c2" } accept;
 
             # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
-            oifname "enp3s0" meta skuid 989 udp dport 53 accept;
+            oifname "enp3s0" meta skuid @acme udp dport 53 accept;
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
@@ -558,7 +553,7 @@ in
         group = "nginx";
       };
       "${mailDomain}" = {
-        group = "root";
+        group = "mailcert";
       };
       "${testDomain}" = {
         group = "nginx";
@@ -725,25 +720,43 @@ in
   };
 
   # Mail
-  mailserver = {
+  services.maddy = {
     enable = true;
-    stateVersion = 3;
-    enablePop3Ssl = true;
-    fqdn = mailDomain;
-    domains = [ defaultDomain ];
-    openFirewall = false;
-
-    # A list of all login accounts. To create the password hashes, use
-    # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
-    loginAccounts = {
-      "user1@example.com" = {
-        hashedPasswordFile = "/a/file/containing/a/hashed/password";
-        aliases = ["postmaster@example.com"];
+    acme.certs = {
+      "${mailDomain}" = {
+        inherit (config.security.acme.certs."${mailDomain}") group;
       };
     };
+    config = ''
+      hostname ${mailDomain}
+      tls ${mailDomain} {
+        cert file ${mailDomainDir}/full.pem
+        key file ${mailDomainDir}/key.pem
+      }
 
-    certificateScheme = "manual";
-    keyFile = "${mailDomainDir}/key.pem";
+      # Bind to the VPN interface address to accept connections
+      # only from the VPN.
+      smtp tcp://10.0.0.2:25 {
+        # ... other SMTP settings ...
+      }
+      submission tcp://10.0.0.2:587 {
+        # ... other submission settings ...
+      }
+      imap tcp://10.0.0.2:143 {
+        # ... other IMAP settings ...
+      }
+      imaps tcp://10.0.0.2:993 {
+        # ... other IMAPS settings ...
+      }
+
+      # Use the VPN for all outgoing connections
+      # You must have a VPN connection set up with your VPS.
+      # The mail server will use the VPN's IP address (10.0.0.2) as its source.
+      # Your VPS must be configured to accept and forward this traffic.
+      remote.smtp {
+        source 10.0.0.2
+      }
+    '';
   };
 
   services.ntopng = {
