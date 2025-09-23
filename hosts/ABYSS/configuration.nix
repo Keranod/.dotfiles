@@ -103,9 +103,6 @@ in
             # Allow incoming WireGuard connections on the public interface
             iifname "enp1s0" udp dport 51820 ct state new accept;
 
-            # Allow all incoming email ports from the public internet
-            iifname "enp1s0" tcp dport { 25, 587, 465, 143, 993 } accept;
-
             # Allow SSH connections from any VPN client
             iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
           }
@@ -116,13 +113,6 @@ in
         }
 
         table ip nat {
-          chain prerouting {
-            type nat hook prerouting priority -100; policy accept;
-            
-            # Forward all incoming email ports to the email server at 10.0.0.2
-            iifname "enp1s0" tcp dport { 25, 587, 465, 143, 993 } dnat to 10.0.0.2;
-          }
-
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
 

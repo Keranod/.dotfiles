@@ -238,7 +238,7 @@ in
             oifname { "vpn-network", "enp0s20u1c2" } accept;
 
             # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
-            oifname "enp3s0" meta skuid 989 udp dport 53 accept;
+            #oifname "enp3s0" meta skuid 989 udp dport 53 accept;
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
@@ -555,7 +555,7 @@ in
         group = "nginx";
       };
       "${mailDomain}" = {
-        group = "maddy";
+        group = "root";
       };
       "${testDomain}" = {
         group = "nginx";
