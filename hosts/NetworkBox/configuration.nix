@@ -725,8 +725,8 @@ in
   services.maddy = {
     enable = true;
     tls.certificates = [{
-      keyPath = ${mailDomainDir}/key.pem;
-      certPath = ${mailDomainDir}/full.pem;
+      keyPath = "${mailDomainDir}/key.pem";
+      certPath = "${mailDomainDir}/full.pem";
     }];
     hostname = defaultDomain;
     primaryDomain = mailDomain;
