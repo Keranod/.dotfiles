@@ -105,10 +105,6 @@ in
 
             # Allow all incoming email ports from the public internet
             iifname "enp1s0" tcp dport { 25, 587, 465, 143, 993 } accept;
-            
-            # Allow all VPN clients to send DNS queries to the NetworkBox
-            #iifname "vpn-network" ip daddr 10.0.0.2 tcp dport 53 accept;
-            #iifname "vpn-network" ip daddr 10.0.0.2 udp dport 53 accept;
 
             # Allow SSH connections from any VPN client
             iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;

@@ -141,8 +141,6 @@ in
     "net.ipv6.conf.default.forwarding" = 1;
   };
 
-  users.groups.mailcert = {};
-
   # Networking
   networking = {
     hostName = serverHostName;
@@ -398,6 +396,10 @@ in
             domain = "${radicaleDomain}";
             answer = "10.0.0.2";
           }
+          {
+            domain = "${mailDomain}";
+            answer = "10.0.0.2";
+          }
         ];
       };
     };
@@ -553,7 +555,7 @@ in
         group = "nginx";
       };
       "${mailDomain}" = {
-        group = "mailcert";
+        group = "maddy";
       };
       "${testDomain}" = {
         group = "nginx";
@@ -722,37 +724,20 @@ in
   # Mail
   services.maddy = {
     enable = true;
-    acme.certs = {
-      "${mailDomain}" = {
-        inherit (config.security.acme.certs."${mailDomain}") group;
-      };
-    };
+    tls.certificates = [{
+      keyPath = ${mailDomainDir}/key.pem;
+      certPath = ${mailDomainDir}/full.pem;
+    }];
+    hostname = defaultDomain;
+    primaryDomain = mailDomain;
     config = ''
-      hostname ${mailDomain}
-      tls ${mailDomain} {
-        cert file ${mailDomainDir}/full.pem
-        key file ${mailDomainDir}/key.pem
-      }
+      # Listen only on the VPN network interface
+      smtp tcp://10.0.0.2:25 { ... }
+      submission tcp://10.0.0.2:587 { ... }
+      imap tcp://10.0.0.2:143 { ... }
+      imaps tcp://10.0.0.2:993 { ... }
 
-      # Bind to the VPN interface address to accept connections
-      # only from the VPN.
-      smtp tcp://10.0.0.2:25 {
-        # ... other SMTP settings ...
-      }
-      submission tcp://10.0.0.2:587 {
-        # ... other submission settings ...
-      }
-      imap tcp://10.0.0.2:143 {
-        # ... other IMAP settings ...
-      }
-      imaps tcp://10.0.0.2:993 {
-        # ... other IMAPS settings ...
-      }
-
-      # Use the VPN for all outgoing connections
-      # You must have a VPN connection set up with your VPS.
-      # The mail server will use the VPN's IP address (10.0.0.2) as its source.
-      # Your VPS must be configured to accept and forward this traffic.
+      # Configure outbound email to use the VPN IP as the source
       remote.smtp {
         source 10.0.0.2
       }
