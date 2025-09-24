@@ -37,6 +37,15 @@ let
 
   defaultDomain = "keranod.dev";
 
+  # Adguard
+  adguardPort = 3080;
+  adguardDomain = "adguard.${defaultDomain}";
+  acmeAdguardDomainDir = "${acmeRoot}/${adguardDomain}";
+
+  # DNS
+  DNSDomain = "dns.${defaultDomain}";
+  acmeDNSDomainDir = "${acmeRoot}/${DNSDomain}";
+
   # Vaultwarden
   vaultDir = "${defaultServicesPath}/vaultwarden";
   vaultDomain = "vault.${defaultDomain}";
@@ -201,18 +210,18 @@ in
         table inet myfilter {
             # The 'input' chain filters traffic coming IN to the NetworkBox host.
             chain input {
-                type filter hook input priority 0; policy drop;
-                
-                # Allow all loopback traffic
-                iifname "lo" accept;
+              type filter hook input priority 0; policy drop;
+              
+              # Allow all loopback traffic
+              iifname "lo" accept;
 
-                # Allow inbound connections for existing connections
-                ct state { established, related } accept;
+              # Allow inbound connections for existing connections
+              ct state { established, related } accept;
 
-                # Allow incoming SSH connections from specified interfaces.
-                iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
+              # Allow incoming SSH connections from specified interfaces.
+              iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
 
-                # Allow all traffic from LAN and VPN interfaces to the NetworkBox
+              # Allow all traffic from LAN and VPN interfaces to the NetworkBox
             	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
             	iifname { "enp0s20u1c2", "vpn-network" } accept;
             }
@@ -339,7 +348,9 @@ in
   # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
-    openFirewall = true; # auto-opens 53 & 3000
+    openFirewall = false; # auto-opens 53 & 3000
+    port = adguardhomePort;
+    host = "127.0.0.1";
     mutableSettings = false; # re-seed on service start
 
     settings = {
@@ -355,6 +366,14 @@ in
         upstream_dns = [
           "127.0.0.1:5335"
         ];
+        # Add DNS-over-TLS configuration
+        tls = {
+          enabled = true;
+          port = 853;
+          server_name = "dns.keranod.dev";
+          certificate_path = "${acmeRoot}/dns.keranod.dev/full.pem";
+          private_key_path = "${acmeRoot}/dns.keranod.dev/key.pem";
+        };
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [ ];
       };
@@ -386,6 +405,14 @@ in
           }
           {
             domain = "${radicaleDomain}";
+            answer = "10.0.0.2";
+          }
+          {
+            domain = "${adguardDomain}";
+            answer = "10.0.0.2";
+          }
+          {
+            domain = "${DNSDomain}";
             answer = "10.0.0.2";
           }
         ];
@@ -537,6 +564,9 @@ in
         group = "nginx";
       };
       "${radicaleDomain}" = {
+        group = "nginx";
+      };
+      "${adguardDomain}" = {
         group = "nginx";
       };
       "${testDomain}" = {
