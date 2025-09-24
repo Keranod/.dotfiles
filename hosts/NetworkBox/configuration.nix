@@ -238,7 +238,7 @@ in
             oifname { "vpn-network", "enp0s20u1c2" } accept;
 
             # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
-            #oifname "enp3s0" meta skuid 989 udp dport 53 accept;
+            oifname "enp3s0" meta skuid 989 udp dport 53 accept;
 
             # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
             # on the physical WAN interface or the wg-vps tunnel.
@@ -723,21 +723,37 @@ in
 
   # Mail
   services.maddy = {
-    enable = false;
+    enable = true;
     tls.certificates = [{
       keyPath = "${mailDomainDir}/key.pem";
       certPath = "${mailDomainDir}/full.pem";
     }];
-    hostname = defaultDomain;
+    hostname = mailDomain;
     primaryDomain = mailDomain;
     config = ''
-      # Listen only on the VPN network interface
-      smtp tcp://10.0.0.2:25 { ... }
-      submission tcp://10.0.0.2:587 { ... }
-      imap tcp://10.0.0.2:143 { ... }
-      imaps tcp://10.0.0.2:993 { ... }
+      # Listen on the VPN interface for incoming connections
+      smtp tcp://10.0.0.2:25 {
+        # Use TLS with the specified certificate
+        tls on
+      }
+      submission tcp://10.0.0.2:587 {
+        tls on
+        # Enforce STARTTLS and authentication
+        starttls required
+        auth required
+      }
+      imaps tcp://10.0.0.2:993 {
+        tls on
+        auth required
+      }
 
-      # Configure outbound email to use the VPN IP as the source
+      # Listen on the loopback interface for communication from other local services, like a webmail client.
+      # smtp tcp://127.0.0.1:25 { tls off }
+
+      # Enable logging for debugging
+      log debug
+
+      # Outbound email to use the VPN IP as the source
       remote.smtp {
         source 10.0.0.2
       }
