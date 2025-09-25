@@ -295,7 +295,7 @@ in
     mode = "0600";
   };
   sops.secrets.hetzner_dns_api_key = { 
-    path = "/run/keys/hetzner_dns_api_key"; 
+    path = hetznerSecretsPath; 
     owner = "acme"; 
     group = "acme"; 
     mode = "0440"; 
