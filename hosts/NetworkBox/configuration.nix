@@ -548,6 +548,10 @@ in
       postRun = "systemctl restart nginx";
     };
     certs = {
+      "${defaultDomain}" = {
+        group = "web-services";
+        extraDomainNames = [ wildcardDomain ];
+      };
       # the Vaultwarden subdomain
       "${vaultDomain}" = {
         group = "nginx";
@@ -566,9 +570,6 @@ in
       };
       "${testDomain}" = {
         group = "nginx";
-      };
-      "${wildcardDomain}" = {
-        group = "web-services";
       };
     };
   };
