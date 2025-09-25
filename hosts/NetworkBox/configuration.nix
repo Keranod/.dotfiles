@@ -619,9 +619,10 @@ in
     virtualHosts."${giteaDomain}" = {
       enableACME = false;
       forceSSL = true;
+      useACMEHost = defaultDomain;
 
-      sslCertificate = "${acmeGiteaDomainDir}/full.pem";
-      sslCertificateKey = "${acmeGiteaDomainDir}/key.pem";
+      #sslCertificate = "${acmeGiteaDomainDir}/full.pem";
+      #sslCertificateKey = "${acmeGiteaDomainDir}/key.pem";
 
       # bind the UI only to the VPN interface, just like Vaultwarden
       listen = [
