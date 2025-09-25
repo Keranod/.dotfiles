@@ -345,7 +345,7 @@ in
   services.adguardhome = {
     enable = true;
     openFirewall = false; # auto-opens 53 & 3000
-    port = adguardhomePort;
+    port = adguardPort;
     host = "127.0.0.1";
     mutableSettings = false; # re-seed on service start
 
@@ -362,14 +362,6 @@ in
         upstream_dns = [
           "127.0.0.1:5335"
         ];
-        # Add DNS-over-TLS configuration
-        tls = {
-          enabled = true;
-          port = 853;
-          server_name = "dns.keranod.dev";
-          certificate_path = "${acmeRoot}/dns.keranod.dev/full.pem";
-          private_key_path = "${acmeRoot}/dns.keranod.dev/key.pem";
-        };
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [ ];
       };
