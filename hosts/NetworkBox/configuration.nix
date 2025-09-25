@@ -34,7 +34,7 @@ let
 
   defaultDomain = "keranod.dev";
 
-  wildcardDomain = "*${defaultDomain}";
+  wildcardDomain = "*.${defaultDomain}";
 
   # Hetzner API file
   hetznerSecretsPath = "${secretsDir}/hetznerAPI";
