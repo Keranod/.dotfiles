@@ -34,6 +34,8 @@ let
 
   defaultDomain = "keranod.dev";
 
+  wildcardDomain = "*${defaultDomain}"
+
   # Hetzner API file
   hetznerSecretsPath = "${secretsDir}/hetznerAPI";
 
@@ -112,6 +114,10 @@ in
         };
       };
     };
+  };
+
+  users.groups.web-services = {
+    members = [ "nginx" "vaultwarden"];
   };
 
   # Use UUID to mount for more reliable approach
@@ -443,10 +449,10 @@ in
             domain = "${radicaleDomain}";
             answer = "10.0.0.2";
           }
-          # {
-          #   domain = "${adguardDomain}";
-          #   answer = "10.0.0.2";
-          # }
+          {
+            domain = "${adguardDomain}";
+            answer = "10.0.0.2";
+          }
         ];
       };
     };
@@ -560,6 +566,9 @@ in
       };
       "${testDomain}" = {
         group = "nginx";
+      };
+      "${wildcardDomain}" = {
+        group = "web-services";
       };
     };
   };
