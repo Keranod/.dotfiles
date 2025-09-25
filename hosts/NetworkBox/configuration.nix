@@ -42,10 +42,6 @@ let
   adguardDomain = "adguard.${defaultDomain}";
   acmeAdguardDomainDir = "${acmeRoot}/${adguardDomain}";
 
-  # DNS
-  DNSDomain = "dns.${defaultDomain}";
-  acmeDNSDomainDir = "${acmeRoot}/${DNSDomain}";
-
   # Vaultwarden
   vaultDir = "${defaultServicesPath}/vaultwarden";
   vaultDomain = "vault.${defaultDomain}";
@@ -407,14 +403,10 @@ in
             domain = "${radicaleDomain}";
             answer = "10.0.0.2";
           }
-          {
-            domain = "${adguardDomain}";
-            answer = "10.0.0.2";
-          }
-          {
-            domain = "${DNSDomain}";
-            answer = "10.0.0.2";
-          }
+          # {
+          #   domain = "${adguardDomain}";
+          #   answer = "10.0.0.2";
+          # }
         ];
       };
     };
@@ -578,15 +570,10 @@ in
   services.nginx = {
     enable = true;
 
-    # sort out later
-    # requires = [
-    #   "sops-install-secrets.service"
-    #   "acme-switch.service"
-    # ];
-    # after = [
-    #   "sops-install-secrets.service"
-    #   "acme-switch.service"
-    # ];
+    serviceConfig = {
+      Requires = "acme-switch.service";
+      After = "acme-switch.service";
+    };
 
     logError = "stderr info";
 
