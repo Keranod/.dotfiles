@@ -562,11 +562,6 @@ in
   services.nginx = {
     enable = true;
 
-    serviceConfig = {
-      Requires = "acme-switch.service";
-      After = "acme-switch.service";
-    };
-
     logError = "stderr info";
 
     recommendedProxySettings = true;
@@ -695,6 +690,11 @@ in
         '';
       };
     };
+  };
+  # This block targets the generated systemd unit for NGINX
+  systemd.services.nginx.serviceConfig = {
+    Requires = "acme-switch.service sops-install-secrets.service";
+    After = "acme-switch.service sops-install-secrets.service";
   };
 
   # restic-backups-usb.service
