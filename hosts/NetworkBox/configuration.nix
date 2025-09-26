@@ -148,6 +148,14 @@ in
     "net.ipv6.conf.default.forwarding" = 1;
   };
 
+  environment.systemPackages = with pkgs; [
+    nodePackages_latest.nodejs
+    home-manager
+    wireguard-tools
+    restic
+    nginx
+  ];
+
   # Networking
   networking = {
     hostName = serverHostName;
@@ -270,14 +278,6 @@ in
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    nodePackages_latest.nodejs
-    home-manager
-    wireguard-tools
-    restic
-    nginx
-  ];
-
   sops.defaultSopsFile = ./secrets.yaml;
   sops.age.sshKeyPaths = [
     sshKey
@@ -318,6 +318,29 @@ in
       PasswordAuthentication = false; # Disable password login
       PermitRootLogin = "no"; # Root login disabled
       PubkeyAuthentication = true; # Ensure pubkey authentication is enabled
+    };
+  };
+
+  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
+  # Sometimes fails for new domain no clue why just run `sudo systemctl start acme-<domain>.service` and if still do not work troubleshoot
+  security.acme = {
+    acceptTerms = true;
+    defaults = {
+      email = "konrad.konkel@wp.pl";
+      dnsProvider = "hetzner";
+      dnsResolver = "127.0.0.1:5335";
+      credentialFiles = {
+        # Need to suffix variable name with _FILE
+        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
+        "HETZNER_API_KEY_FILE" = hetznerSecretsPath;
+      };
+      postRun = "systemctl restart nginx";
+    };
+    certs = {
+      "${defaultDomain}" = {
+        group = "web-services";
+        extraDomainNames = [ wildcardDomain ];
+      };
     };
   };
 
@@ -516,29 +539,6 @@ in
       };
       storage = {
         filesystem_folder = radicaleDirPath;
-      };
-    };
-  };
-
-  # ACME via DNS-01, using the Hetzner DNS LEGO plugin
-  # Sometimes fails for new domain no clue why just run `sudo systemctl start acme-<domain>.service` and if still do not work troubleshoot
-  security.acme = {
-    acceptTerms = true;
-    defaults = {
-      email = "konrad.konkel@wp.pl";
-      dnsProvider = "hetzner";
-      dnsResolver = "127.0.0.1:5335";
-      credentialFiles = {
-        # Need to suffix variable name with _FILE
-        # Get API from your DNS provider and put in proper format https://go-acme.github.io/lego/dns/
-        "HETZNER_API_KEY_FILE" = hetznerSecretsPath;
-      };
-      postRun = "systemctl restart nginx";
-    };
-    certs = {
-      "${defaultDomain}" = {
-        group = "web-services";
-        extraDomainNames = [ wildcardDomain ];
       };
     };
   };
