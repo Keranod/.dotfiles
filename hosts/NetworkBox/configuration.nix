@@ -42,13 +42,11 @@ let
   # Adguard
   adguardPort = 3080;
   adguardDomain = "adguard.${defaultDomain}";
-  acmeAdguardDomainDir = "${acmeRoot}/${adguardDomain}";
 
   # Vaultwarden
   vaultDir = "${defaultServicesPath}/vaultwarden";
   vaultDomain = "vault.${defaultDomain}";
   vaultwardenPort = 3090;
-  acmeVaultDomainDir = "${acmeRoot}/${vaultDomain}";
 
   # Gitea
   giteaDir = "${defaultServicesPath}/gitea";
@@ -58,20 +56,14 @@ let
   # WebDAV
   webdavDomain = "webdav.${defaultDomain}";
   webdavPort = 4010;
-  acmeWebdavDomainDir = "${acmeRoot}/${webdavDomain}";
   webdavSecretsPath = "${secretsDir}/webdav.env";
   webdavDirPath = "${defaultServicesPath}/webdav-files";
 
   # Radicale
   radicaleDomain = "radicale.${defaultDomain}";
   radicalePort = 4020;
-  radicaleDomainDir = "${acmeRoot}/${radicaleDomain}";
   radicaleSecretsPath = "${secretsDir}/radicale.env";
   radicaleDirPath = "${defaultServicesPath}/radicale/collections";
-
-  # Test
-  testDomain = "test.${defaultDomain}";
-  acmeTestDomainDir = "${acmeRoot}/${testDomain}";
 
   # Restic
   resticSecretsPath = "${secretsDir}/restic.env";
@@ -110,6 +102,19 @@ in
           user = "root";
           group = "root";
           mode = "0755";
+        };
+      };
+    };
+    # Create the data directory for WebDAV
+    "10-webdav" = {
+      # The `path` of the file
+      "${webdavDirPath}" = {
+        # file type in this case directory
+        d = {
+          # The remaining options apply to this path.
+          user = "webdav";
+          group = "webdav";
+          mode = "0750";
         };
       };
     };
@@ -306,22 +311,6 @@ in
     mode = "0440"; 
   };
 
-  # Create the data directory for WebDAV
-  systemd.tmpfiles.settings = {
-    "10-webdav" = {
-      # The `path` of the file
-      "${webdavDirPath}" = {
-        # file type in this case directory
-        d = {
-          # The remaining options apply to this path.
-          user = "webdav";
-          group = "webdav";
-          mode = "0750";
-        };
-      };
-    };
-  };
-
   # Enable the OpenSSH service
   services.openssh = {
     enable = true;
@@ -397,7 +386,7 @@ in
   # AdGuard Home: DNS
   services.adguardhome = {
     enable = true;
-    openFirewall = false; # auto-opens 53 & 3000
+    openFirewall = false;
     port = adguardPort;
     host = "127.0.0.1";
     mutableSettings = false; # re-seed on service start
@@ -692,13 +681,13 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString adguardPort}"; 
+        proxyPass = "http://127.0.0.1:${toString adguardPort}/"; 
         extraConfig = ''
           # Standard proxy headers for a modern web application
           proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
+          # proxy_set_header X-Real-IP $remote_addr;
+          # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          # proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
     };
