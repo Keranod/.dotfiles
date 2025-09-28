@@ -3,13 +3,12 @@
 - email notificaions if important services fail
 - restic tet integration of backups and email if failed
 - disk health email if degrating
-- backup daily to external ssd
+- backup daily to external sEd
 - email
-- AdGuard home TLS/SSL
 - self host smart house control
 - self hosted translation engine
 - make nginx rely on acme finishing its service
-- SSL ntop and adguard gui with ssl
+- ntop (ONLY ON FASTER BOX)
 - VPN network
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
@@ -17,7 +16,6 @@
 - auto create /etc/secrets folder
 - harden firewall on TufNix and NetworkBox
 - autogenerate wireguard keys on creation?
-- manage browsers extensiosn via nix?
 - fail2ban on abyss
 - custom command to git pull and nix rebuild
 - VPN working on laptop

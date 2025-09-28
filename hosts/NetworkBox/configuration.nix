@@ -95,6 +95,8 @@ in
     fsType = "vfat";
   };
 
+  # creating dir like this is permament?
+  # create secrets folder this way
   systemd.tmpfiles.settings = {
     "10-usb-mount" = {
       "${usbMountDir}" = {
@@ -547,8 +549,6 @@ in
   };
 
   services.nginx = {
-    # look into logs and sort out that warning/error of buffer or smth
-
     enable = true;
 
     logError = "stderr info";
