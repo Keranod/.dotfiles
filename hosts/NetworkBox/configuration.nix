@@ -561,6 +561,16 @@ in
       large_client_header_buffers 8 32k;
       proxy_headers_hash_max_size 1024;
       proxy_headers_hash_bucket_size 128;
+
+      # Proxy Read Buffer (for Upstream Responses like WebDAV GET/AdGuard)
+      # Sets the number (8) and size (128k) of buffers used for reading a response from the upstream server.
+      proxy_buffers 8 128k; 
+      # Sets the size of the buffer for the first part of the response.
+      proxy_buffer_size 128k;
+
+      # Client Body Buffer (for Request Body like WebDAV PUT)
+      # Sets the buffer size for reading the client request body.
+      client_body_buffer_size 128k;
     '';
 
     virtualHosts."${vaultDomain}" = {
