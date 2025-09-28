@@ -121,7 +121,10 @@ in
   };
 
   users.groups.web-services = {
-    members = [ "nginx" "vaultwarden"];
+    members = [
+      "nginx"
+      "vaultwarden"
+    ];
   };
 
   # Use UUID to mount for more reliable approach
@@ -304,11 +307,11 @@ in
     group = "root";
     mode = "0600";
   };
-  sops.secrets.hetzner_dns_api_key = { 
-    path = hetznerSecretsPath; 
-    owner = "acme"; 
-    group = "acme"; 
-    mode = "0440"; 
+  sops.secrets.hetzner_dns_api_key = {
+    path = hetznerSecretsPath;
+    owner = "acme";
+    group = "acme";
+    mode = "0440";
   };
 
   # Enable the OpenSSH service
@@ -668,7 +671,7 @@ in
     };
 
     virtualHosts."${adguardDomain}" = {
-      enableACME = false; 
+      enableACME = false;
       forceSSL = true;
       useACMEHost = defaultDomain;
 
@@ -681,10 +684,10 @@ in
       ];
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString adguardPort}/"; 
+        proxyPass = "http://127.0.0.1:${toString adguardPort}/";
         extraConfig = ''
           # Standard proxy headers for a modern web application
-          proxy_set_header Host $host;
+          # proxy_set_header Host $host;
           # proxy_set_header X-Real-IP $remote_addr;
           # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           # proxy_set_header X-Forwarded-Proto $scheme;
