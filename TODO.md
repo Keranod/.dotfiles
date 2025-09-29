@@ -3,13 +3,12 @@
 - email notificaions if important services fail
 - restic tet integration of backups and email if failed
 - disk health email if degrating
-- backup daily to external sEd
+- backup daily to external ssd
 - email
 - self host smart house control
 - self hosted translation engine
 - make nginx rely on acme finishing its service
 - ntop (ONLY ON FASTER BOX)
-- VPN network
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
 - make more things autogenerate
