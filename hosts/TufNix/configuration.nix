@@ -99,9 +99,9 @@ in
 
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-    localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+    #remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    #dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    #localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
 
   # Enable the OpenSSH daemon.
@@ -114,11 +114,12 @@ in
       # !!!For Wireguard to work, not the best solution, find solution
       checkReversePath = "loose";
       allowedTCPPorts = [
-        5173
+        #5173
         45000
-        3131
+        #3131
       ];
       allowedUDPPorts = [ 51820 ]; # Clients and peers can use the same port, see listenport
+      allowPing = true;
     };
 
     # Do not switch off using GNOME interface otherwise will lose all internet
