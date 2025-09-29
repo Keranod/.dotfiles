@@ -92,7 +92,7 @@ in
 
       gitpull-nixrebuild() {
         local config_name # Variable to store the configuration name
-        local DOTFILES_DIR="~/.dotfiles"
+        local DOTFILES_DIR="$HOME/.dotfiles"
 
         # --- 1. Determine Configuration Name ---
         # Check if an argument is passed, otherwise fallback to hostname
@@ -102,19 +102,19 @@ in
           config_name="$1"
         fi
 
-        echo "Attempting update for configuration: ${config_name}"
+        echo "Attempting update for configuration: $config_name"
         
         # --- 2. Change Directory and Pull ---
-        echo "Switching to dotfiles directory: ${DOTFILES_DIR}"
+        echo "Switching to dotfiles directory: $DOTFILES_DIR"
         
         # The 'cd' command will immediately stop the script if it fails (due to 'set -e' or equivalent)
-        cd "${DOTFILES_DIR}" || { echo "Error: Failed to change directory to ${DOTFILES_DIR}. Aborting."; return 1; }
+        cd "$DOTFILES_DIR" || { echo "Error: Failed to change directory to $DOTFILES_DIR. Aborting."; return 1; }
 
         echo "Pulling latest changes from Git..."
         
         # The '&&' ensures the script stops if 'git pull' fails
         # We use a subshell to capture output without affecting the main shell's working directory
-        ( ${DOTFILES_DIR}/.git/config )
+        ( $DOTFILES_DIR/.git/config )
         
         # Check if the pull was successful or if there were no changes
         if ! git pull --rebase; then
@@ -123,12 +123,12 @@ in
         fi
         
         # --- 3. Execute NixOS Rebuild ---
-        echo "Rebuilding NixOS with configuration: ${config_name}"
+        echo "Rebuilding NixOS with configuration: $config_name"
         
         # The Nix rebuild command:
         # - If 'sudo nixos-rebuild...' fails, the whole function returns 1.
         # - If it succeeds, '&& exec $SHELL' is executed to restart the shell environment.
-        sudo nixos-rebuild switch --flake "${DOTFILES_DIR}#${config_name}" --show-trace && exec $SHELL
+        sudo nixos-rebuild switch --flake "$DOTFILES_DIR#$config_name" --show-trace && exec $SHELL
         
         # Note: The 'exec $SHELL' replaces the current shell with a new one,
         # so no code after it will run on success.
