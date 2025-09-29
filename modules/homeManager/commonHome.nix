@@ -92,7 +92,7 @@ in
 
       gitpull-nixrebuild() {
         local config_name # Variable to store the configuration name
-        local DOTFILES_DIR="${HOME}/.dotfiles"
+        local DOTFILES_DIR="~/.dotfiles"
 
         # --- 1. Determine Configuration Name ---
         # Check if an argument is passed, otherwise fallback to hostname
