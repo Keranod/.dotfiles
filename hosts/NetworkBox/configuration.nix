@@ -752,7 +752,7 @@ in
       # power source changes (e.g., unplugged from AC to battery), you can set:
       # DEVICES_TO_DISABLE_ON_BAT = "bluetooth wifi";
     };
-  }
+  };
 
   services.ntopng = {
     enable = false;
