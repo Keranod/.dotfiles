@@ -112,10 +112,6 @@ in
 
         echo "Pulling latest changes from Git..."
         
-        # The '&&' ensures the script stops if 'git pull' fails
-        # We use a subshell to capture output without affecting the main shell's working directory
-        ( $DOTFILES_DIR/.git/config )
-        
         # Check if the pull was successful or if there were no changes
         if ! git pull --rebase; then
             echo "Error: Git pull failed. Aborting."
