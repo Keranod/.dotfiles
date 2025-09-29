@@ -733,6 +733,27 @@ in
     pruneOpts = [ "--keep-daily 7" ];
   };
 
+  services.tlp = {
+    enable = true;
+    settings = {
+      # Control whether TLP is enabled (1) or disabled (0)
+      TLP_ENABLE = 1;
+
+      # Disable Bluetooth and Wi-Fi when TLP starts up on boot.
+      # This is often done to save power or ensure the radios are off
+      # until explicitly enabled by the user or a service.
+      DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth wifi";
+
+      # Optionally, you can also ensure they stay off when TLP shuts down
+      # (e.g., during system halt/reboot).
+      DEVICES_TO_DISABLE_ON_SHUTDOWN = "bluetooth wifi";
+
+      # If you want TLP to manage the power state of the radios when the
+      # power source changes (e.g., unplugged from AC to battery), you can set:
+      # DEVICES_TO_DISABLE_ON_BAT = "bluetooth wifi";
+    };
+  }
+
   services.ntopng = {
     enable = false;
     extraConfig = ''

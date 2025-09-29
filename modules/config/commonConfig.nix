@@ -47,5 +47,7 @@
     apacheHttpd
     ssh-to-age
     sops
+    iotop
+    tlp
   ];
 }
