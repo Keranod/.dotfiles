@@ -120,6 +120,18 @@ in
         };
       };
     };
+    "10-secrets" = {
+      # The `path` of the file
+      "${secretsDir}" = {
+        # file type in this case directory
+        d = {
+          # The remaining options apply to this path.
+          user = "root";
+          group = "root";
+          mode = "0755";
+        };
+      };
+    };
   };
 
   users.groups.web-services = {
