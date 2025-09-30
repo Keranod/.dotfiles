@@ -110,16 +110,35 @@ in
   # Open ports in the firewall.
   networking = {
 
-    firewall = {
-      # !!!For Wireguard to work, not the best solution, find solution
-      checkReversePath = "loose";
-      allowedTCPPorts = [
-        #5173
-        45000
-        #3131
-      ];
-      allowedUDPPorts = [ 51820 ]; # Clients and peers can use the same port, see listenport
-      allowPing = true;
+    firewall.enable = false;
+
+    nftables = {
+      enable = true;
+      ruleset = ''
+        table inet filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+
+            # Allow loopback traffic
+            iif "lo" accept;
+
+            # Allow established and related connections
+            ct state established,related accept;
+            
+            # Allow inbound TCP traffic to port 45000 from 192.168.9.0/24
+            ip saddr 192.168.9.0/24 tcp dport 45000 accept
+
+            # Allow inbound UDP traffic to port 45000 from 192.168.9.0/24
+            ip saddr 192.168.9.0/24 udp dport 45000 accept
+
+            # Allow inbound TCP traffic to port 45000 from 192.168.8.0/24
+            ip saddr 192.168.8.0/24 tcp dport 45000 accept
+
+            # Allow inbound UDP traffic to port 45000 from 192.168.8.0/24
+            ip saddr 192.168.8.0/24 udp dport 45000 accept
+          }
+        }
+      '';
     };
 
     # Do not switch off using GNOME interface otherwise will lose all internet

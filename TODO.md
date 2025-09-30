@@ -1,3 +1,4 @@
+- vscode settings + extensions stored selfhost
 - automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
 - sort restic server on VPS for weekly archive or/and daily backup
 - email notificaions if important services fail
@@ -8,16 +9,17 @@
 - self host smart house control
 - self hosted translation engine
 - make nginx rely on acme finishing its service
-- ntop (ONLY ON FASTER BOX)
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
-- TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc
 - make more things autogenerate
 - autogenerate wireguard keys on creation?
 - fail2ban on abyss
-- VPN working on laptop
-  - Check firewall comment for laptop to make it more secure
 - Laptop wakeonlan
 - Encrypt all devices
   - encryption on the fly, only ssh connection can see unencrypted files, processes?
 - Enhance security
   - 2FA?
+
+# Better/New kit
+
+- ntop (ONLY ON FASTER BOX)
+- TLP (Linux power management tool) for better battery life, switch off Bluetooth, lower Hz,etc

@@ -90,40 +90,40 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-            table inet filter {
-              chain input {
-                type filter hook input priority 0; policy drop;
+        table inet filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
 
-                # Allow loopback traffic
-                iif "lo" accept;
+            # Allow loopback traffic
+            iif "lo" accept;
 
-                # Allow established and related connections
-                ct state established,related accept;
+            # Allow established and related connections
+            ct state established,related accept;
 
-                # Allow incoming WireGuard connections on the public interface
-                iifname "enp1s0" udp dport 51820 ct state new accept;
-                
-                # Allow all VPN clients to send DNS queries to the NetworkBox
-                iifname "vpn-network" ip daddr 10.0.0.2 tcp dport 53 accept;
-                iifname "vpn-network" ip daddr 10.0.0.2 udp dport 53 accept;
+            # Allow incoming WireGuard connections on the public interface
+            iifname "enp1s0" udp dport 51820 ct state new accept;
+            
+            # Allow all VPN clients to send DNS queries to the NetworkBox
+            iifname "vpn-network" ip daddr 10.0.0.2 tcp dport 53 accept;
+            iifname "vpn-network" ip daddr 10.0.0.2 udp dport 53 accept;
 
-                # Allow SSH connections from any VPN client
-                iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
-              }
+            # Allow SSH connections from any VPN client
+            iifname "vpn-network" tcp dport 22 ct state new limit rate 1/minute accept;
+          }
 
-              chain forward {
-                type filter hook forward priority 0; policy accept;
-            }
+          chain forward {
+            type filter hook forward priority 0; policy accept;
+          }
         }
 
-            table ip nat {
-                chain postrouting {
-                    type nat hook postrouting priority 100; policy accept;
+        table ip nat {
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
 
-                    # Masquerade traffic from the VPN network as it exits to the internet via enp1s0
-                    ip saddr 10.0.0.0/24 oifname "enp1s0" masquerade;
-                }
-            }
+            # Masquerade traffic from the VPN network as it exits to the internet via enp1s0
+            ip saddr 10.0.0.0/24 oifname "enp1s0" masquerade;
+          }
+        }
       '';
     };
   };
