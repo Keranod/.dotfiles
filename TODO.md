@@ -1,4 +1,7 @@
 - vscode settings + extensions stored selfhost
+  - using git repo
+  - using code-server
+  - usinggit-based ext like settings sync by shan khan
 - automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
 - sort restic server on VPS for weekly archive or/and daily backup
 - email notificaions if important services fail
@@ -12,12 +15,15 @@
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - make more things autogenerate
 - autogenerate wireguard keys on creation?
-- fail2ban on abyss
 - Laptop wakeonlan
 - Encrypt all devices
   - encryption on the fly, only ssh connection can see unencrypted files, processes?
 - Enhance security
   - 2FA?
+
+# If hosting something else on ABYSS than VPN/Proxy(?)
+
+- fail2ban on abyss
 
 # Better/New kit
 
