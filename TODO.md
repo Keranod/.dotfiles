@@ -1,3 +1,4 @@
+- selfhost messaging and calling?
 - vscode settings + extensions stored selfhost
   - using git repo
   - using code-server
