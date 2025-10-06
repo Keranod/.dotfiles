@@ -1,3 +1,4 @@
+- move project to gitea
 - selfhost messaging and calling?
 - vscode settings + extensions stored selfhost
   - using git repo
@@ -15,6 +16,7 @@
 - make nginx rely on acme finishing its service
 - make VPS1 exit without routing all traffic to home server, only route home services and DNS for now to home server somehow
 - make more things autogenerate
+- make vpn/connection to the server work somehow behind cisco proxy/restricitve firewalls
 - autogenerate wireguard keys on creation?
 - Laptop wakeonlan
 - Encrypt all devices
