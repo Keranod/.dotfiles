@@ -1,4 +1,6 @@
 - move project to gitea
+- send email when something connects to the vpn network
+- limit vpn connection to specified MAC?
 - selfhost messaging and calling?
 - vscode settings + extensions stored selfhost
   - using git repo
