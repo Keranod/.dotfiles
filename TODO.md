@@ -4,7 +4,7 @@
 - restic tet integration of backups and email if failed
 - disk health email if degrating
 - backup daily to external ssd
-- email
+- email (use netnamespaces, netns instead user guid)
 - self host smart house control
 - self hosted translation engine
 - make nginx rely on acme finishing its service
