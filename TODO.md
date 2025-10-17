@@ -1,3 +1,4 @@
+- custom saving power profile
 - automount usb device via UUId on mount/unmount, make so that boot do not hang if usb not present
 - sort restic server on VPS for weekly archive or/and daily backup
 - email notificaions if important services fail
