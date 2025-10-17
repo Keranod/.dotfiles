@@ -199,7 +199,7 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        vpnName = {
+        "${vpnName}" = {
           ips = [ "10.0.0.2/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           # Wireguard does not add any routes to any of the tables
