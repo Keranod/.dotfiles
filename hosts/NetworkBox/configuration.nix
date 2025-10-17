@@ -749,10 +749,15 @@ in
       "webdav.service"
       "radicale.service"
       "unbound.service"
+      "adguardhome.service"
     ];
 
     script = ''
-      # 1. Create the Network Namespace
+      # 0. Clean up any remnants from previous failed attempts
+      # This deletes the namespace, ignoring errors if it's already gone.
+      ${pkgs.iproute2}/bin/ip netns del ${vpnnsName} || true
+
+      # 1. Create the Network Namespace (Now guaranteed to be new)
       ${pkgs.iproute2}/bin/ip netns add ${vpnnsName}
 
       # 2. Move the WireGuard interface into the NetNS
@@ -760,18 +765,15 @@ in
 
       # 3. Configure loopback and default route inside the NetNS
       ${pkgs.iproute2}/bin/ip -n ${vpnnsName} link set lo up
-      # The interface is already configured with 10.0.0.2/24 from the NixOS config.
-      # Set the default route to use the VPN server's IP (10.0.0.1)
       ${pkgs.iproute2}/bin/ip -n ${vpnnsName} route add default via 10.0.0.1 dev ${vpnName}
 
       # 4. Set up isolated DNS for the NetNS
       mkdir -p /etc/netns/${vpnnsName}
-      # Use the local VPN IP (10.0.0.2) as the DNS resolver
       echo "nameserver 10.0.0.2" > /etc/netns/${vpnnsName}/resolv.conf
     '';
 
     preStop = ''
-      # Delete the NetNS on stop (this cleans up the interface too)
+      # Keep the preStop cleanup for a clean shutdown
       ${pkgs.iproute2}/bin/ip netns del ${vpnnsName} || true
     '';
 
@@ -806,6 +808,12 @@ in
   };
 
   systemd.services.unbound = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
+  };
+
+  systemd.services.adguardhome = {
     serviceConfig = {
       NetworkNamespacePath = "/run/netns/${vpnnsName}";
     };
