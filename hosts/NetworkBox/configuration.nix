@@ -17,6 +17,9 @@ let
   tvPriority = "1000";
   tvInterface = "wg0";
 
+  vpnnsName = "vpnns";
+  vpnName = "vpn-network";
+
   # SSH Key
   sshKey = "${keranodHomeDir}/.dotfiles/.ssh/id_ed25519";
 
@@ -196,13 +199,11 @@ in
     wireguard = {
       enable = true;
       interfaces = {
-        "vpn-network" = {
+        vpnName = {
           ips = [ "10.0.0.2/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-          # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
-          table = "102";
-          postSetup = "ip rule add from 10.0.0.2 lookup 102";
-          postShutdown = "ip rule del from 10.0.0.2 lookup 102";
+          # Wireguard does not add any routes to any of the tables
+          table = "off";
           peers = [
             {
               name = "ABYSS";
@@ -236,12 +237,15 @@ in
               # Allow inbound connections for existing connections
               ct state { established, related } accept;
 
+              # CRITICAL: Allow WireGuard tunnel packets (UDP 51820) to reach the host
+              iifname "enp3s0" udp dport 51820 accept;
+
               # Allow incoming SSH connections from specified interfaces.
-              iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
+              iifname { "enp0s20u1c2", "${vpnName}", "enp3s0" } tcp dport 22 accept;
 
               # Allow all traffic from LAN and VPN interfaces to the NetworkBox
             	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
-            	iifname { "enp0s20u1c2", "vpn-network" } accept;
+            	iifname { "enp0s20u1c2", "${vpnName}" } accept;
             }
 
             # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
@@ -255,7 +259,7 @@ in
                 ct state { established, related } accept;
 
                 # Allow all traffic destined for VPN and LAN interfaces to pass.
-                oifname { "vpn-network", "enp0s20u1c2" } accept;
+                oifname { "${vpnName}", "enp0s20u1c2" } accept;
 
                 # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
                 oifname "enp3s0" meta skuid 989 udp dport 53 accept;
@@ -395,9 +399,12 @@ in
     enable = true;
     settings = {
       server = {
-        interface = [ "127.0.0.1" ];
+        interface = [ "0.0.0.0" ];
         port = 5335;
-        access-control = [ "127.0.0.1 allow" ];
+        access-control = [
+          "127.0.0.1 allow"
+          "10.0.0.0/24 allow"
+        ];
         harden-glue = true;
         harden-dnssec-stripped = true;
         use-caps-for-id = false;
@@ -406,7 +413,7 @@ in
         hide-identity = true;
         hide-version = true;
         # force outbound queries to use this IP.
-        outgoing-interface = "10.0.0.2";
+        # outgoing-interface = "10.0.0.2";
       };
     };
   };
@@ -726,5 +733,81 @@ in
     extraConfig = ''
       --http-port=3001
     '';
+  };
+
+  systemd.services.setup-vpn-namespace = {
+    description = "Setup network namespace for ALL VPN-isolated services";
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "network.target"
+      "wireguard-${vpnName}.service"
+    ];
+    # Ensure it runs before Nginx, Mail, Gitea, etc.
+    before = [
+      "nginx.service"
+      "vaultwarden.service"
+      "webdav.service"
+      "radicale.service"
+      "unbound.service"
+    ];
+
+    script = ''
+      # 1. Create the Network Namespace
+      ${pkgs.iproute2}/bin/ip netns add ${vpnnsName}
+
+      # 2. Move the WireGuard interface into the NetNS
+      ${pkgs.iproute2}/bin/ip link set dev ${vpnName} netns ${vpnnsName}
+
+      # 3. Configure loopback and default route inside the NetNS
+      ${pkgs.iproute2}/bin/ip -n ${vpnnsName} link set lo up
+      # The interface is already configured with 10.0.0.2/24 from the NixOS config.
+      # Set the default route to use the VPN server's IP (10.0.0.1)
+      ${pkgs.iproute2}/bin/ip -n ${vpnnsName} route add default via 10.0.0.1 dev ${vpnName}
+
+      # 4. Set up isolated DNS for the NetNS
+      mkdir -p /etc/netns/${vpnnsName}
+      # Use the local VPN IP (10.0.0.2) as the DNS resolver
+      echo "nameserver 10.0.0.2" > /etc/netns/${vpnnsName}/resolv.conf
+    '';
+
+    preStop = ''
+      # Delete the NetNS on stop (this cleans up the interface too)
+      ${pkgs.iproute2}/bin/ip netns del ${vpnnsName} || true
+    '';
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+  };
+
+  systemd.services.nginx = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
+  };
+
+  systemd.services.vaultwarden = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
+  };
+
+  systemd.services.webdav = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
+  };
+
+  systemd.services.radicale = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
+  };
+
+  systemd.services.unbound = {
+    serviceConfig = {
+      NetworkNamespacePath = "/run/netns/${vpnnsName}";
+    };
   };
 }
