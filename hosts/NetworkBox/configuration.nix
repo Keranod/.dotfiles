@@ -22,13 +22,10 @@ let
   vpnName = "vpn-network";
   hostVPNIP = "10.0.0.2";
 
-  # VETH
-  vethNetnsIP = "10.100.0.2"; # IP for services (Nginx, Unbound) to listen on
-  vethHostIP = "10.100.0.1"; # IP for services (AdGuard, ACME) to connect to
+  # VETH Link IP Range for Host <-> Namespace communication
+  vethNetnsIP = "10.100.0.2"; # IP for isolated services (Nginx, Unbound) to listen on
+  vethHostIP = "10.100.0.1"; # IP for host services (AdGuard, ACME) to connect to
   vethSubnet = "10.100.0.0/24";
-
-  # Unbound
-  unboundCustomPort = 5335;
 
   # SSH Key
   sshKey = "${keranodHomeDir}/.dotfiles/.ssh/id_ed25519";
@@ -133,6 +130,18 @@ in
         };
       };
     };
+    "10-secrets" = {
+      # The `path` of the file
+      "${secretsDir}" = {
+        # file type in this case directory
+        d = {
+          # The remaining options apply to this path.
+          user = "root";
+          group = "root";
+          mode = "0755";
+        };
+      };
+    };
   };
 
   users.groups.web-services = {
@@ -210,9 +219,12 @@ in
       enable = true;
       interfaces = {
         "${vpnName}" = {
-          ips = [ "${hostVPNIP}/24" ];
+          ips = [ "10.0.0.2/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-          interfaceNamespace = "${vpnnsName}";
+          # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
+          table = "102";
+          postSetup = "ip rule add from 10.0.0.2 lookup 102";
+          postShutdown = "ip rule del from 10.0.0.2 lookup 102";
           peers = [
             {
               name = "ABYSS";
@@ -236,61 +248,61 @@ in
       enable = true;
       ruleset = ''
         table inet myfilter {
-            # The 'input' chain filters traffic coming IN to the NetworkBox host.
-            chain input {
-              type filter hook input priority 0; policy drop;
-              
-              # Allow all loopback traffic
-              iifname "lo" accept;
+          # The 'input' chain filters traffic coming IN to the NetworkBox host.
+          chain input {
+            type filter hook input priority 0; policy drop;
+            
+            # Allow all loopback traffic
+            iifname "lo" accept;
 
-              # Allow inbound connections for existing connections
-              ct state { established, related } accept;
+            # Allow inbound connections for existing connections
+            ct state { established, related } accept;
 
-              # CRITICAL: Allow WireGuard tunnel packets (UDP 51820) to reach the host
-              iifname "enp3s0" udp dport 51820 accept;
+            # Allow default wireguard port in
+            iifname "enp3s0" udp dport 51820 accept;
 
-              # Allow incoming SSH connections from specified interfaces.
-              iifname { "enp0s20u1c2", "${vpnName}", "enp3s0" } tcp dport 22 accept;
+            # Allow incoming SSH connections from specified interfaces.
+            iifname { "enp0s20u1c2", "${vpnName}", "enp3s0" } tcp dport 22 accept;
 
-              # Allow all traffic from LAN and VPN interfaces to the NetworkBox
-            	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
-            	iifname { "enp0s20u1c2", "${vpnName}" } accept;
-            }
+            # Allow all traffic from LAN and VPN interfaces to the NetworkBox
+          	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
+          	iifname { "enp0s20u1c2", "${vpnName}" } accept;
+          }
 
-            # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
-            chain output {
-                type filter hook output priority 0; policy drop;
+          # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+          chain output {
+            type filter hook output priority 0; policy drop;
 
-                # Allow loopback traffic
-                oifname "lo" accept;
+            # Allow loopback traffic
+            oifname "lo" accept;
 
-                # Allow traffic for established connections to continue
-                ct state { established, related } accept;
+            # Allow traffic for established connections to continue
+            ct state { established, related } accept;
 
-                # Allow all traffic destined for VPN and LAN interfaces to pass.
-                oifname { "${vpnName}", "enp0s20u1c2" } accept;
+            # Allow all traffic destined for VPN and LAN interfaces to pass.
+            oifname { "${vpnName}", "enp0s20u1c2" } accept;
 
-                # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
-                oifname "enp3s0" meta skuid 989 udp dport 53 accept;
+            # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
+            oifname "enp3s0" meta skuid 989 udp dport 53 accept;
 
-                # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-                # on the physical WAN interface or the wg-vps tunnel.
-                oifname "enp3s0" tcp dport { 53, 853 } drop;
-                oifname "enp3s0" udp dport { 53, 853 } drop;
+            # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+            # on the physical WAN interface or the wg-vps tunnel.
+            oifname "enp3s0" tcp dport { 53, 853 } drop;
+            oifname "enp3s0" udp dport { 53, 853 } drop;
 
-                # Allow all other traffic from the NetworkBox to go directly to the WAN.
-                oifname "enp3s0" accept;
-            }
+            # Allow all other traffic from the NetworkBox to go directly to the WAN.
+            oifname "enp3s0" accept;
+          }
         }
 
-            # The NAT table for masquerading traffic from the LAN.
+        # The NAT table for masquerading traffic from the LAN.
         table ip nat {
-            chain postrouting {
-                type nat hook postrouting priority 100; policy accept;
-                
-                # Masquerade all other LAN traffic to exit via the WAN.
-                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
-            }
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            
+            # Masquerade all other LAN traffic to exit via the WAN.
+            ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
+          }
         }
       '';
     };
@@ -408,12 +420,9 @@ in
     enable = true;
     settings = {
       server = {
-        interface = [ "0.0.0.0" ];
-        port = unboundCustomPort;
-        access-control = [
-          "127.0.0.1 allow"
-          "${vethSubnet} allow"
-        ];
+        interface = [ "127.0.0.1" ];
+        port = 5335;
+        access-control = [ "127.0.0.1 allow" ];
         harden-glue = true;
         harden-dnssec-stripped = true;
         use-caps-for-id = false;
@@ -421,6 +430,8 @@ in
         edns-buffer-size = 1232;
         hide-identity = true;
         hide-version = true;
+        # force outbound queries to use this IP.
+        outgoing-interface = "10.0.0.2";
       };
     };
   };
@@ -439,12 +450,12 @@ in
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
-          "${vethHostIP}" # Host side of VETH
+          "10.0.0.2"
           "fd00:9::1"
         ];
         port = 53;
         upstream_dns = [
-          "${vethNetnsIP}:${toString unboundCustomPort}"
+          "127.0.0.1:5335"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [ ];
@@ -465,23 +476,23 @@ in
           # equivalent of vault.keranod.dev → 10.0.0.2
           {
             domain = "${vaultDomain}";
-            answer = "${hostVPNIP}";
+            answer = "10.0.0.2";
           }
           {
             domain = "${giteaDomain}";
-            answer = "${hostVPNIP}";
+            answer = "10.0.0.2";
           }
           {
             domain = "${webdavDomain}";
-            answer = "${hostVPNIP}";
+            answer = "10.0.0.2";
           }
           {
             domain = "${radicaleDomain}";
-            answer = "${hostVPNIP}";
+            answer = "10.0.0.2";
           }
           {
             domain = "${adguardDomain}";
-            answer = "${hostVPNIP}";
+            answer = "10.0.0.2";
           }
         ];
       };
@@ -519,7 +530,7 @@ in
         # The SSH settings are nested under 'settings'
         ENABLE_SSH = true;
         SSH_PORT = 22;
-        SSH_LISTEN_ADDR = "${hostVPNIP}"; # Or "10.0.0.2:22" if needed
+        SSH_LISTEN_ADDR = "10.0.0.2"; # Or "10.0.0.2:22" if needed
       };
     };
   };
@@ -594,7 +605,7 @@ in
 
       listen = [
         {
-          addr = "${hostVPNIP}";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
@@ -618,7 +629,7 @@ in
 
       listen = [
         {
-          addr = "${hostVPNIP}";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
@@ -645,7 +656,7 @@ in
 
       listen = [
         {
-          addr = "${hostVPNIP}";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
@@ -674,7 +685,7 @@ in
 
       listen = [
         {
-          addr = "${hostVPNIP}";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
@@ -701,7 +712,7 @@ in
 
       listen = [
         {
-          addr = "${hostVPNIP}";
+          addr = "10.0.0.2";
           port = 443;
           ssl = true;
         }
@@ -735,6 +746,27 @@ in
     pruneOpts = [ "--keep-daily 7" ];
   };
 
+  services.tlp = {
+    enable = true;
+    settings = {
+      # Control whether TLP is enabled (1) or disabled (0)
+      TLP_ENABLE = 1;
+
+      # Disable Bluetooth and Wi-Fi when TLP starts up on boot.
+      # This is often done to save power or ensure the radios are off
+      # until explicitly enabled by the user or a service.
+      DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth wifi";
+
+      # Optionally, you can also ensure they stay off when TLP shuts down
+      # (e.g., during system halt/reboot).
+      DEVICES_TO_DISABLE_ON_SHUTDOWN = "bluetooth wifi";
+
+      # If you want TLP to manage the power state of the radios when the
+      # power source changes (e.g., unplugged from AC to battery), you can set:
+      # DEVICES_TO_DISABLE_ON_BAT = "bluetooth wifi";
+    };
+  };
+
   services.ntopng = {
     enable = false;
     extraConfig = ''
@@ -743,79 +775,42 @@ in
   };
 
   systemd.services.setup-vpn-namespace = {
-    description = "Setup network namespace for ALL VPN-isolated services";
+    description = "Create network namespace and VETH bridge (Minimal)";
     wantedBy = [ "multi-user.target" ];
-    after = [
-      "network.target"
-      "wireguard-${vpnName}.service"
-    ];
-    # Ensure it runs before Nginx, Mail, Gitea, etc.
-    before = [
-      "nginx.service"
-      "vaultwarden.service"
-      "webdav.service"
-      "radicale.service"
-      "unbound.service"
-    ];
+    after = [ "network.target" ];
 
     script = ''
       # 0. Clean up any remnants from previous failed attempts
-      # This deletes the namespace, ignoring errors if it's already gone.
       ${pkgs.iproute2}/bin/ip netns del ${vpnnsName} || true
 
-      # 1. Create the Network Namespace (Now guaranteed to be new)
+      # 1. Create the Network Namespace
       ${pkgs.iproute2}/bin/ip netns add ${vpnnsName}
 
-      # 2. Move the WireGuard interface into the NetNS
-      ${pkgs.iproute2}/bin/ip link set dev ${vpnName} netns ${vpnnsName}
+      # 2. Setup VETH Pair for Host <-> Namespace Communication
+      # Creates two interfaces: veth-host (in host NS) and veth-ns (moved to vpnns)
+      ${pkgs.iproute2}/bin/ip link add veth-host type veth peer name veth-ns
+      ${pkgs.iproute2}/bin/ip link set dev veth-ns netns ${vpnnsName}
 
-      # 3. Configure loopback and default route inside the NetNS
+      # 3. Configure the Host side of the VETH
+      ${pkgs.iproute2}/bin/ip addr add ${vethHostIP}/24 dev veth-host
+      ${pkgs.iproute2}/bin/ip link set veth-host up
+
+      # 4. Configure the Namespace side of the VETH
+      ${pkgs.iproute2}/bin/ip -n ${vpnnsName} addr add ${vethNetnsIP}/24 dev veth-ns
+      ${pkgs.iproute2}/bin/ip -n ${vpnnsName} link set veth-ns up
+
+      # 5. Configure loopback inside the NetNS
       ${pkgs.iproute2}/bin/ip -n ${vpnnsName} link set lo up
-      ${pkgs.iproute2}/bin/ip -n ${vpnnsName} route add default via 10.0.0.1 dev ${vpnName}
-
-      # 4. Set up isolated DNS for the NetNS
-      mkdir -p /etc/netns/${vpnnsName}
-      echo "nameserver ${hostVPNIP}" > /etc/netns/${vpnnsName}/resolv.conf
     '';
 
     preStop = ''
-      # Keep the preStop cleanup for a clean shutdown
+      # Clean up the network namespace on shutdown
       ${pkgs.iproute2}/bin/ip netns del ${vpnnsName} || true
     '';
 
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-    };
-  };
-
-  systemd.services.nginx = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
-    };
-  };
-
-  systemd.services.vaultwarden = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
-    };
-  };
-
-  systemd.services.webdav = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
-    };
-  };
-
-  systemd.services.radicale = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
-    };
-  };
-
-  systemd.services.unbound = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
     };
   };
 }
