@@ -17,8 +17,18 @@ let
   tvPriority = "1000";
   tvInterface = "wg0";
 
+  # VPN
   vpnnsName = "vpnns";
   vpnName = "vpn-network";
+  hostVPNIP = "10.0.0.2";
+
+  # VETH
+  vethNetnsIP = "10.100.0.2"; # IP for services (Nginx, Unbound) to listen on
+  vethHostIP = "10.100.0.1"; # IP for services (AdGuard, ACME) to connect to
+  vethSubnet = "10.100.0.0/24";
+
+  # Unbound
+  unboundCustomPort = 5335;
 
   # SSH Key
   sshKey = "${keranodHomeDir}/.dotfiles/.ssh/id_ed25519";
@@ -200,10 +210,9 @@ in
       enable = true;
       interfaces = {
         "${vpnName}" = {
-          ips = [ "10.0.0.2/24" ];
+          ips = [ "${hostVPNIP}/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-          # Wireguard does not add any routes to any of the tables
-          table = "off";
+          interfaceNamespace = "${vpnnsName}";
           peers = [
             {
               name = "ABYSS";
@@ -400,10 +409,10 @@ in
     settings = {
       server = {
         interface = [ "0.0.0.0" ];
-        port = 5335;
+        port = unboundCustomPort;
         access-control = [
           "127.0.0.1 allow"
-          "10.0.0.0/24 allow"
+          "${vethSubnet} allow"
         ];
         harden-glue = true;
         harden-dnssec-stripped = true;
@@ -412,8 +421,6 @@ in
         edns-buffer-size = 1232;
         hide-identity = true;
         hide-version = true;
-        # force outbound queries to use this IP.
-        # outgoing-interface = "10.0.0.2";
       };
     };
   };
@@ -432,12 +439,12 @@ in
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
           "192.168.9.1"
-          "10.0.0.2"
+          "${vethHostIP}" # Host side of VETH
           "fd00:9::1"
         ];
         port = 53;
         upstream_dns = [
-          "127.0.0.1:5335"
+          "${vethNetnsIP}:${toString unboundCustomPort}"
         ];
         # Bootstrap DNS: used only to resolve the upstream hostnames
         bootstrap_dns = [ ];
@@ -458,23 +465,23 @@ in
           # equivalent of vault.keranod.dev → 10.0.0.2
           {
             domain = "${vaultDomain}";
-            answer = "10.0.0.2";
+            answer = "${hostVPNIP}";
           }
           {
             domain = "${giteaDomain}";
-            answer = "10.0.0.2";
+            answer = "${hostVPNIP}";
           }
           {
             domain = "${webdavDomain}";
-            answer = "10.0.0.2";
+            answer = "${hostVPNIP}";
           }
           {
             domain = "${radicaleDomain}";
-            answer = "10.0.0.2";
+            answer = "${hostVPNIP}";
           }
           {
             domain = "${adguardDomain}";
-            answer = "10.0.0.2";
+            answer = "${hostVPNIP}";
           }
         ];
       };
@@ -512,7 +519,7 @@ in
         # The SSH settings are nested under 'settings'
         ENABLE_SSH = true;
         SSH_PORT = 22;
-        SSH_LISTEN_ADDR = "10.0.0.2"; # Or "10.0.0.2:22" if needed
+        SSH_LISTEN_ADDR = "${hostVPNIP}"; # Or "10.0.0.2:22" if needed
       };
     };
   };
@@ -587,7 +594,7 @@ in
 
       listen = [
         {
-          addr = "10.0.0.2";
+          addr = "${hostVPNIP}";
           port = 443;
           ssl = true;
         }
@@ -611,7 +618,7 @@ in
 
       listen = [
         {
-          addr = "10.0.0.2";
+          addr = "${hostVPNIP}";
           port = 443;
           ssl = true;
         }
@@ -638,7 +645,7 @@ in
 
       listen = [
         {
-          addr = "10.0.0.2";
+          addr = "${hostVPNIP}";
           port = 443;
           ssl = true;
         }
@@ -667,7 +674,7 @@ in
 
       listen = [
         {
-          addr = "10.0.0.2";
+          addr = "${hostVPNIP}";
           port = 443;
           ssl = true;
         }
@@ -694,7 +701,7 @@ in
 
       listen = [
         {
-          addr = "10.0.0.2";
+          addr = "${hostVPNIP}";
           port = 443;
           ssl = true;
         }
@@ -749,7 +756,6 @@ in
       "webdav.service"
       "radicale.service"
       "unbound.service"
-      "adguardhome.service"
     ];
 
     script = ''
@@ -769,7 +775,7 @@ in
 
       # 4. Set up isolated DNS for the NetNS
       mkdir -p /etc/netns/${vpnnsName}
-      echo "nameserver 10.0.0.2" > /etc/netns/${vpnnsName}/resolv.conf
+      echo "nameserver ${hostVPNIP}" > /etc/netns/${vpnnsName}/resolv.conf
     '';
 
     preStop = ''
@@ -808,12 +814,6 @@ in
   };
 
   systemd.services.unbound = {
-    serviceConfig = {
-      NetworkNamespacePath = "/run/netns/${vpnnsName}";
-    };
-  };
-
-  systemd.services.adguardhome = {
     serviceConfig = {
       NetworkNamespacePath = "/run/netns/${vpnnsName}";
     };
