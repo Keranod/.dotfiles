@@ -95,10 +95,13 @@ mkfs.fat -F 32 "$PART1"
 fatlabel "$PART1" NIXBOOT
 
 # Apply LUKS encryption to the main partition
-echo -e "\n\n!!! ENTER LUKS PASSPHRASE NOW !!!\n\n"
-cryptsetup luksFormat "$PART2" --label NIXROOT_CRYPT
-echo -e "\n\n!!! ENTER LUKS PASSPHRASE TO UNLOCK !!!\n\n"
-cryptsetup luksOpen "$PART2" NIXROOT
+echo -e "\n\n!!! STARTING LUKS FORMAT. ENTER PASSPHRASE NOW (will wait indefinitely) !!!\n\n"
+# CRITICAL FIX: Use </dev/tty to force interactive, indefinite wait
+cryptsetup luksFormat "$PART2" --label NIXROOT_CRYPT </dev/tty
+
+echo -e "\n\n!!! LUKS FORMAT COMPLETE. ENTER PASSPHRASE TO UNLOCK (will wait indefinitely) !!!\n\n"
+# CRITICAL FIX: Use </dev/tty to force interactive, indefinite wait
+cryptsetup luksOpen "$PART2" NIXROOT </dev/tty
 
 # Format the unlocked volume
 mkfs.ext4 /dev/mapper/NIXROOT -L NIXROOT_FS
