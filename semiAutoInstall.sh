@@ -58,19 +58,24 @@ echo "UEFI mode: $IS_UEFI"
 # Wipe the disk (destroy all existing partitions)
 echo "Wiping disk $DISK..."
 wipefs --all --force "$DISK"
-# parted --script $DISK mklabel gpt
+
+# ----------------------------------------------------
+# PARTITIONING
+# ----------------------------------------------------
 
 if [ "$IS_UEFI" == "true" ]; then
   echo "Partitioning $DISK for UEFI (GPT)..."
   parted $DISK -- mklabel gpt
-  parted $DISK -- mkpart ESP fat32 1MiB 512MiB
+  parted $DISK -- mkpart ESP fat32 1MiB 512MiB # PART1: /boot
   parted $DISK -- set 1 esp on
-  parted $DISK -- mkpart primary ext4 512MiB 100%
+  # PART2: The main partition for LUKS (no filesystem type specified here)
+  parted $DISK -- mkpart primary 512MiB 100% 
 else
-echo "Partitioning $DISK for Legacy (MBR)..."
-parted $DISK -- mklabel msdos
-parted $DISK -- mkpart primary ext4 1MiB 500MiB
-parted $DISK -- mkpart primary ext4 500MiB 100%
+  echo "Partitioning $DISK for Legacy (MBR)..."
+  parted $DISK -- mklabel msdos
+  parted $DISK -- mkpart primary ext4 1MiB 500MiB # PART1: /boot
+  # PART2: The main partition for LUKS (no filesystem type specified here)
+  parted $DISK -- mkpart primary 500MiB 100%
 fi
 
 # Verify partitions exist
@@ -79,26 +84,40 @@ if [ ! -b "$PART1" ] || [ ! -b "$PART2" ]; then
   exit 1
 fi
 
-echo "Formatting and labeling partitions..."
+# ----------------------------------------------------
+# FORMATTING AND ENCRYPTION (CRITICAL CHANGES HERE)
+# ----------------------------------------------------
+
+echo "Formatting and ENCRYPTING partitions..."
+
+# Format /boot
 mkfs.fat -F 32 "$PART1"
 fatlabel "$PART1" NIXBOOT
-mkfs.ext4 "$PART2" -L NIXROOT
+
+# Apply LUKS encryption to the main partition
+echo -e "\n\n!!! ENTER LUKS PASSPHRASE NOW !!!\n\n"
+cryptsetup luksFormat "$PART2" --label NIXROOT_CRYPT
+echo -e "\n\n!!! ENTER LUKS PASSPHRASE TO UNLOCK !!!\n\n"
+cryptsetup luksOpen "$PART2" NIXROOT
+
+# Format the unlocked volume
+mkfs.ext4 /dev/mapper/NIXROOT -L NIXROOT_FS
 
 # Wait for commands to finish
 sync
-sleep 1  # Wait a second for the formatting to be fully registered
+sleep 1
 lsblk -o name,mountpoint,label,size,uuid
-# Reread partition table
 blockdev --rereadpt $DISK
-
-# Wait to ensure the partition table is reread
 sleep 1
 
-# Mount partitions
+# ----------------------------------------------------
+# MOUNTING (Use the decrypted device)
+# ----------------------------------------------------
 echo "Mounting partitions..."
-mount /dev/disk/by-label/NIXROOT /mnt
+# Mount the decrypted volume as root
+mount /dev/mapper/NIXROOT /mnt 
 mkdir -p /mnt/boot
-mount /dev/disk/by-label/NIXBOOT /mnt/boot
+mount "$PART1" /mnt/boot # Mount /boot partition
 
 # Check if both /mnt and /mnt/boot are mounted successfully
 if mount | grep -q "/mnt" && mount | grep -q "/mnt/boot"; then
@@ -108,13 +127,30 @@ else
   exit 1
 fi
 
-echo "Partitioning and formatting complete."
+echo "Partitioning, encryption, and mounting complete."
 
-echo "Creating swap file"
-dd if=/dev/zero of=/mnt/.swapfile bs=1024 count=2097152 # 2GB size
+# ----------------------------------------------------
+# SWAP (Inside the encrypted volume)
+# ----------------------------------------------------
+echo "Creating swap file INSIDE the encrypted volume"
+dd if=/dev/zero of=/mnt/.swapfile bs=1M count=2048 # 2GB size
 chmod 600 /mnt/.swapfile
 mkswap /mnt/.swapfile
 swapon /mnt/.swapfile
+
+# ----------------------------------------------------
+# CONFIG GENERATION
+# ----------------------------------------------------
+# Generate configuration after LUKS device is opened and mounted
+# Check if configuration.nix exists for the hostname
+if [ ! -f "/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; then
+  echo "Error: configuration.nix not found for '$HOSTNAME'"
+  exit 1
+fi
+
+# Generate configuration for NixOS
+echo "Generating NixOS configuration..."
+nixos-generate-config --root /mnt
 
 # Install git and clone dotfiles
 echo "Installing git and cloning dotfiles..."
@@ -125,16 +161,6 @@ if [ ! -d "/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME" ]; then
   echo "Error: Host configuration for '$HOSTNAME' not found in .dotfiles/hosts/"
   exit 1
 fi
-
-# Check if configuration.nix exists for the hostname
-if [ ! -f "/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME/configuration.nix" ]; then
-  echo "Error: configuration.nix not found for '$HOSTNAME'"
-  exit 1
-fi
-
-# Generate configuration for NixOS
-echo "Generating NixOS configuration..."
-nixos-generate-config --root /mnt
 
 CONFIG_PATH="/mnt/etc/nixos/hardware-configuration.nix"
 TARGET_PATH="/mnt/home/$USERNAME/.dotfiles/hosts/$HOSTNAME/hardware-configuration.nix"

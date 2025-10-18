@@ -126,6 +126,17 @@
             ./modules/config/virtualBox.nix
           ];
         };
+        NixOSTest = lib.nixosSystem {
+          # Architecture
+          inherit system;
+          # List/Array of modules
+          modules = [
+            ./hosts/NixOSTest/configuration.nix
+            ./modules/config/users.nix
+            ./modules/config/commonConfig.nix
+            sops-nix.nixosModules.sops
+          ];
+        };
       };
       homeConfigurations = {
         "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
@@ -168,6 +179,13 @@
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/NetworkBox/home.nix
+          ];
+        };
+        "keranod@NixOSTest" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./modules/homeManager/commonHome.nix
+            ./hosts/NixOSTest/home.nix
           ];
         };
         "franz@FranzNix" = home-manager.lib.homeManagerConfiguration {
