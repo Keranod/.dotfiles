@@ -56,6 +56,10 @@ in
     ./hardware-configuration.nix
   ];
 
+  # Apply TPM-LUKS configuration if the hardware scan detected encryption
+  # Otherwise, tpmLuksConfig will be an empty set, ensuring an unencrypted boot works.
+  config = builtins.if isEncrypted then tpmLuksConfig else {};
+
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

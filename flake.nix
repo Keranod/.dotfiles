@@ -41,6 +41,11 @@
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
+
+      PRIMARY_USER = "keranod";
+
+      NIXOS_TEST_VM = "NixOSTest";
+
       pkgs = import nixpkgs {
         inherit system;
         config = {
@@ -126,12 +131,15 @@
             ./modules/config/virtualBox.nix
           ];
         };
-        NixOSTest = lib.nixosSystem {
+        "${NIXOS_TEST_VM}" = lib.nixosSystem {
           # Architecture
           inherit system;
+          specialArgs = {
+            inherit PRIMARY_USER NIXOS_TEST_VM; # These are now accessible inside the modules
+          };
           # List/Array of modules
           modules = [
-            ./hosts/NixOSTest/configuration.nix
+            ./hosts/${NIXOS_TEST_VM}/configuration.nix
             ./modules/config/users.nix
             ./modules/config/commonConfig.nix
             sops-nix.nixosModules.sops
@@ -139,7 +147,7 @@
         };
       };
       homeConfigurations = {
-        "keranod@TufNix" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@TufNix" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
@@ -150,21 +158,21 @@
             ./hosts/TufNix/home.nix
           ];
         };
-        "keranod@MainServer" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@MainServer" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/MainServer/home.nix
           ];
         };
-        "keranod@ABYSS" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@ABYSS" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/ABYSS/home.nix
           ];
         };
-        "keranod@VMNixOSWork" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@VMNixOSWork" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = { inherit pkgsUnstable_; };
           modules = [
@@ -174,18 +182,18 @@
             ./hosts/VMNixOSWork/home.nix
           ];
         };
-        "keranod@NetworkBox" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@NetworkBox" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/homeManager/commonHome.nix
             ./hosts/NetworkBox/home.nix
           ];
         };
-        "keranod@NixOSTest" = home-manager.lib.homeManagerConfiguration {
+        "${PRIMARY_USER}@${NIXOS_TEST_VM}" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./modules/homeManager/commonHome.nix
-            ./hosts/NixOSTest/home.nix
+            ./hosts/${NIXOS_TEST_VM}/home.nix
           ];
         };
         "franz@FranzNix" = home-manager.lib.homeManagerConfiguration {
