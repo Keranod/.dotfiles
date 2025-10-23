@@ -228,7 +228,7 @@ in
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           listenPort = 51830;
-	  table = "102";
+	        table = "102";
           postSetup = "ip rule add from 10.0.0.2 lookup 102";
           postShutdown = "ip rule del from 10.0.0.2 lookup 102";
           peers = [
@@ -243,6 +243,7 @@ in
               allowedIPs = [
                 "0.0.0.0/0"
               ];
+              persistentKeepalive = 25
             }
           ];
         };
