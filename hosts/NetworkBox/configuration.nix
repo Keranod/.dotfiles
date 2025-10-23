@@ -212,7 +212,7 @@ in
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
           listenPort = 51830;
-	        table = "102";
+          table = "102";
           postSetup = "ip rule add from 10.0.0.2 lookup 102";
           postShutdown = "ip rule del from 10.0.0.2 lookup 102";
           peers = [
@@ -238,70 +238,70 @@ in
     nftables = {
       enable = true;
       ruleset = ''
-        table inet myfilter {
-            # The 'input' chain filters traffic coming IN to the NetworkBox host.
-            chain input {
-              type filter hook input priority 0; policy drop;
-              
-              # Allow all loopback traffic
-              iifname "lo" accept;
+                table inet myfilter {
+                  # The 'input' chain filters traffic coming IN to the NetworkBox host.
+                  chain input {
+                    type filter hook input priority 0; policy drop;
 
-              # Allow inbound connections for existing connections
-              ct state { established, related } accept;
-	      
-	      # Allow default wireguard port in
-              iifname "enp3s0" udp dport 51830 accept;
-	      
-	      # Allow DHCP queries
-	      iifname "enp3s0" udp dport 67 accept;
+                    # Allow all loopback traffic
+                    iifname "lo" accept;
 
-	      # Allow DNS queries
-	      iifname "enp3s0" udp dport 53 accept;
-	      iifname "enp3s0" tcp dport 53 accept;
+                    # Allow inbound connections for existing connections
+                    ct state { established, related } accept;
+          
+        	          # Allow default wireguard port in
+                    iifname "enp3s0" udp dport 51830 accept;
 
-              # Allow incoming SSH connections from specified interfaces.
-              iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
+        	          # Allow DHCP queries
+        	          iifname "enp3s0" udp dport 67 accept;
 
-              # Allow all traffic from LAN and VPN interfaces to the NetworkBox
-            	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
-            	iifname { "enp0s20u1c2", "vpn-network" } accept;
-            }
+        	          # Allow DNS queries
+        	          iifname "enp3s0" udp dport 53 accept;
+        	          iifname "enp3s0" tcp dport 53 accept;
 
-            # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
-            chain output {
-                type filter hook output priority 0; policy drop;
+                    # Allow incoming SSH connections from specified interfaces.
+                    iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
 
-                # Allow loopback traffic
-                oifname "lo" accept;
+                    # Allow all traffic from LAN and VPN interfaces to the NetworkBox
+                  	# (This covers AdGuard DNS queries from clients, pings to this box, etc.)
+                  	iifname { "enp0s20u1c2", "vpn-network" } accept;
+                  }
 
-                # Allow traffic for established connections to continue
-                ct state { established, related } accept;
+                  # The 'output' chain filters traffic ORIGINATING from the NetworkBox host.
+                  chain output {
+                    type filter hook output priority 0; policy drop;
 
-                # Allow all traffic destined for VPN and LAN interfaces to pass.
-                oifname { "vpn-network", "enp0s20u1c2" } accept;
+                    # Allow loopback traffic
+                    oifname "lo" accept;
 
-                # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
-                oifname "enp3s0" meta skuid 989 udp dport 53 accept;
+                    # Allow traffic for established connections to continue
+                    ct state { established, related } accept;
 
-                # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
-                # on the physical WAN interface or the wg-vps tunnel.
-                oifname "enp3s0" tcp dport { 53, 853 } drop;
-                oifname "enp3s0" udp dport { 53, 853 } drop;
+                    # Allow all traffic destined for VPN and LAN interfaces to pass.
+                    oifname { "vpn-network", "enp0s20u1c2" } accept;
 
-                # Allow all other traffic from the NetworkBox to go directly to the WAN.
-                oifname "enp3s0" accept;
-            }
-        }
+                    # Allow DNS queries for the ACME user (UID 989) (check UID using `id acme`) on the public interface
+                    oifname "enp3s0" meta skuid 989 udp dport 53 accept;
 
-            # The NAT table for masquerading traffic from the LAN.
-        table ip nat {
-            chain postrouting {
-                type nat hook postrouting priority 100; policy accept;
-                
-                # Masquerade all other LAN traffic to exit via the WAN.
-                ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
-            }
-        }
+                    # CRITICAL: EXPLICITLY DROP all DNS traffic that tries to leave
+                    # on the physical WAN interface or the wg-vps tunnel.
+                    oifname "enp3s0" tcp dport { 53, 853 } drop;
+                    oifname "enp3s0" udp dport { 53, 853 } drop;
+
+                    # Allow all other traffic from the NetworkBox to go directly to the WAN.
+                    oifname "enp3s0" accept;
+                  }
+                }
+
+                # The NAT table for masquerading traffic from the LAN.
+                table ip nat {
+                  chain postrouting {
+                    type nat hook postrouting priority 100; policy accept;
+                    
+                    # Masquerade all other LAN traffic to exit via the WAN.
+                    ip saddr 192.168.9.0/24 oifname "enp3s0" masquerade;
+                  }
+                }
       '';
     };
   };
@@ -391,22 +391,22 @@ in
     enable = false;
     config = ''
       interface enp0s20u1c2 {
-          AdvSendAdvert on;
-          prefix fd00:9::/64 {
-            AdvOnLink      on;
-            AdvAutonomous  on;   # clients auto-SLAAC a ULA
-          };
-
-          # tell clients to use your ULA DNS
-          RDNSS fd00:9::1 {
-            AdvRDNSSLifetime 600;
-          };
-
-          # Add this to tell clients to route all IPv6 traffic via you
-          route ::/0 {
-              AdvRoutePreference medium;
-          };
+        AdvSendAdvert on;
+        prefix fd00:9::/64 {
+          AdvOnLink      on;
+          AdvAutonomous  on;   # clients auto-SLAAC a ULA
         };
+
+        # tell clients to use your ULA DNS
+        RDNSS fd00:9::1 {
+          AdvRDNSSLifetime 600;
+        };
+
+        # Add this to tell clients to route all IPv6 traffic via you
+        route ::/0 {
+            AdvRoutePreference medium;
+        };
+      };
     '';
   };
 
@@ -444,8 +444,8 @@ in
       dns = {
         bind_hosts = [
           "127.0.0.1"
-	  "192.168.8.2"
-          "10.0.0.2"         
+          "192.168.8.2"
+          "10.0.0.2"
         ];
         port = 53;
         upstream_dns = [
