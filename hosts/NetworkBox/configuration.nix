@@ -192,7 +192,6 @@ in
     defaultGateway = "192.168.8.1";
 
     # LAN: serve 192.168.9.0/24 on enp0s20u1c2
-<<<<<<< HEAD
     #interfaces.enp0s20u1c2.ipv4.addresses = [
     #  {
     #    address = "192.168.9.1";
@@ -204,21 +203,6 @@ in
     #    address = "fd00:9::1";
     #    prefixLength = 64;
     #  }
-    #];
-=======
-    # interfaces.enp0s20u1c2.ipv4.addresses = [
-    #   {
-    #     address = "192.168.9.1";
-    #     prefixLength = 24;
-    #   }
-    # ];
-    # interfaces.enp0s20u1c2.ipv6.addresses = [
-    #   {
-    #     address = "fd00:9::1";
-    #     prefixLength = 64;
-    #   }
-    # ];
->>>>>>> 6980559ab19ae8e07e2cf8f4f95d4daf618f7958
 
     wireguard = {
       enable = true;
@@ -243,7 +227,7 @@ in
               allowedIPs = [
                 "0.0.0.0/0"
               ];
-              persistentKeepalive = 25
+              persistentKeepalive = 25;
             }
           ];
         };
@@ -455,15 +439,8 @@ in
       # DNS
       dns = {
         bind_hosts = [
-<<<<<<< HEAD
           "127.0.0.1"
           "10.0.0.2"         
-=======
-          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
-          #"192.168.9.1"
-          "10.0.0.2"
-          "fd00:9::1"
->>>>>>> 6980559ab19ae8e07e2cf8f4f95d4daf618f7958
         ];
         port = 53;
         upstream_dns = [
