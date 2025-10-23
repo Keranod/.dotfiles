@@ -212,7 +212,8 @@ in
           ips = [ "10.0.0.2/24" ];
           privateKeyFile = "/etc/wireguard/${serverHostName}.key";
           # Do not remove. Otherwise WG will put to main table sending all traffic using this WG
-          table = "102";
+          listenPort = 51830;
+	  table = "102";
           postSetup = "ip rule add from 10.0.0.2 lookup 102";
           postShutdown = "ip rule del from 10.0.0.2 lookup 102";
           peers = [
@@ -249,7 +250,7 @@ in
               ct state { established, related } accept;
 	      
 	      # Allow default wireguard port in
-              iifname "enp3s0" udp dport 51820 accept;
+              iifname "enp3s0" udp dport 51830 accept;
 
               # Allow incoming SSH connections from specified interfaces.
               iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
@@ -438,10 +439,8 @@ in
       # DNS
       dns = {
         bind_hosts = [
-          "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
-          #"192.168.9.1"
-          "10.0.0.2"
-          "fd00:9::1"
+          "127.0.0.1"
+          "10.0.0.2"         
         ];
         port = 53;
         upstream_dns = [
