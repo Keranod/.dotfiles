@@ -192,18 +192,18 @@ in
     defaultGateway = "192.168.8.1";
 
     # LAN: serve 192.168.9.0/24 on enp0s20u1c2
-    interfaces.enp0s20u1c2.ipv4.addresses = [
-      {
-        address = "192.168.9.1";
-        prefixLength = 24;
-      }
-    ];
-    interfaces.enp0s20u1c2.ipv6.addresses = [
-      {
-        address = "fd00:9::1";
-        prefixLength = 64;
-      }
-    ];
+    #interfaces.enp0s20u1c2.ipv4.addresses = [
+    #  {
+    #    address = "192.168.9.1";
+    #    prefixLength = 24;
+    #  }
+    #];
+    #interfaces.enp0s20u1c2.ipv6.addresses = [
+    #  {
+    #    address = "fd00:9::1";
+    #    prefixLength = 64;
+    #  }
+    #];
 
     wireguard = {
       enable = true;
@@ -247,6 +247,9 @@ in
 
               # Allow inbound connections for existing connections
               ct state { established, related } accept;
+	      
+	      # Allow default wireguard port in
+              iifname "enp3s0" udp dport 51820 accept;
 
               # Allow incoming SSH connections from specified interfaces.
               iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
@@ -362,7 +365,7 @@ in
   };
 
   services.dnsmasq = {
-    enable = true;
+    enable = false;
     settings = {
       interface = "enp0s20u1c2";
       bind-interfaces = true;
@@ -380,7 +383,7 @@ in
   };
 
   services.radvd = {
-    enable = true;
+    enable = false;
     config = ''
       interface enp0s20u1c2 {
           AdvSendAdvert on;
@@ -436,7 +439,7 @@ in
       dns = {
         bind_hosts = [
           "127.0.0.1" # <- needs to have localhost oterwise nixos overrides nameservers in netwroking and domain resolution does not work at all
-          "192.168.9.1"
+          #"192.168.9.1"
           "10.0.0.2"
           "fd00:9::1"
         ];
