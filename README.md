@@ -122,6 +122,7 @@ nginx_webdav_users: |
 
 - When rebuilding rename/remove `hardware-configuration.nix` and `id_ed25519.pub`
 - In `flake.nix` make sure to add machine in `nixosConfigurations` and user on the machine in `homeConfigurations`
+- when creating `configuration.nix` and setting up networking just simply check the name of the interface/s before running this install using `ifconfig`
 - `PROXY` - add proxy settings in `configuration.nix` and `home.nix` otherwise no internet access after install and browser will not get internet and some other apps
 - disk check using `lsblk` and hostname needs to match name in hosts folder and confifuration.nix needs to be present in that folder
 - CASE SENSITIVE COMMAND

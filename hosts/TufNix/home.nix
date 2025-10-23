@@ -17,6 +17,8 @@ in
     unar
     tor-browser-bundle-bin
     evolution
+    libreoffice
+    obs-studio
   ];
 
   programs.firefox = {
