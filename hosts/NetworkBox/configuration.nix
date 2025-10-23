@@ -251,6 +251,13 @@ in
 	      
 	      # Allow default wireguard port in
               iifname "enp3s0" udp dport 51830 accept;
+	      
+	      # Allow DHCP queries
+	      iifname "enp3s0" udp dport 67 accept;
+
+	      # Allow DNS queries
+	      iifname "enp3s0" udp dport 53 accept;
+	      iifname "enp3s0" tcp dport 53 accept;
 
               # Allow incoming SSH connections from specified interfaces.
               iifname { "enp0s20u1c2", "vpn-network", "enp3s0" } tcp dport 22 accept;
@@ -366,19 +373,16 @@ in
   };
 
   services.dnsmasq = {
-    enable = false;
+    enable = true;
     settings = {
-      interface = "enp0s20u1c2";
+      interface = "enp3s0";
       bind-interfaces = true;
       port = 0;
 
-      dhcp-range = [ "192.168.9.100,192.168.9.200,24h" ];
+      dhcp-range = [ "192.168.8.100,192.168.8.200,24h" ];
       dhcp-option = [
-        "3,192.168.9.1"
-        "6,192.168.9.1"
-      ];
-      dhcp-host = [
-        "7C:F1:7E:6C:60:00,192.168.9.2"
+        "3,192.168.8.1"
+        "6,192.168.8.2"
       ];
     };
   };
