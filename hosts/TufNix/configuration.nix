@@ -158,6 +158,7 @@ in
               "::/0"
             ];
             endpoint = "46.62.157.130:51820";
+            persistentKeepalive = 25;
           }
         ];
       };
