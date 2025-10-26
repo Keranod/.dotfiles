@@ -124,6 +124,9 @@ in
 
             # Allow established and related connections
             ct state established,related accept;
+
+            # Allow default wireguard port in
+            iifname "wlp47s0" udp dport 51830 accept;
             
             # Allow inbound TCP traffic to port 45000 from 192.168.9.0/24
             ip saddr 192.168.9.0/24 tcp dport 45000 accept
@@ -149,7 +152,7 @@ in
         address = [ "10.0.0.4/24" ];
         dns = [ "10.0.0.2" ];
         privateKeyFile = "/etc/wireguard/${serverHostName}.key";
-
+        listenPort = 51830;
         peers = [
           {
             publicKey = "UIFwVqeUVYxH4QhWqyfh/Qi1HdYD1Y/YrBemuK9dZxo=";
