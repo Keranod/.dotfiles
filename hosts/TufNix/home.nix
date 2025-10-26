@@ -13,7 +13,7 @@ in
     blender
     qbittorrent
     handbrake
-    wechat-uos
+    #wechat-uos
     unar
     tor-browser-bundle-bin
     evolution

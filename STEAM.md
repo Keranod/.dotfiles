@@ -5,6 +5,7 @@
 # Game Saves
 
 - Using Cheat Engine access stored games savefiles to make backups
+- `C:\users\steamuser\Application Data\EldenRing\<random number>`
 
 # Elden Ring
 
