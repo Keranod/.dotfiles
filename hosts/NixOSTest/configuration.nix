@@ -17,9 +17,6 @@ in
   
   # Enable systemd services in the initrd for advanced decryption methods
   boot.initrd.systemd.enable = true; 
-  
-  # Enable LUKS decryption support in the initial ramdisk (initrd)
-  boot.initrd.luks.enable = true;
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
