@@ -21,11 +21,6 @@ in
   # Enable LUKS decryption support in the initial ramdisk (initrd)
   boot.initrd.luks.enable = true;
 
-  # Optionally, force systemd-cryptsetup to automatically detect and use 
-  # any sealed TPM key slots. This works for both TPM-only and TPM+PIN.
-  # This makes the config generic across both PIN policies.
-  boot.initrd.systemd.cryptsetup.enable = true;
-
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
