@@ -6,49 +6,6 @@
 
 let
   serverHostName = "NixOSTest";
-
-  # Check if the hardware configuration contains the LUKS device mapping
-  isEncrypted = builtins.hasAttr "NIXROOT" config.boot.initrd.luks.devices;
-
-  # --- TPM-LUKS Configuration Block ---
-  # This block is only enabled if the hardware scan detected the LUKS volume,
-  # but the services are always enabled for safety if the user decides to enable it later.
-  tpmLuksConfig = {
-    # 1. Enable TPM2 (Trusted Platform Module) services
-    services.tpm2-setup.enable = true;
-
-    # 2. Add the tpm2-luks utility and ensure it's in the initrd
-    environment.systemPackages = with pkgs; [ tpm2-luks ];
-    boot.initrd.extraUtils = [
-      "tpm2-tools"
-      "tpm2-luks"
-    ];
-
-    # 3. Configure the Initrd for LUKS if encryption is detected
-    boot.initrd.luks = {
-      enable = true; # Enables LUKS processing in the initrd
-
-      # Configure the NIXROOT device for TPM unsealing.
-      # This block will only be applied if the hardware scan found NIXROOT.
-      devices =
-        builtins.filterAttrs (name: device: name == "NIXROOT")
-          # Use the existing device definition from hardware-configuration.nix
-          config.boot.initrd.luks.devices
-        // {
-          # Overlay the existing NIXROOT device with the TPM specific settings
-          NIXROOT = {
-            keyFile = "/etc/tpm2-luks/keyfile";
-
-            # This command is run to unseal the key file from the TPM
-            preLuks = ''
-              ${pkgs.tpm2-luks}/bin/tpm2-luks-unseal /etc/tpm2-luks/keyfile
-            '';
-            # Increase timeout to ensure the tpm2-unseal process has time to run
-            timeout = 60;
-          };
-        };
-    };
-  };
 in
 {
   imports = [
@@ -56,9 +13,18 @@ in
     ./hardware-configuration.nix
   ];
 
-  # Apply TPM-LUKS configuration if the hardware scan detected encryption
-  # Otherwise, tpmLuksConfig will be an empty set, ensuring an unencrypted boot works.
-  config = builtins.if isEncrypted then tpmLuksConfig else {};
+  # --- FDE & TPM Configuration ---
+  
+  # Enable systemd services in the initrd for advanced decryption methods
+  boot.initrd.systemd.enable = true; 
+  
+  # Enable LUKS decryption support in the initial ramdisk (initrd)
+  boot.initrd.luks.enable = true;
+
+  # Optionally, force systemd-cryptsetup to automatically detect and use 
+  # any sealed TPM key slots. This works for both TPM-only and TPM+PIN.
+  # This makes the config generic across both PIN policies.
+  boot.initrd.systemd.cryptsetup.enable = true;
 
   # Default settings for EFI
   boot.loader.systemd-boot.enable = true;
@@ -66,10 +32,6 @@ in
   fileSystems."/boot" = {
     fsType = "vfat";
   };
-
-  # Full Disk Encryption (FDE)
-  # This enables LUKS decryption support in the initial ramdisk (initrd)
-  boot.initrd.luks.enable = true;
 
   boot.kernel.sysctl = {
     # IPv4

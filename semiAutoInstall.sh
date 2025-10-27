@@ -6,12 +6,14 @@ HOSTNAME="${2:?Error: you must specify a hostname}"
 USERNAME="${3:?Error: you must specify a username}"; USERNAME="${USERNAME,,}"
 EMAIL="${4:?Error: you must specify an email}"; EMAIL="${EMAIL,,}"
 PROXY="${5:-}"; PROXY="${PROXY,,}"
+PIN_POLICY="${6:-none}"; PIN_POLICY="${PIN_POLICY,,}" # NEW: 'pin' or 'none'
 
-echo "Disk:     $DISK"
-echo "Host:     $HOSTNAME"
-echo "User:     $USERNAME"
-echo "Email:    $EMAIL"
-echo "Proxy:    ${PROXY:-<none>}"
+echo "Disk:      $DISK"
+echo "Host:      $HOSTNAME"
+echo "User:      $USERNAME"
+echo "Email:     $EMAIL"
+echo "Proxy:     ${PROXY:-<none>}"
+echo "PIN Policy: ${PIN_POLICY}"
 
 # Determine partition suffix (p1/p2 for disks ending in a number)
 if [[ "$DISK" =~ [0-9]$ ]]; then
@@ -23,7 +25,7 @@ else
 fi
 
 # ----------------------------------------------------
-# PROXY SETUP (FILLED GAP)
+# PROXY SETUP
 # ----------------------------------------------------
 
 # Check if a proxy is provided
@@ -41,7 +43,7 @@ else
 fi
 
 # ----------------------------------------------------
-# DETECT UEFI/TPM (From Original)
+# DETECT UEFI/TPM
 # ----------------------------------------------------
 
 # Check if EFI variables are supported
@@ -71,7 +73,7 @@ echo "Wiping disk $DISK..."
 wipefs --all --force "$DISK"
 
 # ----------------------------------------------------
-# PARTITIONING (Modified for Encryption/Unencrypted Path)
+# PARTITIONING
 # ----------------------------------------------------
 
 if [ "$IS_UEFI" == "true" ]; then
@@ -105,34 +107,28 @@ fatlabel "$PART1" NIXBOOT
 if [ "$IS_ENCRYPTED" == "true" ]; then
   echo "Applying LUKS encryption to $PART2..."
   
-  # CRITICAL FIX: Use </dev/tty to force interactive, indefinite wait
+  # CRITICAL: Forces interactive passphrase prompt.
   echo -e "\n\n!!! STARTING LUKS FORMAT. ENTER MANUAL PASSPHRASE NOW (will wait indefinitely) !!!\n\n"
-  # Use --type luks2 for modern features
   cryptsetup luksFormat "$PART2" --type luks2 --label NIXROOT_CRYPT </dev/tty
 
   echo -e "\n\n!!! LUKS FORMAT COMPLETE. ENTER PASSPHRASE TO UNLOCK (will wait indefinitely) !!!\n\n"
   cryptsetup luksOpen "$PART2" NIXROOT </dev/tty
 
   # Get the UUID of the physical partition for the post-install seal command
-  # This is the UUID of the LUKS container, NOT the mapped device.
   ENCRYPTED_UUID=$(blkid -s UUID -o value "$PART2")
   
-  # Format the unlocked volume
+  # Format and Mount
   echo "Formatting unlocked volume as ext4..."
   mkfs.ext4 /dev/mapper/NIXROOT -L NIXROOT_FS
-
-  # Mount the decrypted volume as root
   mount /dev/mapper/NIXROOT /mnt
 else
   echo "Formatting $PART2 as standard ext4 (unencrypted)..."
   mkfs.ext4 "$PART2" -L NIXROOT_FS
-  
-  # Mount the unencrypted volume as root
   mount "$PART2" /mnt
 fi
 
 mkdir -p /mnt/boot
-mount "$PART1" /mnt/boot # Mount /boot partition
+mount "$PART1" /mnt/boot
 
 # Check mounts
 if mount | grep -q "/mnt" && mount | grep -q "/mnt/boot"; then
@@ -259,15 +255,23 @@ echo "Starting NixOS installation..."
 INSTALL_CMD="nixos-install --flake /mnt/home/$USERNAME/.dotfiles#$HOSTNAME"
 
 if [ "$IS_ENCRYPTED" == "true" ]; then
-    # Create the sealing command dynamically using the captured UUID
-    # NOTE: The tpm2-luks package MUST be available in the target configuration.nix
-    SEAL_COMMAND='${pkgs.tpm2-luks}/bin/tpm2-luks-seal --device /dev/disk/by-uuid/'"${ENCRYPTED_UUID}"' --slot 1'
-    
-    echo "Adding TPM sealing to post-install hook..."
-    echo "NOTE: You MUST enter the LUKS passphrase AGAIN for sealing during the installation."
-    
-    # IMPORTANT: The --post-install hook runs the SEAL_COMMAND inside the new system,
-    # prompting the user for the passphrase to seal the key.
+    echo "Using systemd-cryptenroll for TPM sealing."
+
+    # Build the conditional PIN argument
+    SEAL_PIN_ARG=""
+    if [ "$PIN_POLICY" == "pin" ] || [ "$PIN_POLICY" == "tpm+pin" ]; then
+        SEAL_PIN_ARG="--tpm2-with-pin=yes"
+        echo "PIN Policy: TPM + PIN. You will be prompted for a new PIN."
+    else
+        echo "PIN Policy: TPM-Only. Automatic unlock enabled."
+    fi
+
+    # The actual sealing command to be run inside the new system
+    # We use PCR 7 (Secure Boot) and a temporary slot 8 for the sealing key
+    # The command will first prompt for the LUKS passphrase to add the new key.
+    SEAL_COMMAND='${pkgs.systemd}/bin/systemd-cryptenroll --recovery-key --tpm2-device=auto --tpm2-pcrs=7 '"${SEAL_PIN_ARG}"' /dev/disk/by-uuid/'"${ENCRYPTED_UUID}"
+
+    echo "Adding TPM sealing to post-install hook. Be ready to enter your LUKS passphrase and/or new PIN."
     $INSTALL_CMD --post-install "$SEAL_COMMAND"
 else
     $INSTALL_CMD
